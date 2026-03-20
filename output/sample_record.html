@@ -51,7 +51,7 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 .hand-tiles {
     display: flex; flex-wrap: nowrap; gap: 2px; align-items: flex-end;
 }
-.hand-top .hand-tiles { justify-content: center; }
+.hand-top .hand-tiles { justify-content: center; transform: rotate(180deg); }
 .hand-bottom .hand-tiles { justify-content: center; }
 
 /* 左右の手牌: 回転して中心向き */
@@ -96,11 +96,13 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     grid-template-columns: repeat(6, auto);
     justify-content: center; min-height: 36px;
 }
+.river-top { transform: rotate(180deg); }
 .river-left {
     grid-template-rows: repeat(6, auto);
     grid-auto-flow: column;
     align-content: center; min-width: 36px;
     overflow: hidden;
+    direction: rtl;
 }
 .river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
 .river-right {
@@ -310,7 +312,12 @@ function getActiveSeat() {
 
 function renderHand(seat, isVertical) {
     let html = '';
-    for (let t = 0; t < 34; t++) {
+    // South (seat 1): reverse order for 90° CW rotation
+    let reversed = (seat === 1);
+    let start = reversed ? 33 : 0;
+    let end = reversed ? -1 : 34;
+    let step = reversed ? -1 : 1;
+    for (let t = start; t !== end; t += step) {
         for (let c = 0; c < hands[seat][t]; c++) {
             let cls = (lastDraw[seat] === t && c === hands[seat][t] - 1) ? "draw-highlight" : "";
             html += isVertical ? tileVert(t, cls) : tileImg(t, cls);
@@ -320,12 +327,21 @@ function renderHand(seat, isVertical) {
 }
 
 function renderRiver(seat, isVertical) {
+    let tiles = rivers[seat];
+    // South (seat 1): reverse within each group of 6 for 90° CW rotation
+    if (seat === 1) {
+        tiles = [];
+        for (let i = 0; i < rivers[seat].length; i += 6) {
+            let group = rivers[seat].slice(i, Math.min(i + 6, rivers[seat].length));
+            tiles.push(...group.reverse());
+        }
+    }
     let html = '';
-    for (let r = 0; r < rivers[seat].length; r++) {
-        let cls = rivers[seat][r].isLast ? "discard-last" : "";
-        if (rivers[seat][r].riichi) cls += " riichi-tile";
-        html += isVertical ? tileRiverVert(rivers[seat][r].tile, cls) :
-                             tileRiver(rivers[seat][r].tile, cls);
+    for (let r = 0; r < tiles.length; r++) {
+        let cls = tiles[r].isLast ? "discard-last" : "";
+        if (tiles[r].riichi) cls += " riichi-tile";
+        html += isVertical ? tileRiverVert(tiles[r].tile, cls) :
+                             tileRiver(tiles[r].tile, cls);
     }
     return html;
 }
