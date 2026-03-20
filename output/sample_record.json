@@ -2,10 +2,10 @@
   "metadata": {
     "wall_seed": 42,
     "agents": [
-      "ShantenAgent#1205",
-      "ShantenAgent#1206",
-      "ShantenAgent#1207",
-      "ShantenAgent#1208"
+      "ShantenAgent#1",
+      "ShantenAgent#2",
+      "ShantenAgent#3",
+      "ShantenAgent#4"
     ]
   },
   "initial_hands": [

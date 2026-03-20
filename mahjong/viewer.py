@@ -96,32 +96,34 @@ const AGENTS = METADATA.agents || ["?","?","?","?"];
 def _css():
     return """
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
+html, body {
     font-family: 'Meiryo', 'Yu Gothic', sans-serif;
-    background: #1a472a; color: #fff; padding: 15px;
+    background: #1a472a; color: #fff; padding: 10px;
+    height: 100vh; overflow: hidden;
 }
-h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
-.meta { text-align: center; color: #aaa; margin-bottom: 10px; font-size: 13px; }
+h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
+.meta { text-align: center; color: #aaa; margin-bottom: 6px; font-size: 12px; }
 
-.controls { text-align: center; margin: 10px 0; }
+.controls { text-align: center; margin: 6px 0; }
 .controls button {
     background: #2d6a3f; border: 1px solid #4a9; color: #fff;
-    padding: 6px 16px; margin: 0 3px; cursor: pointer; border-radius: 4px; font-size: 13px;
+    padding: 4px 12px; margin: 0 2px; cursor: pointer; border-radius: 4px; font-size: 12px;
 }
 .controls button:hover { background: #3a8a5f; }
 .controls button:disabled { opacity: 0.4; cursor: default; }
-.controls .step-info { display: inline-block; min-width: 140px; font-size: 14px; }
+.controls .step-info { display: inline-block; min-width: 130px; font-size: 13px; }
 
 /* === 麻雀卓レイアウト === */
 .mahjong-table {
     max-width: 1000px; margin: 0 auto;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    height: calc(100vh - 100px);
 }
 
 /* 手牌エリア共通 */
 .hand-area {
     background: #0d2818; border: 1px solid #2a5; border-radius: 6px;
-    padding: 6px 10px; position: relative;
+    padding: 4px 8px; position: relative;
 }
 .hand-area.active { border-color: #ff0; box-shadow: 0 0 8px rgba(255,255,0,0.3); }
 .hand-area.winner { border-color: #f44; box-shadow: 0 0 12px rgba(255,80,80,0.5); }
@@ -142,12 +144,19 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
 .hand-top .hand-tiles { justify-content: center; }
 .hand-bottom .hand-tiles { justify-content: center; }
 
-/* 左右の手牌: 縦1列 */
+/* 左右の手牌: 回転して中心向き */
 .hand-left, .hand-right {
-    display: flex; flex-direction: column; min-width: 50px; max-width: 56px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-width: 56px; max-width: 62px;
 }
 .hand-left .hand-tiles, .hand-right .hand-tiles {
     display: flex; flex-direction: column; gap: 1px; align-items: center;
+}
+.hand-left .tile-vert, .hand-left .tile-river-vert {
+    transform: rotate(90deg);
+}
+.hand-right .tile-vert, .hand-right .tile-river-vert {
+    transform: rotate(-90deg);
 }
 .hand-left .hand-label, .hand-right .hand-label {
     flex-direction: column; align-items: center; gap: 0;
@@ -156,14 +165,14 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
 
 /* 中段 */
 .middle-row {
-    display: flex; align-items: center; gap: 6px; width: 100%;
+    display: flex; align-items: stretch; gap: 6px; width: 100%; flex: 1; min-height: 0;
 }
 
 /* 河テーブル（中央） */
 .river-table {
     flex: 1; background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
-    padding: 10px; display: flex; flex-direction: column; gap: 4px;
-    min-height: 300px;
+    padding: 8px; display: flex; flex-direction: column; gap: 4px;
+    min-height: 0;
 }
 .river-middle {
     display: flex; align-items: center; gap: 8px; flex: 1;
@@ -175,12 +184,14 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
 .river-bottom { justify-content: center; min-height: 40px; }
 .river-left {
     flex-direction: column; min-width: 40px; align-items: center;
-    max-height: 240px; overflow-y: auto;
+    max-height: 200px; overflow-y: auto;
 }
+.river-left .tile-river-vert { transform: rotate(90deg); }
 .river-right {
     flex-direction: column; min-width: 40px; align-items: center;
-    max-height: 240px; overflow-y: auto;
+    max-height: 200px; overflow-y: auto;
 }
+.river-right .tile-river-vert { transform: rotate(-90deg); }
 
 /* 中央情報 */
 .center-info {
@@ -190,7 +201,7 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
 
 /* 牌画像 */
 .tile-img {
-    height: 44px; width: auto; border-radius: 3px;
+    height: 40px; width: auto; border-radius: 3px;
     background: #f5f0e0; padding: 1px; border: 1px solid #bba;
     transition: transform 0.1s;
 }
@@ -250,9 +261,9 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
 }
 
 .result-banner {
-    text-align: center; margin: 12px auto; padding: 12px;
+    text-align: center; margin: 4px auto; padding: 8px;
     background: #0d2818; border: 2px solid #f84; border-radius: 8px;
-    font-size: 16px; display: none; max-width: 1000px;
+    font-size: 14px; display: none; max-width: 1000px;
 }
 """
 
