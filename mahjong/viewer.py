@@ -140,13 +140,28 @@ h1 { text-align: center; margin-bottom: 10px; font-size: 20px; }
 .hand-label { font-size: 11px; color: #8a8; margin-bottom: 3px; }
 .tiles { display: flex; flex-wrap: wrap; gap: 2px; align-items: flex-end; }
 
-.tile-img { height: 48px; width: auto; border-radius: 3px; transition: transform 0.1s; }
+.tile-img {
+    height: 48px; width: auto; border-radius: 4px; transition: transform 0.1s;
+    background: #f5f0e0; padding: 2px; border: 1px solid #bba;
+}
 .tile-img:hover { transform: translateY(-3px); }
-.tile-img.draw-highlight { box-shadow: 0 0 8px 2px #ffe066; border: 2px solid #ffcc00; border-radius: 4px; }
-.tile-img.discard-last { box-shadow: 0 0 8px 2px #ff6666; border: 2px solid #ff4444; border-radius: 4px; }
+.tile-img.draw-highlight {
+    background: #fffbe6; box-shadow: 0 0 10px 3px #ffe066;
+    border: 2px solid #ffcc00; border-radius: 5px;
+}
+.tile-img.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 8px 2px #ff6666;
+    border: 2px solid #ff4444; border-radius: 5px;
+}
 
-.tile-img-small { height: 36px; width: auto; border-radius: 2px; }
-.tile-img-small.discard-last { box-shadow: 0 0 6px 2px #ff6666; border: 2px solid #ff4444; border-radius: 3px; }
+.tile-img-small {
+    height: 36px; width: auto; border-radius: 3px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-img-small.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 6px 2px #ff6666;
+    border: 2px solid #ff4444; border-radius: 4px;
+}
 
 .river { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
 
