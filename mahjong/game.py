@@ -1,16 +1,16 @@
 """
 ゲームループ（1局の進行）
 
-配牌 → ツモ → 打牌 → ... を繰り返し、
-ツモ和了または流局で1局が終了する。
+配牌 → ツモ → リーチ判定 → 打牌 → ロン判定 → ... を繰り返し、
+ツモ和了、ロン和了、または流局で1局が終了する。
 
-※ 現段階では鳴き（チー・ポン・カン）、ロン和了は未実装。
-   まずツモ和了と流局のみで1局を回せるようにする。
+※ 鳴き（チー・ポン・カン）は未実装。
+※ リーチ後はツモ切り固定。
 """
 
 from mahjong.wall import Wall
 from mahjong.player import Player
-from mahjong.agari import is_agari
+from mahjong.agari import is_agari, shanten_number
 from mahjong.tile import tile_name, hand_to_str
 from mahjong.record import GameRecord
 
@@ -85,16 +85,73 @@ class GameRound:
                     print(f"    手牌: {hand_to_str(player.hand)}")
                 break
 
-            # 打牌
+            # リーチ判定 & 打牌
             game_state = self._build_game_state()
-            discard = self.agents[self.current_player].choose_discard(
-                player, game_state
-            )
+            riichi_declared = False
+
+            if player.is_riichi:
+                # リーチ中はツモ切り
+                discard = tile
+            elif self._can_riichi(player):
+                # リーチ可能か？
+                wants_riichi = self.agents[self.current_player].choose_riichi(
+                    player, game_state
+                )
+                if wants_riichi:
+                    discard = self.agents[self.current_player].choose_discard_riichi(
+                        player, game_state
+                    )
+                    riichi_declared = True
+                else:
+                    discard = self.agents[self.current_player].choose_discard(
+                        player, game_state
+                    )
+            else:
+                discard = self.agents[self.current_player].choose_discard(
+                    player, game_state
+                )
+
+            if riichi_declared:
+                player.is_riichi = True
+                player.riichi_turn = self.turn
+                self.record.record_riichi(self.current_player)
+                if self.verbose:
+                    print(
+                        f"         *** リーチ! "
+                        f"{self.SEAT_NAMES[self.current_player]}家 ***"
+                    )
+
             player.discard_tile(discard)
-            self.record.record_discard(self.current_player, discard)
+            self.record.record_discard(
+                self.current_player, discard, is_riichi=riichi_declared
+            )
 
             if self.verbose:
                 print(f"         打:{tile_name(discard)}")
+
+            # ロン和了判定（頭ハネ: 打牌者の下家から順に判定）
+            ron_winner = self._check_ron(self.current_player, discard)
+            if ron_winner is not None:
+                self.result = {
+                    "type": "ron",
+                    "winner": ron_winner,
+                    "from_player": self.current_player,
+                    "turn": self.turn,
+                    "winning_tile": discard,
+                }
+                self.record.record_result(self.result)
+                if self.verbose:
+                    winner_name = self.SEAT_NAMES[ron_winner]
+                    from_name = self.SEAT_NAMES[self.current_player]
+                    print(
+                        f"\n*** ロン和了! {winner_name}家 ← {from_name}家 "
+                        f"({self.turn}巡目) ***"
+                    )
+                    print(
+                        f"    手牌: "
+                        f"{hand_to_str(self.players[ron_winner].hand)}"
+                    )
+                break
 
             # 次のプレイヤーへ
             self.current_player = (self.current_player + 1) % 4
@@ -123,6 +180,62 @@ class GameRound:
                 )
             print()
 
+    def _can_riichi(self, player):
+        """
+        リーチ宣言可能か判定する。
+
+        条件:
+        - 門前であること（鳴いていない）
+        - まだリーチしていない
+        - ツモ後の手牌（14枚）からいずれかの牌を切ってテンパイになる
+        - 山に残り牌がある（最低1回のツモ機会が必要）
+        """
+        if player.is_riichi:
+            return False
+        if not player.is_menzen():
+            return False
+        if self.wall.remaining() == 0:
+            return False
+
+        # いずれかの牌を捨ててテンパイになるか
+        melds_count = len(player.melds)
+        for tile_id in range(34):
+            if player.hand[tile_id] == 0:
+                continue
+            player.hand[tile_id] -= 1
+            s = shanten_number(player.hand, melds_count)
+            player.hand[tile_id] += 1
+            if s == 0:
+                return True
+        return False
+
+    def _check_ron(self, discarder, tile):
+        """
+        ロン和了の判定。打牌者の下家から順にチェック（頭ハネ）。
+
+        Returns:
+            ロンするプレイヤーの席番号。誰もロンしなければ None。
+        """
+        game_state = self._build_game_state()
+        for i in range(1, 4):
+            seat = (discarder + i) % 4
+            player = self.players[seat]
+            melds_count = len(player.melds)
+
+            # 仮にその牌を手牌に加えて和了判定
+            player.hand[tile] += 1
+            can_agari = is_agari(player.hand, melds_count)
+            player.hand[tile] -= 1
+
+            if can_agari:
+                # エージェントにロンするか確認
+                wants_ron = self.agents[seat].choose_ron(
+                    player, tile, discarder, game_state
+                )
+                if wants_ron:
+                    return seat
+        return None
+
     def _build_game_state(self):
         """エージェントに渡す局面情報を構築する。"""
         return {
@@ -131,4 +244,5 @@ class GameRound:
             "discards": [p.discards[:] for p in self.players],
             "remaining_tiles": self.wall.remaining(),
             "dora_indicators": self.wall.get_dora_indicators(),
+            "riichi": [p.is_riichi for p in self.players],
         }

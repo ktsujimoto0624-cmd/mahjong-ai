@@ -143,6 +143,22 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
     border: 2px solid #ff4444;
 }
 
+/* リーチ牌（横向き） */
+.tile-river.riichi-tile {
+    transform: rotate(90deg);
+    margin: 4px 8px;
+}
+.tile-river-vert.riichi-tile {
+    transform: rotate(90deg);
+    margin: 4px 2px;
+}
+
+/* リーチマーク */
+.riichi-mark {
+    color: #f44; font-weight: bold; font-size: 11px;
+    margin-left: 4px;
+}
+
 .result-banner {
     text-align: center; margin: 12px auto; padding: 12px;
     background: #0d2818; border: 2px solid #f84; border-radius: 8px;
@@ -193,10 +209,10 @@ h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
 const TILES_DIR = "tiles";
 const TILE_NAMES = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '東', '南', '西', '北', '白', '發', '中'];
 const TILE_SVGS = ['Man1', 'Man2', 'Man3', 'Man4', 'Man5', 'Man6', 'Man7', 'Man8', 'Man9', 'Pin1', 'Pin2', 'Pin3', 'Pin4', 'Pin5', 'Pin6', 'Pin7', 'Pin8', 'Pin9', 'Sou1', 'Sou2', 'Sou3', 'Sou4', 'Sou5', 'Sou6', 'Sou7', 'Sou8', 'Sou9', 'Ton', 'Nan', 'Shaa', 'Pei', 'Haku', 'Hatsu', 'Chun'];
-const ACTIONS = [{"type": "draw", "seat": 0, "tile": 29}, {"type": "discard", "seat": 0, "tile": 29}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10}, {"type": "draw", "seat": 2, "tile": 9}, {"type": "discard", "seat": 2, "tile": 1}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 9}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 21}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 7}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 4}, {"type": "draw", "seat": 3, "tile": 4}, {"type": "discard", "seat": 3, "tile": 12}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 13}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 4}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 8}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26}, {"type": "draw", "seat": 1, "tile": 19}, {"type": "discard", "seat": 1, "tile": 19}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 22}, {"type": "draw", "seat": 3, "tile": 24}, {"type": "discard", "seat": 3, "tile": 20}, {"type": "draw", "seat": 0, "tile": 28}, {"type": "discard", "seat": 0, "tile": 28}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 30}, {"type": "draw", "seat": 2, "tile": 25}, {"type": "discard", "seat": 2, "tile": 18}, {"type": "draw", "seat": 3, "tile": 20}, {"type": "discard", "seat": 3, "tile": 20}, {"type": "draw", "seat": 0, "tile": 20}, {"type": "discard", "seat": 0, "tile": 32}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 30}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 33}, {"type": "draw", "seat": 3, "tile": 2}, {"type": "discard", "seat": 3, "tile": 4}, {"type": "draw", "seat": 0, "tile": 6}, {"type": "discard", "seat": 0, "tile": 20}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 32}, {"type": "draw", "seat": 3, "tile": 19}, {"type": "discard", "seat": 3, "tile": 19}, {"type": "draw", "seat": 0, "tile": 9}, {"type": "discard", "seat": 0, "tile": 24}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33}, {"type": "draw", "seat": 2, "tile": 2}, {"type": "discard", "seat": 2, "tile": 11}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 31}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 9}, {"type": "draw", "seat": 1, "tile": 17}, {"type": "discard", "seat": 1, "tile": 17}, {"type": "draw", "seat": 2, "tile": 14}, {"type": "discard", "seat": 2, "tile": 13}, {"type": "draw", "seat": 3, "tile": 1}, {"type": "discard", "seat": 3, "tile": 1}, {"type": "draw", "seat": 0, "tile": 8}, {"type": "discard", "seat": 0, "tile": 6}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 21}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 19}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 8}, {"type": "draw", "seat": 1, "tile": 12}, {"type": "discard", "seat": 1, "tile": 30}, {"type": "draw", "seat": 2, "tile": 31}, {"type": "discard", "seat": 2, "tile": 3}, {"type": "draw", "seat": 3, "tile": 3}, {"type": "discard", "seat": 3, "tile": 3}, {"type": "draw", "seat": 0, "tile": 25}, {"type": "discard", "seat": 0, "tile": 25}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 27}, {"type": "draw", "seat": 2, "tile": 4}, {"type": "discard", "seat": 2, "tile": 25}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 33}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 10}, {"type": "draw", "seat": 1, "tile": 13}, {"type": "discard", "seat": 1, "tile": 30}, {"type": "draw", "seat": 2, "tile": 28}, {"type": "discard", "seat": 2, "tile": 2}, {"type": "draw", "seat": 3, "tile": 5}, {"type": "discard", "seat": 3, "tile": 8}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 18}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 24}, {"type": "draw", "seat": 2, "tile": 0}, {"type": "discard", "seat": 2, "tile": 0}, {"type": "draw", "seat": 3, "tile": 25}, {"type": "discard", "seat": 3, "tile": 23}, {"type": "draw", "seat": 0, "tile": 32}, {"type": "discard", "seat": 0, "tile": 32}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 28}, {"type": "draw", "seat": 3, "tile": 33}, {"type": "discard", "seat": 3, "tile": 29}, {"type": "draw", "seat": 0, "tile": 13}, {"type": "discard", "seat": 0, "tile": 13}, {"type": "draw", "seat": 1, "tile": 17}, {"type": "discard", "seat": 1, "tile": 17}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 32}, {"type": "draw", "seat": 3, "tile": 20}, {"type": "discard", "seat": 3, "tile": 20}, {"type": "draw", "seat": 0, "tile": 22}, {"type": "discard", "seat": 0, "tile": 26}, {"type": "draw", "seat": 1, "tile": 6}, {"type": "discard", "seat": 1, "tile": 6}, {"type": "draw", "seat": 2, "tile": 17}, {"type": "discard", "seat": 2, "tile": 17}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 33}, {"type": "draw", "seat": 0, "tile": 19}, {"type": "discard", "seat": 0, "tile": 19}, {"type": "draw", "seat": 1, "tile": 16}];
+const ACTIONS = [{"type": "draw", "seat": 0, "tile": 29}, {"type": "discard", "seat": 0, "tile": 29, "riichi": false}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10, "riichi": false}, {"type": "draw", "seat": 2, "tile": 9}, {"type": "discard", "seat": 2, "tile": 1, "riichi": false}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 9, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 21, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 7, "riichi": false}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 4, "riichi": false}, {"type": "draw", "seat": 3, "tile": 4}, {"type": "discard", "seat": 3, "tile": 12, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 4, "riichi": false}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 8, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 19}, {"type": "discard", "seat": 1, "tile": 19, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 22, "riichi": false}, {"type": "draw", "seat": 3, "tile": 24}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 28}, {"type": "discard", "seat": 0, "tile": 28, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 25}, {"type": "discard", "seat": 2, "tile": 18, "riichi": false}, {"type": "draw", "seat": 3, "tile": 20}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 20}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 33, "riichi": false}, {"type": "draw", "seat": 3, "tile": 2}, {"type": "discard", "seat": 3, "tile": 4, "riichi": false}, {"type": "draw", "seat": 0, "tile": 6}, {"type": "discard", "seat": 0, "tile": 20, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 32, "riichi": false}, {"type": "draw", "seat": 3, "tile": 19}, {"type": "discard", "seat": 3, "tile": 19, "riichi": false}, {"type": "draw", "seat": 0, "tile": 9}, {"type": "discard", "seat": 0, "tile": 24, "riichi": false}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33, "riichi": false}, {"type": "draw", "seat": 2, "tile": 2}, {"type": "discard", "seat": 2, "tile": 11, "riichi": false}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 31, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 9, "riichi": false}, {"type": "draw", "seat": 1, "tile": 17}, {"type": "discard", "seat": 1, "tile": 17, "riichi": false}, {"type": "draw", "seat": 2, "tile": 14}, {"type": "discard", "seat": 2, "tile": 13, "riichi": false}, {"type": "draw", "seat": 3, "tile": 1}, {"type": "discard", "seat": 3, "tile": 1, "riichi": false}, {"type": "draw", "seat": 0, "tile": 8}, {"type": "discard", "seat": 0, "tile": 6, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 19, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "riichi", "seat": 0}, {"type": "discard", "seat": 0, "tile": 8, "riichi": true}, {"type": "draw", "seat": 1, "tile": 12}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 31}, {"type": "discard", "seat": 2, "tile": 3, "riichi": false}, {"type": "draw", "seat": 3, "tile": 3}, {"type": "discard", "seat": 3, "tile": 3, "riichi": false}, {"type": "draw", "seat": 0, "tile": 25}, {"type": "discard", "seat": 0, "tile": 25, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 27, "riichi": false}, {"type": "draw", "seat": 2, "tile": 4}, {"type": "discard", "seat": 2, "tile": 25, "riichi": false}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 33, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 10, "riichi": false}, {"type": "draw", "seat": 1, "tile": 13}, {"type": "riichi", "seat": 1}, {"type": "discard", "seat": 1, "tile": 30, "riichi": true}, {"type": "draw", "seat": 2, "tile": 28}, {"type": "discard", "seat": 2, "tile": 2, "riichi": false}, {"type": "draw", "seat": 3, "tile": 5}, {"type": "discard", "seat": 3, "tile": 8, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 24, "riichi": false}, {"type": "draw", "seat": 2, "tile": 0}, {"type": "discard", "seat": 2, "tile": 0, "riichi": false}, {"type": "draw", "seat": 3, "tile": 25}, {"type": "discard", "seat": 3, "tile": 23, "riichi": false}, {"type": "draw", "seat": 0, "tile": 32}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}];
 const INITIAL_HANDS = [[0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 2, 2, 2, 0, 0, 1, 0], [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0], [2, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1]];
-const RESULT = {"type": "tsumo", "winner": 1, "turn": 17, "winning_tile": 16};
-const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#1", "ShantenAgent#2", "ShantenAgent#3", "ShantenAgent#4"]};
+const RESULT = {"type": "ron", "winner": 0, "from_player": 1, "turn": 14, "winning_tile": 18};
+const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#1205", "ShantenAgent#1206", "ShantenAgent#1207", "ShantenAgent#1208"]};
 const SEAT_NAMES = ["東家", "南家", "西家", "北家"];
 const AGENTS = METADATA.agents || ["?","?","?","?"];
 
@@ -205,6 +221,7 @@ let autoTimer = null;
 let hands = [[], [], [], []];
 let rivers = [[], [], [], []];
 let lastDraw = [null, null, null, null];
+let riichiState = [false, false, false, false];
 
 document.getElementById("meta").textContent =
     "seed: " + (METADATA.wall_seed || "?") + " | " + AGENTS.join(" vs ");
@@ -233,6 +250,7 @@ function resetState() {
         hands[s] = INITIAL_HANDS[s].slice();
         rivers[s] = [];
         lastDraw[s] = null;
+        riichiState[s] = false;
     }
 }
 
@@ -243,9 +261,11 @@ function applyActions(upTo) {
         if (a.type === "draw") {
             hands[a.seat][a.tile]++;
             lastDraw[a.seat] = a.tile;
+        } else if (a.type === "riichi") {
+            riichiState[a.seat] = true;
         } else if (a.type === "discard") {
             hands[a.seat][a.tile]--;
-            rivers[a.seat].push({ tile: a.tile, isLast: false });
+            rivers[a.seat].push({ tile: a.tile, isLast: false, riichi: !!a.riichi });
             if (lastDraw[a.seat] === a.tile) lastDraw[a.seat] = null;
         }
     }
@@ -284,6 +304,7 @@ function renderRiver(seat, isVertical) {
     let html = '';
     for (let r = 0; r < rivers[seat].length; r++) {
         let cls = rivers[seat][r].isLast ? "discard-last" : "";
+        if (rivers[seat][r].riichi) cls += " riichi-tile";
         html += isVertical ? tileRiverVert(rivers[seat][r].tile, cls) :
                              tileRiver(rivers[seat][r].tile, cls);
     }
@@ -294,7 +315,7 @@ function render() {
     if (step < 0) { resetState(); } else { applyActions(step); }
     let active = getActiveSeat();
     let isEnd = (step >= ACTIONS.length - 1) && RESULT;
-    let winner = (RESULT && RESULT.type === "tsumo") ? RESULT.winner : -1;
+    let winner = (RESULT && (RESULT.type === "tsumo" || RESULT.type === "ron")) ? RESULT.winner : -1;
 
     // seat 0=東(bottom), 1=南(right), 2=西(top), 3=北(left)
     let positions = [
@@ -310,7 +331,8 @@ function render() {
         if (isEnd && p.seat === winner) el.classList.add("winner");
         else if (p.seat === active) el.classList.add("active");
 
-        let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] +
+        let rMark = riichiState[p.seat] ? '<span class="riichi-mark">リーチ</span>' : '';
+        let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] + rMark +
                     '</span><span class="agent">' + AGENTS[p.seat] + '</span></div>';
         let tiles = '<div class="hand-tiles">' + renderHand(p.seat, p.vertical) + '</div>';
         el.innerHTML = label + tiles;
@@ -338,8 +360,12 @@ function render() {
     let info = "配牌";
     if (step >= 0) {
         let a = ACTIONS[step];
-        info = SEAT_NAMES[a.seat] + " " +
-               (a.type === "draw" ? "ツモ " : "打 ") + TILE_NAMES[a.tile];
+        if (a.type === "riichi") {
+            info = SEAT_NAMES[a.seat] + " リーチ!";
+        } else {
+            info = SEAT_NAMES[a.seat] + " " +
+                   (a.type === "draw" ? "ツモ " : "打 ") + TILE_NAMES[a.tile];
+        }
     }
     document.getElementById("step-info").textContent =
         (step + 1) + "/" + ACTIONS.length + " " + info;
@@ -351,6 +377,13 @@ function render() {
         if (RESULT.type === "tsumo") {
             banner.innerHTML = "ツモ和了! " + SEAT_NAMES[RESULT.winner] +
                 " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn + "巡目 和了牌: " +
+                '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
+                '" style="vertical-align:middle;">';
+        } else if (RESULT.type === "ron") {
+            banner.innerHTML = "ロン和了! " + SEAT_NAMES[RESULT.winner] +
+                " (" + AGENTS[RESULT.winner] + ") ← " +
+                SEAT_NAMES[RESULT.from_player] +
+                " " + RESULT.turn + "巡目 和了牌: " +
                 '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
                 '" style="vertical-align:middle;">';
         } else {

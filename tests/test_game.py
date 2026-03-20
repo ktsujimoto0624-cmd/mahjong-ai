@@ -1,7 +1,7 @@
 """ゲームループのテスト: ランダムエージェント4人で対局"""
 
 from mahjong.game import GameRound
-from mahjong.agent import RandomAgent
+from mahjong.agent import RandomAgent, ShantenAgent
 
 
 def test_single_round():
@@ -39,6 +39,34 @@ def test_many_rounds():
     print("OK\n")
 
 
+def test_riichi():
+    """リーチ宣言のテスト: ShantenAgent同士で対局しリーチが発生する"""
+    print("=== リーチテスト ===")
+    riichi_count = 0
+    games_with_riichi = 0
+
+    for i in range(50):
+        agents = [ShantenAgent(seed=i * 4 + j) for j in range(4)]
+        game = GameRound(agents, wall_seed=i)
+        game.run()
+
+        riichi_actions = [a for a in game.record.actions if a["type"] == "riichi"]
+        if riichi_actions:
+            games_with_riichi += 1
+            riichi_count += len(riichi_actions)
+
+        # リーチ宣言した人はis_riichiフラグが立っている
+        for p in game.players:
+            if p.is_riichi:
+                assert p.riichi_turn >= 0
+
+    print(f"リーチ発生局: {games_with_riichi}/50")
+    print(f"リーチ宣言数: {riichi_count}")
+    assert games_with_riichi > 0, "50局中リーチが1回も出ないのは異常"
+    print("OK\n")
+
+
 if __name__ == "__main__":
     test_single_round()
     test_many_rounds()
+    test_riichi()

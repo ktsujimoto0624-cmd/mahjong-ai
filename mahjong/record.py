@@ -34,12 +34,20 @@ class GameRecord:
             "tile": tile_id,
         })
 
-    def record_discard(self, seat, tile_id):
+    def record_discard(self, seat, tile_id, is_riichi=False):
         """打牌を記録"""
         self.actions.append({
             "type": "discard",
             "seat": seat,
             "tile": tile_id,
+            "riichi": is_riichi,
+        })
+
+    def record_riichi(self, seat):
+        """リーチ宣言を記録"""
+        self.actions.append({
+            "type": "riichi",
+            "seat": seat,
         })
 
     def record_result(self, result):
@@ -104,9 +112,12 @@ class GameRecord:
                     turn += 1
                 t = tile_name(action["tile"])
                 lines.append(f"[{turn:2d}巡] {name}家 ツモ:{t}")
+            elif action["type"] == "riichi":
+                lines.append(f"       {name}家 *** リーチ! ***")
             elif action["type"] == "discard":
                 t = tile_name(action["tile"])
-                lines.append(f"       {name}家 打 :{t}")
+                riichi_mark = " (リーチ宣言牌)" if action.get("riichi") else ""
+                lines.append(f"       {name}家 打 :{t}{riichi_mark}")
 
             last_seat = seat
         lines.append("")
@@ -119,6 +130,15 @@ class GameRecord:
                 wt = tile_name(self.result["winning_tile"])
                 lines.append(
                     f"  ツモ和了: {seat_names[winner]}家 "
+                    f"({self.result['turn']}巡目) 和了牌:{wt}"
+                )
+            elif self.result["type"] == "ron":
+                winner = self.result["winner"]
+                from_p = self.result["from_player"]
+                wt = tile_name(self.result["winning_tile"])
+                lines.append(
+                    f"  ロン和了: {seat_names[winner]}家 "
+                    f"← {seat_names[from_p]}家 "
                     f"({self.result['turn']}巡目) 和了牌:{wt}"
                 )
             else:

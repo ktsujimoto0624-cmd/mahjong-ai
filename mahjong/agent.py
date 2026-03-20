@@ -43,6 +43,49 @@ class AgentBase:
         """
         raise NotImplementedError
 
+    def choose_riichi(self, player, game_state):
+        """
+        リーチ宣言するかどうか決める。
+
+        Args:
+            player: 自分のPlayerオブジェクト（ツモ後14枚の状態）
+            game_state: 現在の局面情報（辞書）
+
+        Returns:
+            True if リーチする
+        """
+        return True  # デフォルトはテンパイ門前なら常にリーチ
+
+    def choose_discard_riichi(self, player, game_state):
+        """
+        リーチ宣言時にどの牌を捨てるか決める。
+        捨てた後にテンパイを維持する牌を選ぶ必要がある。
+
+        Args:
+            player: 自分のPlayerオブジェクト（ツモ後14枚の状態）
+            game_state: 現在の局面情報（辞書）
+
+        Returns:
+            捨てる牌のID
+        """
+        # デフォルトは choose_discard と同じ
+        return self.choose_discard(player, game_state)
+
+    def choose_ron(self, player, tile, from_seat, game_state):
+        """
+        ロン和了するかどうか決める。
+
+        Args:
+            player: 自分のPlayerオブジェクト
+            tile: 他家が捨てた牌のID
+            from_seat: 捨てたプレイヤーの席番号
+            game_state: 現在の局面情報（辞書）
+
+        Returns:
+            True if ロンする
+        """
+        return True  # デフォルトはロンできるなら常にロン
+
 
 class RandomAgent(AgentBase):
     """ランダムに捨てるエージェント（動作確認用）"""
@@ -104,6 +147,29 @@ class ShantenAgent(AgentBase):
                     best_tiles.append(tile_id)
 
             # 元に戻す
+            player.hand[tile_id] += 1
+
+        return self.rng.choice(best_tiles)
+
+    def choose_discard_riichi(self, player, game_state):
+        """リーチ宣言時の打牌: テンパイを維持する牌を選ぶ（受入最大）"""
+        melds_count = len(player.melds)
+        best_tiles = []
+        best_ukeire = -1
+
+        for tile_id in range(NUM_TILE_TYPES):
+            if player.hand[tile_id] == 0:
+                continue
+
+            player.hand[tile_id] -= 1
+            s = shanten_number(player.hand, melds_count)
+            if s == 0:  # テンパイ維持
+                u = self._count_ukeire(player.hand, melds_count, 0)
+                if u > best_ukeire:
+                    best_ukeire = u
+                    best_tiles = [tile_id]
+                elif u == best_ukeire:
+                    best_tiles.append(tile_id)
             player.hand[tile_id] += 1
 
         return self.rng.choice(best_tiles)
