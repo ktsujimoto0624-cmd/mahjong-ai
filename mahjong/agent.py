@@ -5,7 +5,7 @@
 """
 
 import random
-from mahjong.tile import NUM_TILE_TYPES
+from mahjong.tile import NUM_TILE_TYPES, is_suit
 from mahjong.agari import shanten_number
 
 
@@ -75,16 +75,55 @@ class AgentBase:
         """
         ロン和了するかどうか決める。
 
-        Args:
-            player: 自分のPlayerオブジェクト
-            tile: 他家が捨てた牌のID
-            from_seat: 捨てたプレイヤーの席番号
-            game_state: 現在の局面情報（辞書）
-
         Returns:
             True if ロンする
         """
         return True  # デフォルトはロンできるなら常にロン
+
+    def choose_pon(self, player, tile, from_seat, game_state):
+        """
+        ポンするかどうか決める。
+
+        Returns:
+            True if ポンする
+        """
+        return False  # デフォルトは鳴かない
+
+    def choose_chi(self, player, tile, from_seat, game_state):
+        """
+        チーするかどうか決める。
+
+        Returns:
+            チーする場合は手牌から出す2枚のリスト、しない場合はNone
+        """
+        return None  # デフォルトは鳴かない
+
+    def choose_kan(self, player, tile, from_seat, game_state):
+        """
+        大明槓するかどうか決める。
+
+        Returns:
+            True if 大明槓する
+        """
+        return False  # デフォルトは鳴かない
+
+    def choose_ankan(self, player, game_state):
+        """
+        暗槓するかどうか決める（ツモ後、打牌前に判定）。
+
+        Returns:
+            暗槓する牌ID、またはNone
+        """
+        return None  # デフォルトはしない
+
+    def choose_kakan(self, player, game_state):
+        """
+        加槓するかどうか決める（ツモ後、打牌前に判定）。
+
+        Returns:
+            加槓する牌ID、またはNone
+        """
+        return None  # デフォルトはしない
 
 
 class RandomAgent(AgentBase):
@@ -173,6 +212,91 @@ class ShantenAgent(AgentBase):
             player.hand[tile_id] += 1
 
         return self.rng.choice(best_tiles)
+
+    def choose_pon(self, player, tile, from_seat, game_state):
+        """ポン判断: シャンテン数が下がるならポンする"""
+        melds_count = len(player.melds)
+        current_s = shanten_number(player.hand, melds_count)
+
+        # ポン後をシミュレート: 手牌から2枚減、副露+1
+        player.hand[tile] -= 2
+        new_s = shanten_number(player.hand, melds_count + 1)
+        player.hand[tile] += 2
+
+        # シャンテン数が下がるならポン（打牌で1枚減る分も考慮済み）
+        return new_s < current_s
+
+    def choose_chi(self, player, tile, from_seat, game_state):
+        """チー判断: シャンテン数が下がるならチーする"""
+        if not is_suit(tile):
+            return None
+
+        melds_count = len(player.melds)
+        current_s = shanten_number(player.hand, melds_count)
+        best_pair = None
+        best_s = current_s
+
+        # チーできる組み合わせを列挙
+        for pair in self._chi_candidates(player, tile):
+            player.hand[pair[0]] -= 1
+            player.hand[pair[1]] -= 1
+            new_s = shanten_number(player.hand, melds_count + 1)
+            player.hand[pair[0]] += 1
+            player.hand[pair[1]] += 1
+
+            if new_s < best_s:
+                best_s = new_s
+                best_pair = list(pair)
+
+        return best_pair
+
+    def _chi_candidates(self, player, tile):
+        """チー可能な手牌の2枚の組み合わせを列挙"""
+        if not is_suit(tile):
+            return []
+        num = tile % 9  # 0-8
+        base = tile - num  # 萬子/筒子/索子の先頭ID
+        candidates = []
+
+        # tile-2, tile-1 で順子
+        if num >= 2:
+            a, b = base + num - 2, base + num - 1
+            if player.hand[a] > 0 and player.hand[b] > 0:
+                candidates.append((a, b))
+
+        # tile-1, tile+1 で順子
+        if num >= 1 and num <= 7:
+            a, b = base + num - 1, base + num + 1
+            if player.hand[a] > 0 and player.hand[b] > 0:
+                candidates.append((a, b))
+
+        # tile+1, tile+2 で順子
+        if num <= 6:
+            a, b = base + num + 1, base + num + 2
+            if player.hand[a] > 0 and player.hand[b] > 0:
+                candidates.append((a, b))
+
+        return candidates
+
+    def choose_ankan(self, player, game_state):
+        """暗槓判断: 4枚揃っていたら暗槓する"""
+        if player.is_riichi:
+            return None  # リーチ中は暗槓しない（簡易実装）
+        for tile_id in range(NUM_TILE_TYPES):
+            if player.hand[tile_id] >= 4:
+                return tile_id
+        return None
+
+    def choose_kakan(self, player, game_state):
+        """加槓判断: ポンした牌の4枚目を持っていたら加槓する"""
+        if player.is_riichi:
+            return None
+        for meld in player.melds:
+            if meld["type"] == "pon":
+                tile_id = meld["tiles"][0]
+                if player.hand[tile_id] >= 1:
+                    return tile_id
+        return None
 
     def _count_ukeire(self, hand, melds_count, current_shanten):
         """

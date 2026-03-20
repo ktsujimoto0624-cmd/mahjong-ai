@@ -60,6 +60,90 @@ class Player:
         """門前の手牌枚数"""
         return hand_total(self.hand)
 
+    def add_meld(self, meld_type, tiles, from_seat=None):
+        """
+        副露（鳴き）を追加する。
+
+        Args:
+            meld_type: "chi", "pon", "daiminkan", "ankan", "kakan"
+            tiles: 副露に含まれる牌IDのリスト
+            from_seat: 鳴いた相手の席番号（ankanはNone）
+        """
+        self.melds.append({
+            "type": meld_type,
+            "tiles": tiles,
+            "from": from_seat,
+        })
+
+    def add_chi(self, taken_tile, hand_tiles, from_seat):
+        """
+        チーを実行する。
+
+        Args:
+            taken_tile: 鳴いた牌（他家の捨て牌）
+            hand_tiles: 手牌から出す2枚のリスト
+            from_seat: 鳴いた相手の席番号
+        """
+        for t in hand_tiles:
+            self.hand[t] -= 1
+        meld_tiles = sorted([taken_tile] + hand_tiles)
+        self.add_meld("chi", meld_tiles, from_seat)
+
+    def add_pon(self, taken_tile, from_seat):
+        """
+        ポンを実行する。
+
+        Args:
+            taken_tile: 鳴いた牌（他家の捨て牌）
+            from_seat: 鳴いた相手の席番号
+        """
+        self.hand[taken_tile] -= 2
+        self.add_meld("pon", [taken_tile, taken_tile, taken_tile], from_seat)
+
+    def add_daiminkan(self, taken_tile, from_seat):
+        """
+        大明槓を実行する。
+
+        Args:
+            taken_tile: 鳴いた牌（他家の捨て牌）
+            from_seat: 鳴いた相手の席番号
+        """
+        self.hand[taken_tile] -= 3
+        self.add_meld(
+            "daiminkan",
+            [taken_tile, taken_tile, taken_tile, taken_tile],
+            from_seat,
+        )
+
+    def add_ankan(self, tile_id):
+        """
+        暗槓を実行する。
+
+        Args:
+            tile_id: 暗槓する牌のID
+        """
+        self.hand[tile_id] -= 4
+        self.add_meld(
+            "ankan",
+            [tile_id, tile_id, tile_id, tile_id],
+            None,
+        )
+
+    def add_kakan(self, tile_id):
+        """
+        加槓を実行する（既存のポンに1枚追加）。
+
+        Args:
+            tile_id: 加槓する牌のID
+        """
+        self.hand[tile_id] -= 1
+        for meld in self.melds:
+            if meld["type"] == "pon" and meld["tiles"][0] == tile_id:
+                meld["type"] = "kakan"
+                meld["tiles"].append(tile_id)
+                return
+        raise ValueError(f"{tile_name(tile_id)}のポンが見つからない")
+
     def is_menzen(self):
         """門前（鳴いていない）かどうか"""
         # 暗槓は門前扱い

@@ -97,14 +97,14 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     justify-content: center; min-height: 36px;
 }
 .river-top { transform: rotate(180deg); }
-/* 南家河: 下→上に6牌、次の列は右へ(中心から離れる方向) */
+/* 南家河: 下→上に6牌、次の列は右へ */
 .river-right {
     display: flex; flex-direction: column-reverse; flex-wrap: wrap;
     align-content: flex-start;
     max-height: 166px; min-width: 36px; overflow: hidden;
 }
 .river-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
-/* 北家河: 上→下に6牌、次の列は左へ(中心から離れる方向) */
+/* 北家河: 上→下に6牌、次の列は左へ */
 .river-left {
     display: flex; flex-direction: column; flex-wrap: wrap-reverse;
     align-content: flex-end;
@@ -168,12 +168,10 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     transform: rotate(90deg);
     margin: 4px 8px;
 }
-/* 南家リーチ: -90°+90°=0°(縦) */
 .river-right .tile-river-vert.riichi-tile {
     transform: rotate(0deg);
     margin: 2px 4px;
 }
-/* 北家リーチ: 90°+90°=180°(縦逆) */
 .river-left .tile-river-vert.riichi-tile {
     transform: rotate(180deg);
     margin: 2px 4px;
@@ -183,6 +181,34 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 .riichi-mark {
     color: #f44; font-weight: bold; font-size: 11px;
     margin-left: 4px;
+}
+
+/* 副露エリア */
+.melds-area {
+    display: flex; gap: 6px; margin-left: 12px; align-items: flex-end;
+}
+.meld-group {
+    display: flex; gap: 1px; padding: 2px 3px;
+    background: rgba(0,0,0,0.2); border-radius: 3px;
+}
+.tile-meld {
+    height: 36px; width: auto; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-meld.meld-taken {
+    background: #d0e8d0; border: 1px solid #5a5;
+}
+.tile-meld-vert {
+    height: auto; width: 32px; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-meld-vert.meld-taken {
+    background: #d0e8d0; border: 1px solid #5a5;
+}
+.hand-left .tile-meld-vert { transform: rotate(90deg); margin: -6px 0; }
+.hand-right .tile-meld-vert { transform: rotate(-90deg); margin: -6px 0; }
+.hand-left .melds-area, .hand-right .melds-area {
+    flex-direction: column; margin-left: 0; margin-top: 8px;
 }
 
 .result-banner {
@@ -235,10 +261,10 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 const TILES_DIR = "tiles";
 const TILE_NAMES = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '東', '南', '西', '北', '白', '發', '中'];
 const TILE_SVGS = ['Man1', 'Man2', 'Man3', 'Man4', 'Man5', 'Man6', 'Man7', 'Man8', 'Man9', 'Pin1', 'Pin2', 'Pin3', 'Pin4', 'Pin5', 'Pin6', 'Pin7', 'Pin8', 'Pin9', 'Sou1', 'Sou2', 'Sou3', 'Sou4', 'Sou5', 'Sou6', 'Sou7', 'Sou8', 'Sou9', 'Ton', 'Nan', 'Shaa', 'Pei', 'Haku', 'Hatsu', 'Chun'];
-const ACTIONS = [{"type": "draw", "seat": 0, "tile": 29}, {"type": "discard", "seat": 0, "tile": 29, "riichi": false}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10, "riichi": false}, {"type": "draw", "seat": 2, "tile": 9}, {"type": "discard", "seat": 2, "tile": 1, "riichi": false}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 9, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 21, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 7, "riichi": false}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 4, "riichi": false}, {"type": "draw", "seat": 3, "tile": 4}, {"type": "discard", "seat": 3, "tile": 12, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 4, "riichi": false}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 8, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 19}, {"type": "discard", "seat": 1, "tile": 19, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 22, "riichi": false}, {"type": "draw", "seat": 3, "tile": 24}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 28}, {"type": "discard", "seat": 0, "tile": 28, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 25}, {"type": "discard", "seat": 2, "tile": 18, "riichi": false}, {"type": "draw", "seat": 3, "tile": 20}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 20}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 33, "riichi": false}, {"type": "draw", "seat": 3, "tile": 2}, {"type": "discard", "seat": 3, "tile": 4, "riichi": false}, {"type": "draw", "seat": 0, "tile": 6}, {"type": "discard", "seat": 0, "tile": 20, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 32, "riichi": false}, {"type": "draw", "seat": 3, "tile": 19}, {"type": "discard", "seat": 3, "tile": 19, "riichi": false}, {"type": "draw", "seat": 0, "tile": 9}, {"type": "discard", "seat": 0, "tile": 24, "riichi": false}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33, "riichi": false}, {"type": "draw", "seat": 2, "tile": 2}, {"type": "discard", "seat": 2, "tile": 11, "riichi": false}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 31, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 9, "riichi": false}, {"type": "draw", "seat": 1, "tile": 17}, {"type": "discard", "seat": 1, "tile": 17, "riichi": false}, {"type": "draw", "seat": 2, "tile": 14}, {"type": "discard", "seat": 2, "tile": 13, "riichi": false}, {"type": "draw", "seat": 3, "tile": 1}, {"type": "discard", "seat": 3, "tile": 1, "riichi": false}, {"type": "draw", "seat": 0, "tile": 8}, {"type": "discard", "seat": 0, "tile": 6, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 19, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "riichi", "seat": 0}, {"type": "discard", "seat": 0, "tile": 8, "riichi": true}, {"type": "draw", "seat": 1, "tile": 12}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 31}, {"type": "discard", "seat": 2, "tile": 3, "riichi": false}, {"type": "draw", "seat": 3, "tile": 3}, {"type": "discard", "seat": 3, "tile": 3, "riichi": false}, {"type": "draw", "seat": 0, "tile": 25}, {"type": "discard", "seat": 0, "tile": 25, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 27, "riichi": false}, {"type": "draw", "seat": 2, "tile": 4}, {"type": "discard", "seat": 2, "tile": 25, "riichi": false}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 33, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 10, "riichi": false}, {"type": "draw", "seat": 1, "tile": 13}, {"type": "riichi", "seat": 1}, {"type": "discard", "seat": 1, "tile": 30, "riichi": true}, {"type": "draw", "seat": 2, "tile": 28}, {"type": "discard", "seat": 2, "tile": 2, "riichi": false}, {"type": "draw", "seat": 3, "tile": 5}, {"type": "discard", "seat": 3, "tile": 8, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 24, "riichi": false}, {"type": "draw", "seat": 2, "tile": 0}, {"type": "discard", "seat": 2, "tile": 0, "riichi": false}, {"type": "draw", "seat": 3, "tile": 25}, {"type": "discard", "seat": 3, "tile": 23, "riichi": false}, {"type": "draw", "seat": 0, "tile": 32}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}];
+const ACTIONS = [{"type": "draw", "seat": 0, "tile": 29}, {"type": "discard", "seat": 0, "tile": 29, "riichi": false}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10, "riichi": false}, {"type": "draw", "seat": 2, "tile": 9}, {"type": "discard", "seat": 2, "tile": 1, "riichi": false}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 9, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 21, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 7, "riichi": false}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 4, "riichi": false}, {"type": "draw", "seat": 3, "tile": 4}, {"type": "discard", "seat": 3, "tile": 12, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 4, "riichi": false}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 8, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 19}, {"type": "discard", "seat": 1, "tile": 19, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 22, "riichi": false}, {"type": "draw", "seat": 3, "tile": 24}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 28}, {"type": "discard", "seat": 0, "tile": 28, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 25}, {"type": "discard", "seat": 2, "tile": 18, "riichi": false}, {"type": "draw", "seat": 3, "tile": 20}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 20}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 33, "riichi": false}, {"type": "draw", "seat": 3, "tile": 2}, {"type": "discard", "seat": 3, "tile": 4, "riichi": false}, {"type": "draw", "seat": 0, "tile": 6}, {"type": "discard", "seat": 0, "tile": 20, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 32, "riichi": false}, {"type": "draw", "seat": 3, "tile": 19}, {"type": "discard", "seat": 3, "tile": 19, "riichi": false}, {"type": "draw", "seat": 0, "tile": 9}, {"type": "discard", "seat": 0, "tile": 24, "riichi": false}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33, "riichi": false}, {"type": "draw", "seat": 2, "tile": 2}, {"type": "discard", "seat": 2, "tile": 11, "riichi": false}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 31, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 9, "riichi": false}, {"type": "draw", "seat": 1, "tile": 17}, {"type": "discard", "seat": 1, "tile": 17, "riichi": false}, {"type": "draw", "seat": 2, "tile": 14}, {"type": "discard", "seat": 2, "tile": 13, "riichi": false}, {"type": "draw", "seat": 3, "tile": 1}, {"type": "discard", "seat": 3, "tile": 1, "riichi": false}, {"type": "draw", "seat": 0, "tile": 8}, {"type": "discard", "seat": 0, "tile": 6, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 19, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "riichi", "seat": 0}, {"type": "discard", "seat": 0, "tile": 8, "riichi": true}, {"type": "draw", "seat": 1, "tile": 12}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 31}, {"type": "discard", "seat": 2, "tile": 3, "riichi": false}, {"type": "draw", "seat": 3, "tile": 3}, {"type": "discard", "seat": 3, "tile": 3, "riichi": false}, {"type": "draw", "seat": 0, "tile": 25}, {"type": "discard", "seat": 0, "tile": 25, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 27, "riichi": false}, {"type": "draw", "seat": 2, "tile": 4}, {"type": "discard", "seat": 2, "tile": 25, "riichi": false}, {"type": "meld", "seat": 3, "meld_type": "chi", "tiles": [23, 24, 25], "from_seat": 2, "taken_tile": 25}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 33, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 10, "riichi": false}, {"type": "draw", "seat": 1, "tile": 13}, {"type": "riichi", "seat": 1}, {"type": "discard", "seat": 1, "tile": 30, "riichi": true}, {"type": "draw", "seat": 2, "tile": 28}, {"type": "discard", "seat": 2, "tile": 2, "riichi": false}, {"type": "draw", "seat": 3, "tile": 5}, {"type": "discard", "seat": 3, "tile": 8, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 24, "riichi": false}, {"type": "draw", "seat": 2, "tile": 0}, {"type": "discard", "seat": 2, "tile": 0, "riichi": false}, {"type": "draw", "seat": 3, "tile": 25}, {"type": "discard", "seat": 3, "tile": 26, "riichi": false}, {"type": "draw", "seat": 0, "tile": 32}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}];
 const INITIAL_HANDS = [[0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 2, 2, 2, 0, 0, 1, 0], [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0], [2, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1]];
 const RESULT = {"type": "ron", "winner": 0, "from_player": 1, "turn": 14, "winning_tile": 18};
-const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#1", "ShantenAgent#2", "ShantenAgent#3", "ShantenAgent#4"]};
+const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#1809", "ShantenAgent#1810", "ShantenAgent#1811", "ShantenAgent#1812"]};
 const SEAT_NAMES = ["東家", "南家", "西家", "北家"];
 const AGENTS = METADATA.agents || ["?","?","?","?"];
 
@@ -246,6 +272,7 @@ let step = -1;
 let autoTimer = null;
 let hands = [[], [], [], []];
 let rivers = [[], [], [], []];
+let melds = [[], [], [], []];
 let lastDraw = [null, null, null, null];
 let riichiState = [false, false, false, false];
 
@@ -275,6 +302,7 @@ function resetState() {
     for (let s = 0; s < 4; s++) {
         hands[s] = INITIAL_HANDS[s].slice();
         rivers[s] = [];
+        melds[s] = [];
         lastDraw[s] = null;
         riichiState[s] = false;
     }
@@ -293,6 +321,40 @@ function applyActions(upTo) {
             hands[a.seat][a.tile]--;
             rivers[a.seat].push({ tile: a.tile, isLast: false, riichi: !!a.riichi });
             if (lastDraw[a.seat] === a.tile) lastDraw[a.seat] = null;
+        } else if (a.type === "meld") {
+            let mt = a.meld_type;
+            let tiles = a.tiles;
+            let taken = a.taken_tile;
+            if (mt === "chi") {
+                for (let t of tiles) {
+                    if (t !== taken) hands[a.seat][t]--;
+                }
+            } else if (mt === "pon") {
+                hands[a.seat][taken] -= 2;
+            } else if (mt === "daiminkan") {
+                hands[a.seat][taken] -= 3;
+            } else if (mt === "ankan") {
+                hands[a.seat][taken] -= 4;
+            } else if (mt === "kakan") {
+                hands[a.seat][taken] -= 1;
+                for (let m of melds[a.seat]) {
+                    if (m.meld_type === "pon" && m.tiles[0] === taken) {
+                        m.meld_type = "kakan";
+                        m.tiles.push(taken);
+                    }
+                }
+            }
+            if (mt !== "kakan") {
+                melds[a.seat].push({
+                    meld_type: mt, tiles: tiles,
+                    from_seat: a.from_seat, taken_tile: taken
+                });
+            }
+            if (a.from_seat !== null && a.from_seat !== undefined
+                && mt !== "ankan" && mt !== "kakan") {
+                let fromRiver = rivers[a.from_seat];
+                if (fromRiver.length > 0) fromRiver.pop();
+            }
         }
     }
     for (let s = 0; s < 4; s++) {
@@ -317,7 +379,6 @@ function getActiveSeat() {
 
 function renderHand(seat, isVertical) {
     let html = '';
-    // South (seat 1): reverse order for 90° CW rotation
     let reversed = (seat === 1);
     let start = reversed ? 33 : 0;
     let end = reversed ? -1 : 34;
@@ -343,13 +404,37 @@ function renderRiver(seat, isVertical) {
     return html;
 }
 
+function renderMelds(seat, isVertical) {
+    let seatMelds = melds[seat];
+    if (seatMelds.length === 0) return '';
+    let html = '';
+    for (let m of seatMelds) {
+        html += '<span class="meld-group">';
+        let label = {
+            chi:"\u30C1\u30FC", pon:"\u30DD\u30F3",
+            daiminkan:"\u660E\u69FB", ankan:"\u6697\u69FB",
+            kakan:"\u52A0\u69FB"
+        }[m.meld_type] || "";
+        for (let t of m.tiles) {
+            let cls = (t === m.taken_tile && m.meld_type !== "ankan") ? "meld-taken" : "";
+            html += isVertical ?
+                '<img class="tile-meld-vert ' + cls + '" src="' + tileSvgUrl(t) +
+                '" title="' + label + " " + TILE_NAMES[t] + '">' :
+                '<img class="tile-meld ' + cls + '" src="' + tileSvgUrl(t) +
+                '" title="' + label + " " + TILE_NAMES[t] + '">';
+        }
+        html += '</span>';
+    }
+    return html;
+}
+
 function render() {
     if (step < 0) { resetState(); } else { applyActions(step); }
     let active = getActiveSeat();
     let isEnd = (step >= ACTIONS.length - 1) && RESULT;
-    let winner = (RESULT && (RESULT.type === "tsumo" || RESULT.type === "ron")) ? RESULT.winner : -1;
+    let winner = (RESULT && (RESULT.type === "tsumo" || RESULT.type === "ron"))
+        ? RESULT.winner : -1;
 
-    // seat 0=東(bottom), 1=南(right), 2=西(top), 3=北(left)
     let positions = [
         { seat: 2, id: "hand-2", pos: "hand-top", vertical: false },
         { seat: 3, id: "hand-3", pos: "hand-left", vertical: true },
@@ -363,14 +448,18 @@ function render() {
         if (isEnd && p.seat === winner) el.classList.add("winner");
         else if (p.seat === active) el.classList.add("active");
 
-        let rMark = riichiState[p.seat] ? '<span class="riichi-mark">リーチ</span>' : '';
+        let rMark = riichiState[p.seat]
+            ? '<span class="riichi-mark">\u30EA\u30FC\u30C1</span>' : '';
         let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] + rMark +
                     '</span><span class="agent">' + AGENTS[p.seat] + '</span></div>';
-        let tiles = '<div class="hand-tiles">' + renderHand(p.seat, p.vertical) + '</div>';
+        let meldsHtml = renderMelds(p.seat, p.vertical);
+        let meldsDiv = meldsHtml
+            ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
+        let tiles = '<div class="hand-tiles">' +
+            renderHand(p.seat, p.vertical) + meldsDiv + '</div>';
         el.innerHTML = label + tiles;
     }
 
-    // Rivers
     let riverConfigs = [
         { seat: 2, id: "river-2", vertical: false },
         { seat: 3, id: "river-3", vertical: true },
@@ -381,45 +470,53 @@ function render() {
         document.getElementById(rc.id).innerHTML = renderRiver(rc.seat, rc.vertical);
     }
 
-    // Center
     let turn = getCurrentTurn();
     document.getElementById("center-info").innerHTML =
-        "<div style='font-size:18px;'>巡目: " + turn + "</div>" +
-        "<div style='font-size:12px;color:#8a8;margin-top:4px;'>残り: " +
-        (122 - countDraws()) + "枚</div>";
+        "<div style='font-size:18px;'>\u5DE1\u76EE: " + turn + "</div>" +
+        "<div style='font-size:12px;color:#8a8;margin-top:4px;'>\u6B8B\u308A: " +
+        (122 - countDraws()) + "\u679A</div>";
 
-    // Step info
-    let info = "配牌";
+    let info = "\u914D\u724C";
     if (step >= 0) {
         let a = ACTIONS[step];
         if (a.type === "riichi") {
-            info = SEAT_NAMES[a.seat] + " リーチ!";
+            info = SEAT_NAMES[a.seat] + " \u30EA\u30FC\u30C1!";
+        } else if (a.type === "meld") {
+            let mLabel = {
+                chi:"\u30C1\u30FC", pon:"\u30DD\u30F3",
+                daiminkan:"\u660E\u69FB", ankan:"\u6697\u69FB",
+                kakan:"\u52A0\u69FB"
+            }[a.meld_type] || "";
+            info = SEAT_NAMES[a.seat] + " " + mLabel + "! " + TILE_NAMES[a.taken_tile];
         } else {
             info = SEAT_NAMES[a.seat] + " " +
-                   (a.type === "draw" ? "ツモ " : "打 ") + TILE_NAMES[a.tile];
+                   (a.type === "draw" ? "\u30C4\u30E2 " : "\u6253 ") +
+                   TILE_NAMES[a.tile];
         }
     }
     document.getElementById("step-info").textContent =
         (step + 1) + "/" + ACTIONS.length + " " + info;
 
-    // Result
     let banner = document.getElementById("result-banner");
     if (isEnd) {
         banner.style.display = "block";
         if (RESULT.type === "tsumo") {
-            banner.innerHTML = "ツモ和了! " + SEAT_NAMES[RESULT.winner] +
-                " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn + "巡目 和了牌: " +
+            banner.innerHTML = "\u30C4\u30E2\u548C\u4E86! " +
+                SEAT_NAMES[RESULT.winner] +
+                " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn +
+                "\u5DE1\u76EE \u548C\u4E86\u724C: " +
                 '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
                 '" style="vertical-align:middle;">';
         } else if (RESULT.type === "ron") {
-            banner.innerHTML = "ロン和了! " + SEAT_NAMES[RESULT.winner] +
-                " (" + AGENTS[RESULT.winner] + ") ← " +
+            banner.innerHTML = "\u30ED\u30F3\u548C\u4E86! " +
+                SEAT_NAMES[RESULT.winner] +
+                " (" + AGENTS[RESULT.winner] + ") \u2190 " +
                 SEAT_NAMES[RESULT.from_player] +
-                " " + RESULT.turn + "巡目 和了牌: " +
+                " " + RESULT.turn + "\u5DE1\u76EE \u548C\u4E86\u724C: " +
                 '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
                 '" style="vertical-align:middle;">';
         } else {
-            banner.innerHTML = "流局 (" + RESULT.turn + "巡目)";
+            banner.innerHTML = "\u6D41\u5C40 (" + RESULT.turn + "\u5DE1\u76EE)";
         }
     } else { banner.style.display = "none"; }
     updateButtons();
@@ -446,17 +543,18 @@ function goEnd() { step = ACTIONS.length - 1; render(); }
 function toggleAuto() {
     if (autoTimer) {
         clearInterval(autoTimer); autoTimer = null;
-        document.getElementById("btn-auto").textContent = "自動再生";
+        document.getElementById("btn-auto").textContent = "\u81EA\u52D5\u518D\u751F";
     } else {
         autoTimer = setInterval(() => {
             if (step >= ACTIONS.length - 1) {
                 clearInterval(autoTimer); autoTimer = null;
-                document.getElementById("btn-auto").textContent = "自動再生";
+                document.getElementById("btn-auto").textContent =
+                    "\u81EA\u52D5\u518D\u751F";
                 return;
             }
             goNext();
         }, 300);
-        document.getElementById("btn-auto").textContent = "停止";
+        document.getElementById("btn-auto").textContent = "\u505C\u6B62";
     }
 }
 

@@ -2,10 +2,10 @@
   "metadata": {
     "wall_seed": 42,
     "agents": [
-      "ShantenAgent#1",
-      "ShantenAgent#2",
-      "ShantenAgent#3",
-      "ShantenAgent#4"
+      "ShantenAgent#1809",
+      "ShantenAgent#1810",
+      "ShantenAgent#1811",
+      "ShantenAgent#1812"
     ]
   },
   "initial_hands": [
@@ -677,6 +677,18 @@
       "riichi": false
     },
     {
+      "type": "meld",
+      "seat": 3,
+      "meld_type": "chi",
+      "tiles": [
+        23,
+        24,
+        25
+      ],
+      "from_seat": 2,
+      "taken_tile": 25
+    },
+    {
       "type": "draw",
       "seat": 3,
       "tile": 31
@@ -776,7 +788,7 @@
     {
       "type": "discard",
       "seat": 3,
-      "tile": 23,
+      "tile": 26,
       "riichi": false
     },
     {

@@ -50,6 +50,26 @@ class GameRecord:
             "seat": seat,
         })
 
+    def record_meld(self, seat, meld_type, tiles, from_seat, taken_tile):
+        """
+        副露（鳴き）を記録
+
+        Args:
+            seat: 鳴いたプレイヤーの席番号
+            meld_type: "chi", "pon", "daiminkan", "ankan", "kakan"
+            tiles: 副露の牌IDリスト
+            from_seat: 鳴いた相手の席番号（ankanはNone）
+            taken_tile: 鳴いた牌のID
+        """
+        self.actions.append({
+            "type": "meld",
+            "seat": seat,
+            "meld_type": meld_type,
+            "tiles": tiles,
+            "from_seat": from_seat,
+            "taken_tile": taken_tile,
+        })
+
     def record_result(self, result):
         """局の結果を記録"""
         self.result = result
@@ -118,6 +138,14 @@ class GameRecord:
                 t = tile_name(action["tile"])
                 riichi_mark = " (リーチ宣言牌)" if action.get("riichi") else ""
                 lines.append(f"       {name}家 打 :{t}{riichi_mark}")
+            elif action["type"] == "meld":
+                mt = action["meld_type"]
+                tiles_str = " ".join(tile_name(t) for t in action["tiles"])
+                from_name = seat_names[action["from_seat"]] if action["from_seat"] is not None else ""
+                label = {"chi": "チー", "pon": "ポン", "daiminkan": "大明槓",
+                         "ankan": "暗槓", "kakan": "加槓"}[mt]
+                src = f" ← {from_name}家" if from_name else ""
+                lines.append(f"       {name}家 {label}{src} [{tiles_str}]")
 
             last_seat = seat
         lines.append("")
