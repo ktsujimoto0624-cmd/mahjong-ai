@@ -91,27 +91,26 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 }
 
 /* 河エリア: 6牌ずつ並べる */
-.river-area { display: grid; gap: 1px; }
+.river-area { gap: 1px; }
 .river-top, .river-bottom {
-    grid-template-columns: repeat(6, auto);
+    display: grid; grid-template-columns: repeat(6, auto);
     justify-content: center; min-height: 36px;
 }
 .river-top { transform: rotate(180deg); }
-.river-left {
-    grid-template-rows: repeat(6, auto);
-    grid-auto-flow: column;
-    align-content: center; min-width: 36px;
-    overflow: hidden;
-    direction: rtl;
-}
-.river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
+/* 南家河: 下→上に6牌、次の列は右へ(中心から離れる方向) */
 .river-right {
-    grid-template-rows: repeat(6, auto);
-    grid-auto-flow: column;
-    align-content: center; min-width: 36px;
-    overflow: hidden;
+    display: flex; flex-direction: column-reverse; flex-wrap: wrap;
+    align-content: flex-start;
+    max-height: 166px; min-width: 36px; overflow: hidden;
 }
 .river-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
+/* 北家河: 上→下に6牌、次の列は左へ(中心から離れる方向) */
+.river-left {
+    display: flex; flex-direction: column; flex-wrap: wrap-reverse;
+    align-content: flex-end;
+    max-height: 166px; min-width: 36px; overflow: hidden;
+}
+.river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
 
 /* 中央情報 */
 .center-info {
