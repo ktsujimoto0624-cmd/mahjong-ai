@@ -4,87 +4,156 @@
 <meta charset="UTF-8">
 <title>麻雀棋譜ビューア</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Meiryo', 'Yu Gothic', sans-serif; background: #1a472a; color: #fff; padding: 20px; }
-h1 { text-align: center; margin-bottom: 10px; font-size: 20px; }
-.meta { text-align: center; color: #aaa; margin-bottom: 15px; font-size: 13px; }
 
-.controls { text-align: center; margin: 15px 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Meiryo', 'Yu Gothic', sans-serif;
+    background: #1a472a; color: #fff; padding: 15px;
+}
+h1 { text-align: center; margin-bottom: 6px; font-size: 20px; }
+.meta { text-align: center; color: #aaa; margin-bottom: 10px; font-size: 13px; }
+
+.controls { text-align: center; margin: 10px 0; }
 .controls button {
     background: #2d6a3f; border: 1px solid #4a9; color: #fff;
-    padding: 8px 18px; margin: 0 4px; cursor: pointer; border-radius: 4px; font-size: 14px;
+    padding: 6px 16px; margin: 0 3px; cursor: pointer; border-radius: 4px; font-size: 13px;
 }
 .controls button:hover { background: #3a8a5f; }
 .controls button:disabled { opacity: 0.4; cursor: default; }
-.controls .step-info { display: inline-block; min-width: 120px; font-size: 14px; }
+.controls .step-info { display: inline-block; min-width: 140px; font-size: 14px; }
 
-.table {
-    display: grid;
-    grid-template-areas: ".    north ." "west center east" ".    south .";
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-template-rows: auto auto auto;
-    gap: 10px; max-width: 1100px; margin: 0 auto;
+/* === 麻雀卓レイアウト === */
+.mahjong-table {
+    max-width: 1000px; margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
 
-.player { background: #0d2818; border: 1px solid #2a5; border-radius: 8px; padding: 12px; min-height: 120px; }
-.player.active { border-color: #ff0; box-shadow: 0 0 10px rgba(255,255,0,0.3); }
-.player.winner { border-color: #f44; box-shadow: 0 0 15px rgba(255,80,80,0.5); }
-.player-north { grid-area: north; }
-.player-east  { grid-area: east; }
-.player-south { grid-area: south; }
-.player-west  { grid-area: west; }
+/* 手牌エリア共通 */
+.hand-area {
+    background: #0d2818; border: 1px solid #2a5; border-radius: 6px;
+    padding: 6px 10px; position: relative;
+}
+.hand-area.active { border-color: #ff0; box-shadow: 0 0 8px rgba(255,255,0,0.3); }
+.hand-area.winner { border-color: #f44; box-shadow: 0 0 12px rgba(255,80,80,0.5); }
 
-.center { grid-area: center; display: flex; align-items: center; justify-content: center; }
-.center-info { background: #0a1f10; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid #2a5; }
+.hand-label {
+    font-size: 13px; font-weight: bold; margin-bottom: 4px;
+    display: flex; justify-content: space-between;
+}
+.hand-label .agent { color: #8c8; font-size: 11px; font-weight: normal; }
 
-.player-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; }
-.seat-name { font-weight: bold; font-size: 15px; }
-.agent-name { color: #8c8; font-size: 12px; }
+/* 上下の手牌: 横1列 */
+.hand-top, .hand-bottom {
+    display: flex; flex-direction: column; width: 100%;
+}
+.hand-tiles {
+    display: flex; flex-wrap: nowrap; gap: 2px; align-items: flex-end;
+}
+.hand-top .hand-tiles { justify-content: center; }
+.hand-bottom .hand-tiles { justify-content: center; }
 
-.hand { margin: 5px 0; }
-.hand-label { font-size: 11px; color: #8a8; margin-bottom: 3px; }
-.tiles { display: flex; flex-wrap: wrap; gap: 2px; align-items: flex-end; }
+/* 左右の手牌: 縦1列 */
+.hand-left, .hand-right {
+    display: flex; flex-direction: column; min-width: 50px; max-width: 56px;
+}
+.hand-left .hand-tiles, .hand-right .hand-tiles {
+    display: flex; flex-direction: column; gap: 1px; align-items: center;
+}
+.hand-left .hand-label, .hand-right .hand-label {
+    flex-direction: column; align-items: center; gap: 0;
+}
+.hand-left .hand-label .agent, .hand-right .hand-label .agent { display: none; }
 
+/* 中段 */
+.middle-row {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+}
+
+/* 河テーブル（中央） */
+.river-table {
+    flex: 1; background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
+    padding: 10px; display: flex; flex-direction: column; gap: 4px;
+    min-height: 300px;
+}
+.river-middle {
+    display: flex; align-items: center; gap: 8px; flex: 1;
+}
+
+/* 河エリア */
+.river-area { display: flex; flex-wrap: wrap; gap: 1px; }
+.river-top { justify-content: center; min-height: 40px; }
+.river-bottom { justify-content: center; min-height: 40px; }
+.river-left {
+    flex-direction: column; min-width: 40px; align-items: center;
+    max-height: 240px; overflow-y: auto;
+}
+.river-right {
+    flex-direction: column; min-width: 40px; align-items: center;
+    max-height: 240px; overflow-y: auto;
+}
+
+/* 中央情報 */
+.center-info {
+    flex: 1; text-align: center; padding: 10px;
+    background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
+}
+
+/* 牌画像 */
 .tile-img {
-    height: 48px; width: auto; border-radius: 4px; transition: transform 0.1s;
-    background: #f5f0e0; padding: 2px; border: 1px solid #bba;
+    height: 44px; width: auto; border-radius: 3px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+    transition: transform 0.1s;
 }
-.tile-img:hover { transform: translateY(-3px); }
+.tile-img:hover { transform: translateY(-2px); }
 .tile-img.draw-highlight {
-    background: #fffbe6; box-shadow: 0 0 10px 3px #ffe066;
-    border: 2px solid #ffcc00; border-radius: 5px;
+    background: #fffbe6; box-shadow: 0 0 8px 2px #ffe066;
+    border: 2px solid #ffcc00;
 }
 .tile-img.discard-last {
-    background: #ffe0e0; box-shadow: 0 0 8px 2px #ff6666;
-    border: 2px solid #ff4444; border-radius: 5px;
+    background: #ffe0e0; box-shadow: 0 0 6px 2px #ff6666;
+    border: 2px solid #ff4444;
 }
 
-.tile-img-small {
-    height: 36px; width: auto; border-radius: 3px;
+/* 河の牌（小さめ） */
+.tile-river {
+    height: 32px; width: auto; border-radius: 2px;
     background: #e8e0d0; padding: 1px; border: 1px solid #a99;
 }
-.tile-img-small.discard-last {
-    background: #ffe0e0; box-shadow: 0 0 6px 2px #ff6666;
-    border: 2px solid #ff4444; border-radius: 4px;
+.tile-river.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 5px 1px #ff6666;
+    border: 2px solid #ff4444;
 }
 
-.river { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
+/* 縦の牌（左右プレイヤー） */
+.tile-vert {
+    height: auto; width: 36px; border-radius: 3px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.tile-vert.draw-highlight {
+    background: #fffbe6; box-shadow: 0 0 8px 2px #ffe066;
+    border: 2px solid #ffcc00;
+}
+
+.tile-river-vert {
+    height: auto; width: 28px; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-river-vert.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 5px 1px #ff6666;
+    border: 2px solid #ff4444;
+}
 
 .result-banner {
-    text-align: center; margin: 15px 0; padding: 12px;
+    text-align: center; margin: 12px auto; padding: 12px;
     background: #0d2818; border: 2px solid #f84; border-radius: 8px;
-    font-size: 16px; display: none;
+    font-size: 16px; display: none; max-width: 1000px;
 }
 
-.credit { text-align: center; margin-top: 15px; font-size: 11px; color: #586; }
-.credit a { color: #8b6; }
 </style>
 </head>
 <body>
-
 <h1>麻雀棋譜ビューア</h1>
 <div class="meta" id="meta"></div>
-
 <div class="controls">
     <button id="btn-start" onclick="goStart()">|&lt;</button>
     <button id="btn-prev" onclick="goPrev()">&lt; 戻る</button>
@@ -94,12 +163,28 @@ h1 { text-align: center; margin-bottom: 10px; font-size: 20px; }
     <button id="btn-auto" onclick="toggleAuto()">自動再生</button>
 </div>
 
-<div class="table">
-    <div class="player player-north" id="player-2"></div>
-    <div class="player player-west"  id="player-3"></div>
-    <div class="center"><div class="center-info" id="center-info">巡目: 0</div></div>
-    <div class="player player-east"  id="player-1"></div>
-    <div class="player player-south" id="player-0"></div>
+<!-- 麻雀卓レイアウト -->
+<div class="mahjong-table">
+    <!-- 対面(北=seat2) 手牌 -->
+    <div class="hand-area hand-top" id="hand-2"></div>
+
+    <!-- 中段: 左手(西=seat3) | 河エリア | 右手(東=seat1) -->
+    <div class="middle-row">
+        <div class="hand-area hand-left" id="hand-3"></div>
+        <div class="river-table">
+            <div class="river-area river-top" id="river-2"></div>
+            <div class="river-middle">
+                <div class="river-area river-left" id="river-3"></div>
+                <div class="center-info" id="center-info"></div>
+                <div class="river-area river-right" id="river-1"></div>
+            </div>
+            <div class="river-area river-bottom" id="river-0"></div>
+        </div>
+        <div class="hand-area hand-right" id="hand-1"></div>
+    </div>
+
+    <!-- 自分(南=seat0) 手牌 -->
+    <div class="hand-area hand-bottom" id="hand-0"></div>
 </div>
 
 <div class="result-banner" id="result-banner"></div>
@@ -115,7 +200,6 @@ const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#1", "ShantenAgent#2"
 const SEAT_NAMES = ["東家", "南家", "西家", "北家"];
 const AGENTS = METADATA.agents || ["?","?","?","?"];
 
-
 let step = -1;
 let autoTimer = null;
 let hands = [[], [], [], []];
@@ -125,18 +209,23 @@ let lastDraw = [null, null, null, null];
 document.getElementById("meta").textContent =
     "seed: " + (METADATA.wall_seed || "?") + " | " + AGENTS.join(" vs ");
 
-function tileSvgUrl(tileId) {
-    return TILES_DIR + "/" + TILE_SVGS[tileId] + ".svg";
-}
+function tileSvgUrl(id) { return TILES_DIR + "/" + TILE_SVGS[id] + ".svg"; }
 
-function renderTile(tileId, cls) {
-    return '<img class="tile-img ' + cls + '" src="' + tileSvgUrl(tileId) +
-           '" alt="' + TILE_NAMES[tileId] + '" title="' + TILE_NAMES[tileId] + '">';
+function tileImg(id, cls) {
+    return '<img class="tile-img ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
 }
-
-function renderTileSmall(tileId, cls) {
-    return '<img class="tile-img-small ' + cls + '" src="' + tileSvgUrl(tileId) +
-           '" alt="' + TILE_NAMES[tileId] + '" title="' + TILE_NAMES[tileId] + '">';
+function tileVert(id, cls) {
+    return '<img class="tile-vert ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
+}
+function tileRiver(id, cls) {
+    return '<img class="tile-river ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
+}
+function tileRiverVert(id, cls) {
+    return '<img class="tile-river-vert ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
 }
 
 function resetState() {
@@ -161,9 +250,8 @@ function applyActions(upTo) {
         }
     }
     for (let s = 0; s < 4; s++) {
-        if (rivers[s].length > 0) {
-            rivers[s][rivers[s].length - 1].isLast = (upTo >= 0);
-        }
+        if (rivers[s].length > 0)
+            rivers[s][rivers[s].length - 1].isLast = true;
     }
 }
 
@@ -173,7 +261,7 @@ function getCurrentTurn() {
     for (let i = 0; i <= step; i++) {
         if (ACTIONS[i].type === "draw") draws[ACTIONS[i].seat]++;
     }
-    return Math.max(0, Math.floor((Math.max(...draws) - 1)));
+    return Math.max(0, Math.max(...draws) - 1);
 }
 
 function getActiveSeat() {
@@ -181,82 +269,100 @@ function getActiveSeat() {
     return ACTIONS[step].seat;
 }
 
+function renderHand(seat, isVertical) {
+    let html = '';
+    for (let t = 0; t < 34; t++) {
+        for (let c = 0; c < hands[seat][t]; c++) {
+            let cls = (lastDraw[seat] === t && c === hands[seat][t] - 1) ? "draw-highlight" : "";
+            html += isVertical ? tileVert(t, cls) : tileImg(t, cls);
+        }
+    }
+    return html;
+}
+
+function renderRiver(seat, isVertical) {
+    let html = '';
+    for (let r = 0; r < rivers[seat].length; r++) {
+        let cls = rivers[seat][r].isLast ? "discard-last" : "";
+        html += isVertical ? tileRiverVert(rivers[seat][r].tile, cls) :
+                             tileRiver(rivers[seat][r].tile, cls);
+    }
+    return html;
+}
+
 function render() {
     if (step < 0) { resetState(); } else { applyActions(step); }
-
-    let activeSeat = getActiveSeat();
+    let active = getActiveSeat();
     let isEnd = (step >= ACTIONS.length - 1) && RESULT;
-    let winnerSeat = (RESULT && RESULT.type === "tsumo") ? RESULT.winner : -1;
+    let winner = (RESULT && RESULT.type === "tsumo") ? RESULT.winner : -1;
 
-    for (let s = 0; s < 4; s++) {
-        let el = document.getElementById("player-" + s);
-        el.className = "player player-" + ["south","east","north","west"][s];
-        if (isEnd && s === winnerSeat) el.classList.add("winner");
-        else if (s === activeSeat) el.classList.add("active");
+    // seat 0=東(bottom), 1=南(right), 2=西(top), 3=北(left)
+    let positions = [
+        { seat: 2, id: "hand-2", pos: "hand-top", vertical: false },
+        { seat: 3, id: "hand-3", pos: "hand-left", vertical: true },
+        { seat: 1, id: "hand-1", pos: "hand-right", vertical: true },
+        { seat: 0, id: "hand-0", pos: "hand-bottom", vertical: false },
+    ];
 
-        let html = '<div class="player-header">' +
-            '<span class="seat-name">' + SEAT_NAMES[s] + '</span>' +
-            '<span class="agent-name">' + AGENTS[s] + '</span></div>';
+    for (let p of positions) {
+        let el = document.getElementById(p.id);
+        el.className = "hand-area " + p.pos;
+        if (isEnd && p.seat === winner) el.classList.add("winner");
+        else if (p.seat === active) el.classList.add("active");
 
-        // hand
-        html += '<div class="hand"><div class="hand-label">手牌</div><div class="tiles">';
-        for (let t = 0; t < 34; t++) {
-            for (let c = 0; c < hands[s][t]; c++) {
-                let cls = (lastDraw[s] === t && c === hands[s][t] - 1) ? "draw-highlight" : "";
-                html += renderTile(t, cls);
-            }
-        }
-        html += '</div></div>';
-
-        // river
-        html += '<div class="hand"><div class="hand-label">河（捨て牌）</div><div class="river">';
-        for (let r = 0; r < rivers[s].length; r++) {
-            let cls = rivers[s][r].isLast ? "discard-last" : "";
-            html += renderTileSmall(rivers[s][r].tile, cls);
-        }
-        html += '</div></div>';
-
-        el.innerHTML = html;
+        let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] +
+                    '</span><span class="agent">' + AGENTS[p.seat] + '</span></div>';
+        let tiles = '<div class="hand-tiles">' + renderHand(p.seat, p.vertical) + '</div>';
+        el.innerHTML = label + tiles;
     }
 
+    // Rivers
+    let riverConfigs = [
+        { seat: 2, id: "river-2", vertical: false },
+        { seat: 3, id: "river-3", vertical: true },
+        { seat: 1, id: "river-1", vertical: true },
+        { seat: 0, id: "river-0", vertical: false },
+    ];
+    for (let rc of riverConfigs) {
+        document.getElementById(rc.id).innerHTML = renderRiver(rc.seat, rc.vertical);
+    }
+
+    // Center
     let turn = getCurrentTurn();
     document.getElementById("center-info").innerHTML =
-        "<div>巡目: " + turn + "</div>" +
-        "<div style='font-size:12px;color:#8a8;margin-top:5px;'>残り: " +
+        "<div style='font-size:18px;'>巡目: " + turn + "</div>" +
+        "<div style='font-size:12px;color:#8a8;margin-top:4px;'>残り: " +
         (122 - countDraws()) + "枚</div>";
 
+    // Step info
     let info = "配牌";
     if (step >= 0) {
         let a = ACTIONS[step];
         info = SEAT_NAMES[a.seat] + " " +
-               (a.type === "draw" ? "ツモ " : "打 ") +
-               TILE_NAMES[a.tile];
+               (a.type === "draw" ? "ツモ " : "打 ") + TILE_NAMES[a.tile];
     }
     document.getElementById("step-info").textContent =
         (step + 1) + "/" + ACTIONS.length + " " + info;
 
+    // Result
     let banner = document.getElementById("result-banner");
     if (isEnd) {
         banner.style.display = "block";
         if (RESULT.type === "tsumo") {
             banner.innerHTML = "ツモ和了! " + SEAT_NAMES[RESULT.winner] +
-                " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn + "巡目" +
-                " 和了牌: " + '<img class="tile-img" src="' +
-                tileSvgUrl(RESULT.winning_tile) + '" style="vertical-align:middle;">';
+                " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn + "巡目 和了牌: " +
+                '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
+                '" style="vertical-align:middle;">';
         } else {
             banner.innerHTML = "流局 (" + RESULT.turn + "巡目)";
         }
-    } else {
-        banner.style.display = "none";
-    }
+    } else { banner.style.display = "none"; }
     updateButtons();
 }
 
 function countDraws() {
     let c = 0;
-    for (let i = 0; i <= step; i++) {
-        if (ACTIONS[i].type === "draw") c++;
-    }
+    for (let i = 0; i <= step; i++) { if (ACTIONS[i].type === "draw") c++; }
     return c;
 }
 
