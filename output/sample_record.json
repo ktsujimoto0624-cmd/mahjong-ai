@@ -1,0 +1,860 @@
+{
+  "metadata": {
+    "wall_seed": 42,
+    "agents": [
+      "ShantenAgent#1",
+      "ShantenAgent#2",
+      "ShantenAgent#3",
+      "ShantenAgent#4"
+    ]
+  },
+  "initial_hands": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      2,
+      2,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1
+    ]
+  ],
+  "actions": [
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 29
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 29
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 10
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 10
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 9
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 1
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 31
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 9
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 10
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 21
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 24
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 7
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 22
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 4
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 4
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 12
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 10
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 13
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 23
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 4
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 32
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 8
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 11
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 11
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 26
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 26
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 19
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 19
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 21
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 22
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 24
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 20
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 28
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 28
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 23
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 25
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 18
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 20
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 20
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 20
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 32
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 21
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 33
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 2
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 4
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 6
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 20
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 18
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 18
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 11
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 32
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 19
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 19
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 9
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 24
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 33
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 33
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 2
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 11
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 23
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 31
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 3
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 9
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 17
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 17
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 14
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 13
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 1
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 1
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 8
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 6
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 21
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 11
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 19
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 11
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 11
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 3
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 8
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 12
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 31
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 3
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 3
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 3
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 25
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 25
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 27
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 4
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 25
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 31
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 33
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 10
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 10
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 13
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 30
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 28
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 2
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 5
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 8
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 26
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 18
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 24
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 24
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 0
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 0
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 25
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 23
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 32
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 32
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 18
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 18
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 32
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 28
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 33
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 29
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 13
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 13
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 17
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 17
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 22
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 32
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 20
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 20
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 22
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 26
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 6
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 6
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 17
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 17
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 31
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 33
+    },
+    {
+      "type": "draw",
+      "seat": 0,
+      "tile": 19
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 19
+    },
+    {
+      "type": "draw",
+      "seat": 1,
+      "tile": 16
+    }
+  ],
+  "result": {
+    "type": "tsumo",
+    "winner": 1,
+    "turn": 17,
+    "winning_tile": 16
+  }
+}
