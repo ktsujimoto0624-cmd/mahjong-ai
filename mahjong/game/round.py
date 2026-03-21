@@ -22,13 +22,16 @@ class GameRound(NakiMixin):
 
     SEAT_NAMES = ["東", "南", "西", "北"]
 
-    def __init__(self, agents, wall_seed=None, verbose=False):
+    def __init__(self, agents, wall_seed=None, verbose=False,
+                 dealer=0, round_wind=0):
         self.agents = agents
         self.wall = Wall(seed=wall_seed)
         self.players = [Player(seat=i) for i in range(4)]
         self.verbose = verbose
         self.turn = 0
-        self.current_player = 0
+        self.dealer = dealer
+        self.round_wind = round_wind
+        self.current_player = dealer
         self.result = None
 
         self.record = GameRecord()
@@ -274,7 +277,7 @@ class GameRound(NakiMixin):
     def _advance_turn(self):
         """次のプレイヤーに進める"""
         self.current_player = (self.current_player + 1) % 4
-        if self.current_player == 0:
+        if self.current_player == self.dealer:
             self.turn += 1
 
     def _can_riichi(self, player):
@@ -331,8 +334,8 @@ class GameRound(NakiMixin):
             "winning_tile": winning_tile,
             "is_tsumo": is_tsumo,
             "is_riichi": player.is_riichi,
-            "seat_wind": seat,
-            "round_wind": 0,  # 東場固定（半荘管理は未実装）
+            "seat_wind": (seat - self.dealer + 4) % 4,
+            "round_wind": self.round_wind,
             "is_menzen": player.is_menzen(),
         }
 
