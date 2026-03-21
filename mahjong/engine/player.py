@@ -7,6 +7,7 @@
 from mahjong.engine.tile import (
     empty_hand, hand_to_str, hand_total, tile_name, NUM_TILE_TYPES,
 )
+from mahjong.engine.agari import waiting_tiles
 
 
 class Player:
@@ -143,6 +144,20 @@ class Player:
                 meld["tiles"].append(tile_id)
                 return
         raise ValueError(f"{tile_name(tile_id)}のポンが見つからない")
+
+    def is_furiten(self):
+        """
+        捨て牌フリテン判定。
+
+        自分の待ち牌のいずれかが自分の河にある場合、フリテン。
+        """
+        waits = waiting_tiles(self.hand, len(self.melds))
+        if not waits:
+            return False
+        for tile_id in waits:
+            if tile_id in self.discards:
+                return True
+        return False
 
     def is_menzen(self):
         """門前（鳴いていない）かどうか"""

@@ -251,7 +251,7 @@ class GameRound(NakiMixin):
         return True
 
     def _check_ron(self, discarder, tile):
-        """ロン和了判定。頭ハネ（下家優先）。"""
+        """ロン和了判定。フリテンチェック付き。頭ハネ（下家優先）。"""
         game_state = self._build_game_state()
         for i in range(1, 4):
             seat = (discarder + i) % 4
@@ -262,12 +262,23 @@ class GameRound(NakiMixin):
             can_agari = is_agari(player.hand, melds_count)
             player.hand[tile] -= 1
 
-            if can_agari:
-                wants_ron = self.agents[seat].choose_ron(
-                    player, tile, discarder, game_state,
-                )
-                if wants_ron:
-                    return seat
+            if not can_agari:
+                continue
+
+            # フリテン判定: 自分の河に待ち牌があればロン不可
+            if player.is_furiten():
+                if self.verbose:
+                    print(
+                        f"         ({self.SEAT_NAMES[seat]}家: "
+                        f"フリテンのためロン不可)"
+                    )
+                continue
+
+            wants_ron = self.agents[seat].choose_ron(
+                player, tile, discarder, game_state,
+            )
+            if wants_ron:
+                return seat
         return None
 
     # === ユーティリティ ===

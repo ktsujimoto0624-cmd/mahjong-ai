@@ -339,3 +339,25 @@ def _shanten_kokushi(hand):
     kinds = sum(1 for i in kokushi_tiles if hand[i] > 0)
     has_pair = any(hand[i] >= 2 for i in kokushi_tiles)
     return 13 - kinds - (1 if has_pair else 0)
+
+
+def waiting_tiles(hand, melds_count=0):
+    """
+    テンパイ時の待ち牌リストを返す。
+
+    Args:
+        hand: カウント配列 (34要素)
+        melds_count: 副露数
+
+    Returns:
+        list[int]: 和了可能な牌IDのリスト（テンパイでなければ空）
+    """
+    waits = []
+    for tile_id in range(NUM_TILE_TYPES):
+        if hand[tile_id] >= 4:
+            continue
+        hand[tile_id] += 1
+        if is_agari(hand, melds_count):
+            waits.append(tile_id)
+        hand[tile_id] -= 1
+    return waits
