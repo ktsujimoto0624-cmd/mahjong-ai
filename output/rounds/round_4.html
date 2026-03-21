@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>麻雀棋譜ビューア</title>
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    font-family: 'Meiryo', 'Yu Gothic', sans-serif;
+    background: #1a472a; color: #fff; padding: 10px;
+    height: 100vh; overflow: hidden;
+}
+h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
+.meta { text-align: center; color: #aaa; margin-bottom: 6px; font-size: 12px; }
+
+.controls { text-align: center; margin: 6px 0; }
+.controls button {
+    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
+    padding: 4px 12px; margin: 0 2px; cursor: pointer; border-radius: 4px; font-size: 12px;
+}
+.controls button:hover { background: #3a8a5f; }
+.controls button:disabled { opacity: 0.4; cursor: default; }
+.controls .step-info { display: inline-block; min-width: 130px; font-size: 13px; }
+
+/* === 麻雀卓レイアウト === */
+.mahjong-table {
+    max-width: 1000px; margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    height: calc(100vh - 100px);
+}
+
+/* 手牌エリア共通 */
+.hand-area {
+    background: #0d2818; border: 1px solid #2a5; border-radius: 6px;
+    padding: 4px 8px; position: relative;
+}
+.hand-area.active { border-color: #ff0; box-shadow: 0 0 8px rgba(255,255,0,0.3); }
+.hand-area.winner { border-color: #f44; box-shadow: 0 0 12px rgba(255,80,80,0.5); }
+
+.hand-label {
+    font-size: 13px; font-weight: bold; margin-bottom: 4px;
+    display: flex; justify-content: space-between;
+}
+.hand-label .agent { color: #8c8; font-size: 11px; font-weight: normal; }
+
+/* 上下の手牌: 横1列 */
+.hand-top, .hand-bottom {
+    display: flex; flex-direction: column; width: 100%;
+}
+.hand-tiles {
+    display: flex; flex-wrap: nowrap; align-items: flex-end;
+}
+.hand-top .hand-tiles { transform: rotate(180deg); }
+
+/* 手牌本体（副露と分離） */
+.hand-pure {
+    display: flex; flex-wrap: nowrap; gap: 2px; align-items: flex-end;
+    justify-content: center;
+    flex: 1; min-width: 0;
+}
+
+/* 左右の手牌: 回転して中心向き */
+.hand-left, .hand-right {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-width: 56px; max-width: 62px;
+}
+.hand-left .hand-tiles, .hand-right .hand-tiles {
+    display: flex; flex-direction: column; gap: 0; align-items: center;
+}
+.hand-left .hand-pure, .hand-right .hand-pure {
+    display: flex; flex-direction: column; gap: 0; align-items: center;
+    flex: 1; min-height: 0; justify-content: center;
+}
+.hand-left .tile-vert, .hand-left .tile-river-vert {
+    transform: rotate(90deg);
+    margin: -8px 0;
+}
+.hand-right .tile-vert, .hand-right .tile-river-vert {
+    transform: rotate(-90deg);
+    margin: -8px 0;
+}
+.hand-left .hand-label, .hand-right .hand-label {
+    flex-direction: column; align-items: center; gap: 0;
+}
+.hand-left .hand-label .agent, .hand-right .hand-label .agent { display: none; }
+
+/* 中段 */
+.middle-row {
+    display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1; min-height: 0;
+}
+
+/* 河テーブル（中央） */
+.river-table {
+    flex: 1; background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
+    padding: 6px; display: flex; flex-direction: column; gap: 2px;
+    min-height: 0;
+}
+.river-middle {
+    display: flex; align-items: center; gap: 4px; flex: 1;
+}
+
+/* 河エリア: 6牌ずつ並べる */
+.river-area { gap: 1px; }
+.river-top, .river-bottom {
+    display: grid; grid-template-columns: repeat(6, auto);
+    justify-content: center; min-height: 36px;
+}
+.river-top { transform: rotate(180deg); }
+/* 南家河: 下→上に6牌、次の列は右へ */
+.river-right {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column-reverse; flex-wrap: wrap;
+    align-content: flex-start;
+    max-height: 166px; overflow: hidden;
+}
+.river-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
+/* 北家河: 上→下に6牌、次の列は左へ */
+.river-left {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; flex-wrap: wrap-reverse;
+    align-content: flex-end;
+    max-height: 166px; overflow: hidden;
+}
+.river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
+
+/* 中央情報（ドラ・嶺上牌: 7牌×2列分のスペース確保） */
+.center-info {
+    flex: 0 0 220px; text-align: center; padding: 6px 8px;
+    background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
+}
+
+/* 牌画像 */
+.tile-img {
+    height: 40px; width: auto; border-radius: 3px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+    transition: transform 0.1s;
+}
+.tile-img:hover { transform: translateY(-2px); }
+.tile-img.draw-highlight {
+    background: #fffbe6; box-shadow: 0 0 8px 2px #ffe066;
+    border: 2px solid #ffcc00;
+}
+.tile-img.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 6px 2px #ff6666;
+    border: 2px solid #ff4444;
+}
+
+/* 河の牌（小さめ） */
+.tile-river {
+    height: 32px; width: auto; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-river.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 5px 1px #ff6666;
+    border: 2px solid #ff4444;
+}
+
+/* 縦の牌（左右プレイヤー） */
+.tile-vert {
+    height: auto; width: 36px; border-radius: 3px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.tile-vert.draw-highlight {
+    background: #fffbe6; box-shadow: 0 0 8px 2px #ffe066;
+    border: 2px solid #ffcc00;
+}
+
+.tile-river-vert {
+    height: auto; width: 28px; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-river-vert.discard-last {
+    background: #ffe0e0; box-shadow: 0 0 5px 1px #ff6666;
+    border: 2px solid #ff4444;
+}
+
+/* リーチ牌（横向き） */
+.tile-river.riichi-tile {
+    transform: rotate(90deg);
+    margin: 4px 8px;
+}
+.river-right .tile-river-vert.riichi-tile {
+    transform: rotate(0deg);
+    margin: 2px 4px;
+}
+.river-left .tile-river-vert.riichi-tile {
+    transform: rotate(180deg);
+    margin: 2px 4px;
+}
+
+/* リーチマーク */
+.riichi-mark {
+    color: #f44; font-weight: bold; font-size: 11px;
+    margin-left: 4px;
+}
+
+/* === 副露エリア（4人が90度ずつ回転した点対称） === */
+.melds-area {
+    display: flex; gap: 4px;
+}
+.meld-group {
+    display: flex; gap: 1px; padding: 2px 3px;
+    background: rgba(0,0,0,0.2); border-radius: 3px;
+}
+.tile-meld {
+    height: 36px; width: auto; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.tile-meld-vert {
+    height: auto; width: 32px; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+
+/* 東家(下): 右端に副露、手牌が左にずれる */
+.hand-bottom .melds-area {
+    flex-direction: row-reverse;
+    align-items: flex-end; flex-shrink: 0;
+}
+
+/* 西家(上): 180度回転で自動反転 → 右端=画面左 */
+.hand-top .melds-area {
+    flex-direction: row;
+    align-items: flex-end; flex-shrink: 0;
+}
+
+/* 北家(左): 下端に副露、手牌が上にずれる */
+.hand-left .melds-area {
+    flex-direction: column-reverse; flex-shrink: 0;
+}
+.hand-left .meld-group {
+    flex-direction: column; gap: 0;
+}
+.hand-left .tile-meld-vert { transform: rotate(90deg); margin: -6px 0; }
+
+/* 南家(右): 上端に副露、手牌が下にずれる */
+.hand-right .melds-area {
+    flex-direction: column; flex-shrink: 0; order: -1;
+}
+.hand-right .meld-group {
+    flex-direction: column-reverse; gap: 0;
+}
+.hand-right .tile-meld-vert { transform: rotate(-90deg); margin: -6px 0; }
+
+/* 横向き牌（鳴いた牌を示す） */
+.tile-meld.tile-sideways {
+    transform: rotate(90deg);
+    margin: 6px -4px;
+}
+.hand-left .tile-meld-vert.tile-sideways {
+    transform: rotate(180deg);
+    margin: 0 0;
+}
+.hand-right .tile-meld-vert.tile-sideways {
+    transform: rotate(0deg);
+    margin: 0 0;
+}
+
+/* 暗槓の裏向き牌 */
+.meld-facedown {
+    background: #4a6a8a;
+    border: 1px solid #6a8aaa;
+    filter: saturate(0.3) brightness(0.7);
+}
+
+/* 加槓・大明槓の重ね表示 */
+.kakan-stack {
+    position: relative;
+    display: inline-flex;
+}
+.tile-meld.tile-stacked {
+    position: absolute;
+    bottom: 100%; left: 50%;
+    transform: translateX(-50%) rotate(90deg);
+    margin: 0; height: 32px;
+}
+.hand-left .kakan-stack, .hand-right .kakan-stack {
+    display: flex; flex-direction: row;
+}
+.hand-left .tile-meld-vert.tile-stacked {
+    position: absolute;
+    transform: rotate(180deg);
+    margin: 0; width: 28px;
+    top: 50%; left: auto; right: 100%;
+    transform: rotate(180deg) translateY(-50%);
+}
+.hand-right .tile-meld-vert.tile-stacked {
+    position: absolute;
+    transform: rotate(0deg);
+    margin: 0; width: 28px;
+    top: 50%; left: 100%;
+    transform: rotate(0deg) translateY(-50%);
+}
+
+.result-banner {
+    text-align: center; margin: 4px auto; padding: 8px;
+    background: #0d2818; border: 2px solid #f84; border-radius: 8px;
+    font-size: 14px; display: none; max-width: 1000px;
+}
+
+/* === スマホ縦画面対応 === */
+@media (max-width: 600px) {
+    html, body { padding: 4px; }
+    h1 { font-size: 14px; margin-bottom: 2px; }
+    .meta { font-size: 10px; margin-bottom: 2px; }
+    .controls { margin: 2px 0; }
+    .controls button { padding: 3px 8px; font-size: 10px; }
+    .controls .step-info { font-size: 11px; min-width: 100px; }
+
+    .mahjong-table { gap: 2px; height: calc(100vh - 70px); }
+    .middle-row { gap: 2px; }
+    .river-table { padding: 3px; gap: 1px; }
+    .river-middle { gap: 2px; }
+
+    /* 中央情報を縮小（ドラ表示は維持） */
+    .center-info { flex: 0 0 150px; padding: 3px 4px; font-size: 10px; }
+    .center-info div { font-size: 10px !important; }
+
+    /* 牌を縮小 */
+    .tile-img { height: 30px; }
+    .tile-river { height: 24px; }
+    .tile-vert { width: 28px; }
+    .tile-river-vert { width: 20px; }
+    .tile-meld { height: 28px; }
+    .tile-meld-vert { width: 24px; }
+
+    /* 左右プレイヤーの幅を縮小 */
+    .hand-left, .hand-right { min-width: 40px; max-width: 46px; }
+
+    /* 河のオーバーフロー確保 */
+    .river-left, .river-right { min-width: 24px; }
+    .river-left .tile-river-vert, .river-right .tile-river-vert {
+        margin: -6px 0;
+    }
+    .hand-left .tile-vert, .hand-left .tile-river-vert,
+    .hand-right .tile-vert, .hand-right .tile-river-vert {
+        margin: -10px 0;
+    }
+    .hand-left .tile-meld-vert, .hand-right .tile-meld-vert {
+        margin: -8px 0;
+    }
+
+    .hand-area { padding: 2px 4px; }
+    .hand-label { font-size: 11px; }
+    .result-banner { font-size: 12px; padding: 4px; }
+}
+
+</style>
+</head>
+<body>
+<h1>麻雀棋譜ビューア</h1>
+<div class="meta" id="meta"></div>
+<div class="controls">
+    <button id="btn-start" onclick="goStart()">|&lt;</button>
+    <button id="btn-prev" onclick="goPrev()">&lt; 戻る</button>
+    <span class="step-info" id="step-info">配牌</span>
+    <button id="btn-next" onclick="goNext()">進む &gt;</button>
+    <button id="btn-end" onclick="goEnd()">&gt;|</button>
+    <button id="btn-auto" onclick="toggleAuto()">自動再生</button>
+</div>
+
+<!-- 麻雀卓レイアウト -->
+<div class="mahjong-table">
+    <!-- 対面(北=seat2) 手牌 -->
+    <div class="hand-area hand-top" id="hand-2"></div>
+
+    <!-- 中段: 左手(西=seat3) | 河エリア | 右手(東=seat1) -->
+    <div class="middle-row">
+        <div class="hand-area hand-left" id="hand-3"></div>
+        <div class="river-table">
+            <div class="river-area river-top" id="river-2"></div>
+            <div class="river-middle">
+                <div class="river-area river-left" id="river-3"></div>
+                <div class="center-info" id="center-info"></div>
+                <div class="river-area river-right" id="river-1"></div>
+            </div>
+            <div class="river-area river-bottom" id="river-0"></div>
+        </div>
+        <div class="hand-area hand-right" id="hand-1"></div>
+    </div>
+
+    <!-- 自分(南=seat0) 手牌 -->
+    <div class="hand-area hand-bottom" id="hand-0"></div>
+</div>
+
+<div class="result-banner" id="result-banner"></div>
+
+<script>
+const TILES_DIR = "../tiles";
+const TILE_NAMES = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '東', '南', '西', '北', '白', '發', '中'];
+const TILE_SVGS = ['Man1', 'Man2', 'Man3', 'Man4', 'Man5', 'Man6', 'Man7', 'Man8', 'Man9', 'Pin1', 'Pin2', 'Pin3', 'Pin4', 'Pin5', 'Pin6', 'Pin7', 'Pin8', 'Pin9', 'Sou1', 'Sou2', 'Sou3', 'Sou4', 'Sou5', 'Sou6', 'Sou7', 'Sou8', 'Sou9', 'Ton', 'Nan', 'Shaa', 'Pei', 'Haku', 'Hatsu', 'Chun'];
+const ACTIONS = [{"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 21}, {"type": "discard", "seat": 0, "tile": 31, "riichi": false}, {"type": "draw", "seat": 1, "tile": 25}, {"type": "discard", "seat": 1, "tile": 17, "riichi": false}, {"type": "draw", "seat": 2, "tile": 24}, {"type": "discard", "seat": 2, "tile": 25, "riichi": false}, {"type": "draw", "seat": 3, "tile": 0}, {"type": "discard", "seat": 3, "tile": 0, "riichi": false}, {"type": "draw", "seat": 0, "tile": 18}, {"type": "discard", "seat": 0, "tile": 3, "riichi": false}, {"type": "meld", "seat": 1, "meld_type": "chi", "tiles": [3, 4, 5], "from_seat": 0, "taken_tile": 3}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "draw", "seat": 2, "tile": 28}, {"type": "discard", "seat": 2, "tile": 14, "riichi": false}, {"type": "draw", "seat": 3, "tile": 16}, {"type": "discard", "seat": 3, "tile": 17, "riichi": false}, {"type": "draw", "seat": 0, "tile": 13}, {"type": "discard", "seat": 0, "tile": 9, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 31, "riichi": false}, {"type": "draw", "seat": 2, "tile": 31}, {"type": "discard", "seat": 2, "tile": 32, "riichi": false}, {"type": "draw", "seat": 3, "tile": 28}, {"type": "discard", "seat": 3, "tile": 33, "riichi": false}, {"type": "draw", "seat": 0, "tile": 18}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 6}, {"type": "discard", "seat": 1, "tile": 6, "riichi": false}, {"type": "draw", "seat": 2, "tile": 5}, {"type": "discard", "seat": 2, "tile": 24, "riichi": false}, {"type": "draw", "seat": 3, "tile": 29}, {"type": "discard", "seat": 3, "tile": 28, "riichi": false}, {"type": "draw", "seat": 0, "tile": 27}, {"type": "discard", "seat": 0, "tile": 25, "riichi": false}, {"type": "draw", "seat": 1, "tile": 20}, {"type": "discard", "seat": 1, "tile": 20, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 18, "riichi": false}, {"type": "meld", "seat": 3, "meld_type": "chi", "tiles": [18, 19, 20], "from_seat": 2, "taken_tile": 18}, {"type": "discard", "seat": 3, "tile": 29, "riichi": false}, {"type": "draw", "seat": 0, "tile": 21}, {"type": "discard", "seat": 0, "tile": 23, "riichi": false}, {"type": "meld", "seat": 3, "meld_type": "pon", "tiles": [23, 23, 23], "from_seat": 0, "taken_tile": 23}, {"type": "discard", "seat": 3, "tile": 29, "riichi": false}, {"type": "draw", "seat": 0, "tile": 9}, {"type": "discard", "seat": 0, "tile": 9, "riichi": false}, {"type": "draw", "seat": 1, "tile": 21}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "meld", "seat": 0, "meld_type": "pon", "tiles": [21, 21, 21], "from_seat": 1, "taken_tile": 21}, {"type": "discard", "seat": 0, "tile": 30, "riichi": false}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10, "riichi": false}, {"type": "draw", "seat": 2, "tile": 7}, {"type": "discard", "seat": 2, "tile": 10, "riichi": false}, {"type": "draw", "seat": 3, "tile": 18}, {"type": "discard", "seat": 3, "tile": 18, "riichi": false}, {"type": "draw", "seat": 0, "tile": 24}, {"type": "discard", "seat": 0, "tile": 24, "riichi": false}, {"type": "draw", "seat": 1, "tile": 6}, {"type": "discard", "seat": 1, "tile": 6, "riichi": false}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 26, "riichi": false}, {"type": "draw", "seat": 3, "tile": 32}, {"type": "discard", "seat": 3, "tile": 32, "riichi": false}, {"type": "draw", "seat": 0, "tile": 12}, {"type": "discard", "seat": 0, "tile": 12, "riichi": false}, {"type": "draw", "seat": 1, "tile": 5}, {"type": "discard", "seat": 1, "tile": 5, "riichi": false}];
+const INITIAL_HANDS = [[1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 0], [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 0, 1], [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0], [0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1]];
+const RESULT = {"type": "ron", "winner": 3, "from_player": 1, "turn": 6, "winning_tile": 5, "score": null, "round_label": "東4局0本場", "round_wind": 0, "round_number": 3, "honba": 0, "dealer": 3};
+const METADATA = {"wall_seed": 46, "agents": ["ShantenAgent#1", "ShantenAgent#2", "ShantenAgent#3", "ShantenAgent#4"]};
+const SEAT_NAMES = ["東家", "南家", "西家", "北家"];
+const AGENTS = METADATA.agents || ["?","?","?","?"];
+
+let step = -1;
+let autoTimer = null;
+let hands = [[], [], [], []];
+let rivers = [[], [], [], []];
+let melds = [[], [], [], []];
+let lastDraw = [null, null, null, null];
+let riichiState = [false, false, false, false];
+
+document.getElementById("meta").textContent =
+    "seed: " + (METADATA.wall_seed || "?") + " | " + AGENTS.join(" vs ");
+
+function tileSvgUrl(id) { return TILES_DIR + "/" + TILE_SVGS[id] + ".svg"; }
+
+function tileImg(id, cls) {
+    return '<img class="tile-img ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
+}
+function tileVert(id, cls) {
+    return '<img class="tile-vert ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
+}
+function tileRiver(id, cls) {
+    return '<img class="tile-river ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
+}
+function tileRiverVert(id, cls) {
+    return '<img class="tile-river-vert ' + cls + '" src="' + tileSvgUrl(id) +
+           '" title="' + TILE_NAMES[id] + '">';
+}
+
+function resetState() {
+    for (let s = 0; s < 4; s++) {
+        hands[s] = INITIAL_HANDS[s].slice();
+        rivers[s] = [];
+        melds[s] = [];
+        lastDraw[s] = null;
+        riichiState[s] = false;
+    }
+}
+
+function applyActions(upTo) {
+    resetState();
+    for (let i = 0; i <= upTo; i++) {
+        let a = ACTIONS[i];
+        if (a.type === "draw") {
+            hands[a.seat][a.tile]++;
+            lastDraw[a.seat] = a.tile;
+        } else if (a.type === "riichi") {
+            riichiState[a.seat] = true;
+        } else if (a.type === "discard") {
+            hands[a.seat][a.tile]--;
+            rivers[a.seat].push({ tile: a.tile, isLast: false, riichi: !!a.riichi });
+            if (lastDraw[a.seat] === a.tile) lastDraw[a.seat] = null;
+        } else if (a.type === "meld") {
+            let mt = a.meld_type;
+            let tiles = a.tiles;
+            let taken = a.taken_tile;
+            if (mt === "chi") {
+                for (let t of tiles) {
+                    if (t !== taken) hands[a.seat][t]--;
+                }
+            } else if (mt === "pon") {
+                hands[a.seat][taken] -= 2;
+            } else if (mt === "daiminkan") {
+                hands[a.seat][taken] -= 3;
+            } else if (mt === "ankan") {
+                hands[a.seat][taken] -= 4;
+            } else if (mt === "kakan") {
+                hands[a.seat][taken] -= 1;
+                for (let m of melds[a.seat]) {
+                    if (m.meld_type === "pon" && m.tiles[0] === taken) {
+                        m.meld_type = "kakan";
+                        m.tiles.push(taken);
+                    }
+                }
+            }
+            if (mt !== "kakan") {
+                melds[a.seat].push({
+                    meld_type: mt, tiles: tiles,
+                    from_seat: a.from_seat, taken_tile: taken
+                });
+            }
+            if (a.from_seat !== null && a.from_seat !== undefined
+                && mt !== "ankan" && mt !== "kakan") {
+                let fromRiver = rivers[a.from_seat];
+                if (fromRiver.length > 0) fromRiver.pop();
+            }
+        }
+    }
+    for (let s = 0; s < 4; s++) {
+        if (rivers[s].length > 0)
+            rivers[s][rivers[s].length - 1].isLast = true;
+    }
+}
+
+function getCurrentTurn() {
+    if (step < 0) return 0;
+    let draws = [0, 0, 0, 0];
+    for (let i = 0; i <= step; i++) {
+        if (ACTIONS[i].type === "draw") draws[ACTIONS[i].seat]++;
+    }
+    return Math.max(0, Math.max(...draws) - 1);
+}
+
+function getActiveSeat() {
+    if (step < 0) return -1;
+    return ACTIONS[step].seat;
+}
+
+function renderHand(seat, isVertical) {
+    let html = '';
+    let reversed = (seat === 1);
+    let start = reversed ? 33 : 0;
+    let end = reversed ? -1 : 34;
+    let step = reversed ? -1 : 1;
+    for (let t = start; t !== end; t += step) {
+        for (let c = 0; c < hands[seat][t]; c++) {
+            let cls = (lastDraw[seat] === t && c === hands[seat][t] - 1) ? "draw-highlight" : "";
+            html += isVertical ? tileVert(t, cls) : tileImg(t, cls);
+        }
+    }
+    return html;
+}
+
+function renderRiver(seat, isVertical) {
+    let tiles = rivers[seat];
+    let html = '';
+    for (let r = 0; r < tiles.length; r++) {
+        let cls = tiles[r].isLast ? "discard-last" : "";
+        if (tiles[r].riichi) cls += " riichi-tile";
+        html += isVertical ? tileRiverVert(tiles[r].tile, cls) :
+                             tileRiver(tiles[r].tile, cls);
+    }
+    return html;
+}
+
+function renderMelds(seat, isVertical) {
+    let seatMelds = melds[seat];
+    if (seatMelds.length === 0) return '';
+    let html = '';
+    let tCls = isVertical ? 'tile-meld-vert' : 'tile-meld';
+
+    function meldTile(tid, extra, lbl) {
+        return '<img class="' + tCls + ' ' + extra +
+            '" src="' + tileSvgUrl(tid) +
+            '" title="' + lbl + ' ' + TILE_NAMES[tid] + '">';
+    }
+
+    for (let m of seatMelds) {
+        html += '<span class="meld-group">';
+        let label = {
+            chi:"\u30C1\u30FC", pon:"\u30DD\u30F3",
+            daiminkan:"\u660E\u69FB", ankan:"\u6697\u69FB",
+            kakan:"\u52A0\u69FB"
+        }[m.meld_type] || "";
+
+        if (m.meld_type === 'ankan') {
+            for (let i = 0; i < 4; i++) {
+                let cls = (i === 0 || i === 3) ? 'meld-facedown' : '';
+                html += meldTile(m.tiles[i], cls, label);
+            }
+        } else {
+            let relPos = (m.from_seat - seat + 4) % 4;
+            let swPos = relPos === 3 ? 0 : relPos === 2 ? 1 : 2;
+
+            if (m.meld_type === 'chi') {
+                html += meldTile(m.taken_tile, 'tile-sideways', label);
+                let rest = m.tiles.filter(function(t) {
+                    return t !== m.taken_tile;
+                }).sort(function(a, b) { return a - b; });
+                for (let j = 0; j < rest.length; j++) {
+                    html += meldTile(rest[j], '', label);
+                }
+            } else if (m.meld_type === 'pon') {
+                for (let i = 0; i < 3; i++) {
+                    let cls = (i === swPos) ? 'tile-sideways' : '';
+                    html += meldTile(m.tiles[i], cls, label);
+                }
+            } else if (m.meld_type === 'daiminkan' || m.meld_type === 'kakan') {
+                for (let i = 0; i < 3; i++) {
+                    if (i === swPos) {
+                        html += '<span class="kakan-stack">' +
+                            meldTile(m.tiles[i], 'tile-sideways', label) +
+                            meldTile(m.tiles[3], 'tile-stacked', label) +
+                            '</span>';
+                    } else {
+                        html += meldTile(m.tiles[i], '', label);
+                    }
+                }
+            }
+        }
+        html += '</span>';
+    }
+    return html;
+}
+
+function render() {
+    if (step < 0) { resetState(); } else { applyActions(step); }
+    let active = getActiveSeat();
+    let isEnd = (step >= ACTIONS.length - 1) && RESULT;
+    let winner = (RESULT && (RESULT.type === "tsumo" || RESULT.type === "ron"))
+        ? RESULT.winner : -1;
+
+    let positions = [
+        { seat: 2, id: "hand-2", pos: "hand-top", vertical: false },
+        { seat: 3, id: "hand-3", pos: "hand-left", vertical: true },
+        { seat: 1, id: "hand-1", pos: "hand-right", vertical: true },
+        { seat: 0, id: "hand-0", pos: "hand-bottom", vertical: false },
+    ];
+
+    for (let p of positions) {
+        let el = document.getElementById(p.id);
+        el.className = "hand-area " + p.pos;
+        if (isEnd && p.seat === winner) el.classList.add("winner");
+        else if (p.seat === active) el.classList.add("active");
+
+        let rMark = riichiState[p.seat]
+            ? '<span class="riichi-mark">\u30EA\u30FC\u30C1</span>' : '';
+        let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] + rMark +
+                    '</span><span class="agent">' + AGENTS[p.seat] + '</span></div>';
+        let meldsHtml = renderMelds(p.seat, p.vertical);
+        let meldsDiv = meldsHtml
+            ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
+        let tiles = '<div class="hand-tiles">' +
+            '<div class="hand-pure">' + renderHand(p.seat, p.vertical) + '</div>' +
+            meldsDiv + '</div>';
+        el.innerHTML = label + tiles;
+    }
+
+    let riverConfigs = [
+        { seat: 2, id: "river-2", vertical: false },
+        { seat: 3, id: "river-3", vertical: true },
+        { seat: 1, id: "river-1", vertical: true },
+        { seat: 0, id: "river-0", vertical: false },
+    ];
+    for (let rc of riverConfigs) {
+        document.getElementById(rc.id).innerHTML = renderRiver(rc.seat, rc.vertical);
+    }
+
+    let turn = getCurrentTurn();
+    document.getElementById("center-info").innerHTML =
+        "<div style='font-size:18px;'>\u5DE1\u76EE: " + turn + "</div>" +
+        "<div style='font-size:12px;color:#8a8;margin-top:4px;'>\u6B8B\u308A: " +
+        (122 - countDraws()) + "\u679A</div>";
+
+    let info = "\u914D\u724C";
+    if (step >= 0) {
+        let a = ACTIONS[step];
+        if (a.type === "riichi") {
+            info = SEAT_NAMES[a.seat] + " \u30EA\u30FC\u30C1!";
+        } else if (a.type === "meld") {
+            let mLabel = {
+                chi:"\u30C1\u30FC", pon:"\u30DD\u30F3",
+                daiminkan:"\u660E\u69FB", ankan:"\u6697\u69FB",
+                kakan:"\u52A0\u69FB"
+            }[a.meld_type] || "";
+            info = SEAT_NAMES[a.seat] + " " + mLabel + "! " + TILE_NAMES[a.taken_tile];
+        } else {
+            info = SEAT_NAMES[a.seat] + " " +
+                   (a.type === "draw" ? "\u30C4\u30E2 " : "\u6253 ") +
+                   TILE_NAMES[a.tile];
+        }
+    }
+    document.getElementById("step-info").textContent =
+        (step + 1) + "/" + ACTIONS.length + " " + info;
+
+    let banner = document.getElementById("result-banner");
+    if (isEnd) {
+        banner.style.display = "block";
+        if (RESULT.type === "tsumo") {
+            banner.innerHTML = "\u30C4\u30E2\u548C\u4E86! " +
+                SEAT_NAMES[RESULT.winner] +
+                " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn +
+                "\u5DE1\u76EE \u548C\u4E86\u724C: " +
+                '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
+                '" style="vertical-align:middle;">';
+        } else if (RESULT.type === "ron") {
+            banner.innerHTML = "\u30ED\u30F3\u548C\u4E86! " +
+                SEAT_NAMES[RESULT.winner] +
+                " (" + AGENTS[RESULT.winner] + ") \u2190 " +
+                SEAT_NAMES[RESULT.from_player] +
+                " " + RESULT.turn + "\u5DE1\u76EE \u548C\u4E86\u724C: " +
+                '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
+                '" style="vertical-align:middle;">';
+        } else {
+            banner.innerHTML = "\u6D41\u5C40 (" + RESULT.turn + "\u5DE1\u76EE)";
+        }
+    } else { banner.style.display = "none"; }
+    updateButtons();
+}
+
+function countDraws() {
+    let c = 0;
+    for (let i = 0; i <= step; i++) { if (ACTIONS[i].type === "draw") c++; }
+    return c;
+}
+
+function updateButtons() {
+    document.getElementById("btn-prev").disabled = (step < 0);
+    document.getElementById("btn-start").disabled = (step < 0);
+    document.getElementById("btn-next").disabled = (step >= ACTIONS.length - 1);
+    document.getElementById("btn-end").disabled = (step >= ACTIONS.length - 1);
+}
+
+function goNext() { if (step < ACTIONS.length - 1) { step++; render(); } }
+function goPrev() { if (step >= 0) { step--; render(); } }
+function goStart() { step = -1; render(); }
+function goEnd() { step = ACTIONS.length - 1; render(); }
+
+function toggleAuto() {
+    if (autoTimer) {
+        clearInterval(autoTimer); autoTimer = null;
+        document.getElementById("btn-auto").textContent = "\u81EA\u52D5\u518D\u751F";
+    } else {
+        autoTimer = setInterval(() => {
+            if (step >= ACTIONS.length - 1) {
+                clearInterval(autoTimer); autoTimer = null;
+                document.getElementById("btn-auto").textContent =
+                    "\u81EA\u52D5\u518D\u751F";
+                return;
+            }
+            goNext();
+        }, 300);
+        document.getElementById("btn-auto").textContent = "\u505C\u6B62";
+    }
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") goNext();
+    else if (e.key === "ArrowLeft") goPrev();
+    else if (e.key === "Home") goStart();
+    else if (e.key === "End") goEnd();
+    else if (e.key === " ") { e.preventDefault(); toggleAuto(); }
+});
+
+render();
+
+</script>
+</body>
+</html>
