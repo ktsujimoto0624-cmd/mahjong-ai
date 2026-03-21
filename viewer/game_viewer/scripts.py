@@ -391,7 +391,7 @@ function toggleAuto() {
                 return;
             }
             goNext();
-        }, 300);
+        }, 100);
         document.getElementById("btn-auto").textContent = "\\u505C\\u6B62";
     }
 }

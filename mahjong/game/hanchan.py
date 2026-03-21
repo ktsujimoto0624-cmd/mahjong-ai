@@ -17,7 +17,7 @@ class Hanchan:
     """半荘（複数局）を管理するクラス"""
 
     def __init__(self, agents, mode="tonnansen", starting_points=25000,
-                 verbose=False, base_seed=None):
+                 verbose=False, base_seed=None, max_rounds=100):
         """
         Args:
             agents: 4人分のエージェント
@@ -25,10 +25,12 @@ class Hanchan:
             starting_points: 初期持ち点
             verbose: ログ出力
             base_seed: 牌山シード（Noneでランダム）
+            max_rounds: 最大局数（無限ループ防止）
         """
         self.agents = agents
         self.mode = mode
         self.max_wind = 1 if mode == "tonpusen" else 2
+        self.max_rounds = max_rounds
         self.verbose = verbose
         self.base_seed = base_seed
 
@@ -186,6 +188,11 @@ class Hanchan:
 
         # 規定の場が終了
         if self.round_wind >= self.max_wind:
+            self.is_finished = True
+            return
+
+        # 最大局数制限
+        if len(self.round_results) >= self.max_rounds:
             self.is_finished = True
             return
 
