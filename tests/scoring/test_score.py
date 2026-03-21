@@ -1,8 +1,8 @@
 """点数計算のテスト"""
 
-from mahjong.tile import empty_hand, dora_from_indicator
-from mahjong.yaku import judge_yaku
-from mahjong.score import calculate_score
+from mahjong.engine.tile import empty_hand, dora_from_indicator
+from mahjong.scoring.yaku import judge_yaku
+from mahjong.scoring.score import calculate_score
 
 
 def _make_win_info(hand, winning_tile, **kwargs):
@@ -188,8 +188,8 @@ def test_fu_calculation():
 
 def test_game_scoring():
     """ゲーム統合: 100局エラーなし"""
-    from mahjong.game import GameRound
-    from mahjong.agent import ShantenAgent
+    from mahjong.game.round import GameRound
+    from agents import ShantenAgent
 
     scored = 0
     for seed in range(100):

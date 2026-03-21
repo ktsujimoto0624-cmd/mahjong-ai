@@ -5,12 +5,12 @@
 """
 
 import math
-from mahjong.tile import (
+from mahjong.engine.tile import (
     SANGENPAI, KAZEHAI, is_suit, is_honor,
     is_terminal, is_terminal_or_honor,
 )
-from mahjong.agari import decompose_regular, _check_seven_pairs
-from mahjong.yaku import judge_yaku
+from mahjong.engine.agari import decompose_regular, _check_seven_pairs
+from mahjong.scoring.yaku import judge_yaku
 
 
 def calculate_score(win_info):

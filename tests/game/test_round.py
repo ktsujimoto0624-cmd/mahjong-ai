@@ -1,7 +1,7 @@
 """ゲームループのテスト: ランダムエージェント4人で対局"""
 
-from mahjong.game import GameRound
-from mahjong.agent import RandomAgent, ShantenAgent
+from mahjong.game.round import GameRound
+from agents import RandomAgent, ShantenAgent
 
 
 def test_single_round():

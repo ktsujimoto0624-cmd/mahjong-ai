@@ -6,7 +6,7 @@
 
 import json
 import os
-from mahjong.tile import tile_name, hand_to_str, TILE_NAMES, NUM_TILE_TYPES
+from mahjong.engine.tile import tile_name, hand_to_str, TILE_NAMES, NUM_TILE_TYPES
 
 
 class GameRecord:

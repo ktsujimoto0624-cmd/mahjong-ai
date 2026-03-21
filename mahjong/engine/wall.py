@@ -6,7 +6,7 @@
 """
 
 import random
-from mahjong.tile import NUM_TILE_TYPES, NUM_EACH_TILE, NUM_TOTAL_TILES
+from mahjong.engine.tile import NUM_TILE_TYPES, NUM_EACH_TILE, NUM_TOTAL_TILES
 
 
 class Wall:

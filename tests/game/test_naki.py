@@ -1,9 +1,9 @@
 """鳴き（チー・ポン・カン）のテスト"""
 
-from mahjong.game import GameRound
-from mahjong.agent import ShantenAgent
-from mahjong.player import Player
-from mahjong.tile import empty_hand
+from mahjong.game.round import GameRound
+from agents import ShantenAgent
+from mahjong.engine.player import Player
+from mahjong.engine.tile import empty_hand
 
 
 def test_pon_adds_meld():

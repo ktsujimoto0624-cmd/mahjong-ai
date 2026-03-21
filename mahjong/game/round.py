@@ -8,13 +8,13 @@
 ※ リーチ後はツモ切り固定。
 """
 
-from mahjong.wall import Wall
-from mahjong.player import Player
-from mahjong.agari import is_agari, shanten_number
-from mahjong.tile import tile_name, hand_to_str, is_suit, dora_from_indicator
-from mahjong.record import GameRecord
-from mahjong.score import calculate_score
-from mahjong.game_naki import NakiMixin
+from mahjong.engine.wall import Wall
+from mahjong.engine.player import Player
+from mahjong.engine.agari import is_agari, shanten_number
+from mahjong.engine.tile import tile_name, hand_to_str, is_suit, dora_from_indicator
+from mahjong.record.record import GameRecord
+from mahjong.scoring.score import calculate_score
+from mahjong.game.naki import NakiMixin
 
 
 class GameRound(NakiMixin):
@@ -336,7 +336,7 @@ class GameRound(NakiMixin):
             score["yaku"].append(("ドラ", dora_count))
             score["han"] += dora_count
             # 翻数が変わったので基本点を再計算
-            from mahjong.score import _han_fu_to_base, _calculate_payments
+            from mahjong.scoring.score import _han_fu_to_base, _calculate_payments
             score["base_points"] = _han_fu_to_base(
                 score["han"], score["fu"],
             )

@@ -4,8 +4,8 @@
 GameRound から鳴き判定・実行ロジックを分離したMixin。
 """
 
-from mahjong.agari import is_agari
-from mahjong.tile import tile_name, hand_to_str, is_suit
+from mahjong.engine.agari import is_agari
+from mahjong.engine.tile import tile_name, hand_to_str, is_suit
 
 
 class NakiMixin:

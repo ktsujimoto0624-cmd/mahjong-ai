@@ -4,7 +4,7 @@
 手牌・河（捨て牌）・副露（鳴き）・点数を管理する。
 """
 
-from mahjong.tile import (
+from mahjong.engine.tile import (
     empty_hand, hand_to_str, hand_total, tile_name, NUM_TILE_TYPES,
 )
 

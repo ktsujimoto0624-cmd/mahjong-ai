@@ -1,7 +1,7 @@
 """ShantenAgent vs RandomAgent の対戦テスト"""
 
-from mahjong.game import GameRound
-from mahjong.agent import RandomAgent, ShantenAgent
+from mahjong.game.round import GameRound
+from agents import RandomAgent, ShantenAgent
 
 
 def test_shanten_vs_random(num_games=100):

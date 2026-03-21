@@ -9,9 +9,9 @@
 """
 
 import json
-from mahjong.tile import TILE_NAMES
-from mahjong.viewer_css import get_css
-from mahjong.viewer_js import get_javascript
+from mahjong.engine.tile import TILE_NAMES
+from viewer.game_viewer.styles import get_css
+from viewer.game_viewer.scripts import get_javascript
 
 TILE_SVG_FILES = [
     "Man1", "Man2", "Man3", "Man4", "Man5", "Man6", "Man7", "Man8", "Man9",

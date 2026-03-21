@@ -1,9 +1,9 @@
 """棋譜記録とHTMLビューアのテスト"""
 
 import os
-from mahjong.game import GameRound
-from mahjong.agent import ShantenAgent
-from mahjong.viewer import generate_html
+from mahjong.game.round import GameRound
+from agents import ShantenAgent
+from viewer.game_viewer.generator import generate_html
 
 
 def test_record_and_view():

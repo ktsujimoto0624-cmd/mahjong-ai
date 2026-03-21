@@ -5,12 +5,12 @@
 WinInfo（和了情報）を受け取り、成立する役のリストを返す。
 """
 
-from mahjong.tile import (
+from mahjong.engine.tile import (
     NUM_TILE_TYPES, HONOR_START, SANGENPAI, KAZEHAI,
     TON, NAN, SHA, PEI, HAKU, HATSU, CHUN,
     is_suit, is_honor, is_terminal, is_terminal_or_honor,
 )
-from mahjong.agari import decompose_regular, _check_seven_pairs, _check_kokushi
+from mahjong.engine.agari import decompose_regular, _check_seven_pairs, _check_kokushi
 
 
 def judge_yaku(win_info):

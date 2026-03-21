@@ -1,8 +1,8 @@
 """Phase 1 基本動作テスト: 牌・山・プレイヤーの動作確認"""
 
-from mahjong.tile import tile_name, hand_to_str, is_man, is_honor, suit_number
-from mahjong.wall import Wall
-from mahjong.player import Player
+from mahjong.engine.tile import tile_name, hand_to_str, is_man, is_honor, suit_number
+from mahjong.engine.wall import Wall
+from mahjong.engine.player import Player
 
 
 def test_tile_basics():

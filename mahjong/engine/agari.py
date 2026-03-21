@@ -10,7 +10,7 @@
 カウント配列を使って再帰的に判定する。
 """
 
-from mahjong.tile import (
+from mahjong.engine.tile import (
     NUM_TILE_TYPES, HONOR_START, is_suit, is_honor,
 )
 
