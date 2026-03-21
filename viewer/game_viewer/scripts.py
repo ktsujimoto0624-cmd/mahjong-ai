@@ -227,7 +227,8 @@ function render() {
         let meldsDiv = meldsHtml
             ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
         let tiles = '<div class="hand-tiles">' +
-            renderHand(p.seat, p.vertical) + meldsDiv + '</div>';
+            '<div class="hand-pure">' + renderHand(p.seat, p.vertical) + '</div>' +
+            meldsDiv + '</div>';
         el.innerHTML = label + tiles;
     }
 

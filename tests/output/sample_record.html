@@ -49,10 +49,16 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     display: flex; flex-direction: column; width: 100%;
 }
 .hand-tiles {
-    display: flex; flex-wrap: nowrap; gap: 2px; align-items: flex-end;
+    display: flex; flex-wrap: nowrap; align-items: flex-end;
 }
-.hand-top .hand-tiles { justify-content: center; transform: rotate(180deg); }
-.hand-bottom .hand-tiles { justify-content: center; }
+.hand-top .hand-tiles { transform: rotate(180deg); }
+
+/* 手牌本体（副露と分離） */
+.hand-pure {
+    display: flex; flex-wrap: nowrap; gap: 2px; align-items: flex-end;
+    justify-content: center;
+    flex: 1; min-width: 0;
+}
 
 /* 左右の手牌: 回転して中心向き */
 .hand-left, .hand-right {
@@ -61,6 +67,10 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 }
 .hand-left .hand-tiles, .hand-right .hand-tiles {
     display: flex; flex-direction: column; gap: 0; align-items: center;
+}
+.hand-left .hand-pure, .hand-right .hand-pure {
+    display: flex; flex-direction: column; gap: 0; align-items: center;
+    flex: 1; min-height: 0; justify-content: center;
 }
 .hand-left .tile-vert, .hand-left .tile-river-vert {
     transform: rotate(90deg);
@@ -200,33 +210,30 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     background: #e8e0d0; padding: 1px; border: 1px solid #a99;
 }
 
-/* 東家(下): 右端から左へ配置 */
+/* 東家(下): 右端に副露、手牌が左にずれる */
 .hand-bottom .melds-area {
-    flex-direction: row-reverse; margin-left: auto;
-    align-items: flex-end;
+    flex-direction: row-reverse;
+    align-items: flex-end; flex-shrink: 0;
 }
 
-/* 西家(上): 180度回転内なのでrow-reverseで左端から右へ見える */
+/* 西家(上): 180度回転で自動反転 → 右端=画面左 */
 .hand-top .melds-area {
-    flex-direction: row-reverse; margin-left: auto;
-    align-items: flex-end;
+    flex-direction: row;
+    align-items: flex-end; flex-shrink: 0;
 }
-.hand-top .meld-group { flex-direction: row-reverse; }
 
-/* 北家(左): 下端から上へ配置、グループ内は縦並び */
+/* 北家(左): 下端に副露、手牌が上にずれる */
 .hand-left .melds-area {
-    flex-direction: column-reverse; margin-left: 0; margin-top: auto;
-    border-top: 2px solid #4a9; padding-top: 6px;
+    flex-direction: column-reverse; flex-shrink: 0;
 }
 .hand-left .meld-group {
     flex-direction: column; gap: 0;
 }
 .hand-left .tile-meld-vert { transform: rotate(90deg); margin: -6px 0; }
 
-/* 南家(右): 上端から下へ配置、グループ内は縦並び */
+/* 南家(右): 上端に副露、手牌が下にずれる */
 .hand-right .melds-area {
-    flex-direction: column; margin-left: 0; order: -1;
-    border-bottom: 2px solid #4a9; padding-bottom: 6px;
+    flex-direction: column; flex-shrink: 0; order: -1;
 }
 .hand-right .meld-group {
     flex-direction: column-reverse; gap: 0;
@@ -564,7 +571,8 @@ function render() {
         let meldsDiv = meldsHtml
             ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
         let tiles = '<div class="hand-tiles">' +
-            renderHand(p.seat, p.vertical) + meldsDiv + '</div>';
+            '<div class="hand-pure">' + renderHand(p.seat, p.vertical) + '</div>' +
+            meldsDiv + '</div>';
         el.innerHTML = label + tiles;
     }
 
