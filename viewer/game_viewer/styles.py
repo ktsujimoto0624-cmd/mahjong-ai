@@ -85,17 +85,17 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 
 /* 中段 */
 .middle-row {
-    display: flex; align-items: stretch; gap: 6px; width: 100%; flex: 1; min-height: 0;
+    display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1; min-height: 0;
 }
 
 /* 河テーブル（中央） */
 .river-table {
     flex: 1; background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
-    padding: 8px; display: flex; flex-direction: column; gap: 4px;
+    padding: 6px; display: flex; flex-direction: column; gap: 2px;
     min-height: 0;
 }
 .river-middle {
-    display: flex; align-items: center; gap: 8px; flex: 1;
+    display: flex; align-items: center; gap: 4px; flex: 1;
 }
 
 /* 河エリア: 6牌ずつ並べる */
@@ -122,8 +122,9 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 
 /* 中央情報 */
 .center-info {
-    flex: 1; text-align: center; padding: 10px;
+    flex: 0 0 auto; text-align: center; padding: 6px 8px;
     background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
+    min-width: 60px;
 }
 
 /* 牌画像 */
@@ -292,5 +293,52 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     text-align: center; margin: 4px auto; padding: 8px;
     background: #0d2818; border: 2px solid #f84; border-radius: 8px;
     font-size: 14px; display: none; max-width: 1000px;
+}
+
+/* === スマホ縦画面対応 === */
+@media (max-width: 600px) {
+    html, body { padding: 4px; }
+    h1 { font-size: 14px; margin-bottom: 2px; }
+    .meta { font-size: 10px; margin-bottom: 2px; }
+    .controls { margin: 2px 0; }
+    .controls button { padding: 3px 8px; font-size: 10px; }
+    .controls .step-info { font-size: 11px; min-width: 100px; }
+
+    .mahjong-table { gap: 2px; height: calc(100vh - 70px); }
+    .middle-row { gap: 2px; }
+    .river-table { padding: 3px; gap: 1px; }
+    .river-middle { gap: 2px; }
+
+    /* 中央情報を最小化 */
+    .center-info { padding: 3px 4px; min-width: 44px; font-size: 10px; }
+    .center-info div { font-size: 10px !important; }
+
+    /* 牌を縮小 */
+    .tile-img { height: 30px; }
+    .tile-river { height: 24px; }
+    .tile-vert { width: 28px; }
+    .tile-river-vert { width: 20px; }
+    .tile-meld { height: 28px; }
+    .tile-meld-vert { width: 24px; }
+
+    /* 左右プレイヤーの幅を縮小 */
+    .hand-left, .hand-right { min-width: 40px; max-width: 46px; }
+
+    /* 河のオーバーフロー確保 */
+    .river-left, .river-right { min-width: 24px; }
+    .river-left .tile-river-vert, .river-right .tile-river-vert {
+        margin: -6px 0;
+    }
+    .hand-left .tile-vert, .hand-left .tile-river-vert,
+    .hand-right .tile-vert, .hand-right .tile-river-vert {
+        margin: -10px 0;
+    }
+    .hand-left .tile-meld-vert, .hand-right .tile-meld-vert {
+        margin: -8px 0;
+    }
+
+    .hand-area { padding: 2px 4px; }
+    .hand-label { font-size: 11px; }
+    .result-banner { font-size: 12px; padding: 4px; }
 }
 """
