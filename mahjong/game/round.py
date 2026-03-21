@@ -38,6 +38,8 @@ class GameRound(NakiMixin):
         self.record.set_metadata(
             wall_seed=wall_seed,
             agents=[a.label for a in agents],
+            dealer=dealer,
+            round_wind=round_wind,
         )
 
     def run(self):
@@ -112,6 +114,9 @@ class GameRound(NakiMixin):
                 p.draw_tile(tile)
 
         self.record.record_deal([p.hand for p in self.players])
+        self.record.set_metadata(
+            dora_indicators=self.wall.get_dora_indicators(),
+        )
 
         if self.verbose:
             print("=== 配牌 ===")

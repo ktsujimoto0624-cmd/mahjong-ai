@@ -40,6 +40,7 @@ class Hanchan:
         self.dealer = 0        # 親の席番号
 
         self.round_results = []  # 各局の結果リスト
+        self.round_records = []  # 各局のGameRecord
         self.is_finished = False
 
     def run(self):
@@ -79,6 +80,12 @@ class Hanchan:
             dealer=self.dealer,
             round_wind=self.round_wind,
         )
+        game.record.set_metadata(
+            honba=self.honba,
+            riichi_pool=self.riichi_pool,
+            points=list(self.points),
+            round_number=self.round_number,
+        )
         game.run()
 
         # リーチ供託を回収
@@ -87,6 +94,8 @@ class Hanchan:
         for seat in range(4):
             if game.players[seat].is_riichi:
                 self.points[seat] -= 1000
+
+        self.round_records.append(game.record)
 
         result = game.result
         result["round_label"] = round_label

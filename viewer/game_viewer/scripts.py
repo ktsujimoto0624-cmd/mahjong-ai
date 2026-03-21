@@ -219,10 +219,19 @@ function render() {
         if (isEnd && p.seat === winner) el.classList.add("winner");
         else if (p.seat === active) el.classList.add("active");
 
+        let dealer = METADATA.dealer || 0;
+        let seatWind = (p.seat - dealer + 4) % 4;
+        let windName = ["\\u6771","\\u5357","\\u897F","\\u5317"][seatWind];
+        let isDealer = (p.seat === dealer);
+        let dealerMark = isDealer ? '<span class="dealer-mark">\\u89AA</span>' : '';
         let rMark = riichiState[p.seat]
             ? '<span class="riichi-mark">\\u30EA\\u30FC\\u30C1</span>' : '';
-        let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] + rMark +
-                    '</span><span class="agent">' + AGENTS[p.seat] + '</span></div>';
+        let pts = (METADATA.points) ? METADATA.points[p.seat] : '';
+        let ptsHtml = pts !== '' ? '<span class="pts">' + pts + '</span>' : '';
+        let label = '<div class="hand-label">' +
+            '<span>' + windName + dealerMark + rMark + '</span>' +
+            '<span class="agent">' + AGENTS[p.seat] + '</span>' +
+            ptsHtml + '</div>';
         let meldsHtml = renderMelds(p.seat, p.vertical);
         let meldsDiv = meldsHtml
             ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
@@ -243,10 +252,40 @@ function render() {
     }
 
     let turn = getCurrentTurn();
-    document.getElementById("center-info").innerHTML =
-        "<div style='font-size:18px;'>\\u5DE1\\u76EE: " + turn + "</div>" +
-        "<div style='font-size:12px;color:#8a8;margin-top:4px;'>\\u6B8B\\u308A: " +
-        (122 - countDraws()) + "\\u679A</div>";
+    let windNames = ["\\u6771","\\u5357","\\u897F","\\u5317"];
+    let rw = METADATA.round_wind || 0;
+    let rn = (METADATA.round_number || 0) + 1;
+    let honba = METADATA.honba || 0;
+    let pool = METADATA.riichi_pool || 0;
+    let roundLabel = windNames[rw] + rn + "\\u5C40";
+    if (honba > 0) roundLabel += " " + honba + "\\u672C\\u5834";
+
+    let doraHtml = '';
+    let doraList = METADATA.dora_indicators || [];
+    let kanCount = 0;
+    for (let i = 0; i <= step && i < ACTIONS.length; i++) {
+        if (ACTIONS[i].type === 'meld' &&
+            (ACTIONS[i].meld_type === 'ankan' || ACTIONS[i].meld_type === 'daiminkan'
+             || ACTIONS[i].meld_type === 'kakan')) kanCount++;
+    }
+    for (let d = 0; d < Math.min(doraList.length, 1 + kanCount); d++) {
+        doraHtml += '<img class="tile-dora" src="' + tileSvgUrl(doraList[d]) +
+            '" title="\\u30C9\\u30E9\\u8868\\u793A\\u724C">';
+    }
+    for (let d = Math.min(doraList.length, 1 + kanCount); d < 5; d++) {
+        doraHtml += '<span class="tile-dora tile-dora-hidden"></span>';
+    }
+
+    let centerHtml =
+        '<div class="center-round">' + roundLabel + '</div>' +
+        '<div class="center-dora"><span class="dora-label">\\u30C9\\u30E9</span>' +
+        doraHtml + '</div>' +
+        '<div class="center-stats">' +
+        '<span>\\u5DE1\\u76EE:' + turn + '</span>' +
+        '<span>\\u6B8B:' + (122 - countDraws()) + '</span>' +
+        (pool > 0 ? '<span>\\u4F9B\\u8A17:' + pool + '</span>' : '') +
+        '</div>';
+    document.getElementById("center-info").innerHTML = centerHtml;
 
     let info = "\\u914D\\u724C";
     if (step >= 0) {

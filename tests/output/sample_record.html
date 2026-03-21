@@ -87,17 +87,17 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 
 /* 中段 */
 .middle-row {
-    display: flex; align-items: stretch; gap: 6px; width: 100%; flex: 1; min-height: 0;
+    display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1; min-height: 0;
 }
 
 /* 河テーブル（中央） */
 .river-table {
     flex: 1; background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
-    padding: 8px; display: flex; flex-direction: column; gap: 4px;
+    padding: 6px; display: flex; flex-direction: column; gap: 2px;
     min-height: 0;
 }
 .river-middle {
-    display: flex; align-items: center; gap: 8px; flex: 1;
+    display: flex; align-items: center; gap: 4px; flex: 1;
 }
 
 /* 河エリア: 6牌ずつ並べる */
@@ -109,23 +109,54 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 .river-top { transform: rotate(180deg); }
 /* 南家河: 下→上に6牌、次の列は右へ */
 .river-right {
+    flex: 1; min-width: 0;
     display: flex; flex-direction: column-reverse; flex-wrap: wrap;
     align-content: flex-start;
-    max-height: 166px; min-width: 36px; overflow: hidden;
+    max-height: 166px; overflow: hidden;
 }
 .river-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
 /* 北家河: 上→下に6牌、次の列は左へ */
 .river-left {
+    flex: 1; min-width: 0;
     display: flex; flex-direction: column; flex-wrap: wrap-reverse;
     align-content: flex-end;
-    max-height: 166px; min-width: 36px; overflow: hidden;
+    max-height: 166px; overflow: hidden;
 }
 .river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
 
 /* 中央情報 */
 .center-info {
-    flex: 1; text-align: center; padding: 10px;
+    flex: 0 0 220px; text-align: center; padding: 6px 8px;
     background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+}
+.center-round { font-size: 16px; font-weight: bold; color: #fd6; }
+.center-dora {
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+}
+.dora-label {
+    font-size: 10px; color: #aaa; margin-right: 4px; writing-mode: vertical-rl;
+}
+.tile-dora {
+    height: 28px; width: auto; border-radius: 2px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.tile-dora-hidden {
+    display: inline-block; height: 28px; width: 20px;
+    background: #2a4a3a; border: 1px solid #3a6a4a; border-radius: 2px;
+}
+.center-stats {
+    display: flex; justify-content: center; gap: 8px;
+    font-size: 11px; color: #8a8;
+}
+
+/* プレイヤー情報 */
+.dealer-mark {
+    background: #d44; color: #fff; font-size: 9px;
+    padding: 1px 4px; border-radius: 3px; margin-left: 4px;
+}
+.pts {
+    color: #ff8; font-size: 12px; font-weight: bold;
 }
 
 /* 牌画像 */
@@ -296,6 +327,58 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     font-size: 14px; display: none; max-width: 1000px;
 }
 
+/* === スマホ縦画面対応 === */
+@media (max-width: 600px) {
+    html, body { padding: 4px; }
+    h1 { font-size: 14px; margin-bottom: 2px; }
+    .meta { font-size: 10px; margin-bottom: 2px; }
+    .controls { margin: 2px 0; }
+    .controls button { padding: 3px 8px; font-size: 10px; }
+    .controls .step-info { font-size: 11px; min-width: 100px; }
+
+    .mahjong-table { gap: 2px; height: calc(100vh - 70px); }
+    .middle-row { gap: 2px; }
+    .river-table { padding: 3px; gap: 1px; }
+    .river-middle { gap: 2px; }
+
+    /* 中央情報を縮小（ドラ表示は維持） */
+    .center-info { flex: 0 0 140px; padding: 3px 4px; }
+    .center-round { font-size: 12px; }
+    .tile-dora { height: 22px; }
+    .tile-dora-hidden { height: 22px; width: 16px; }
+    .center-stats { font-size: 9px; gap: 4px; }
+    .dealer-mark { font-size: 8px; }
+    .pts { font-size: 10px; }
+
+    /* 牌を縮小 */
+    .tile-img { height: 30px; }
+    .tile-river { height: 24px; }
+    .tile-vert { width: 28px; }
+    .tile-river-vert { width: 20px; }
+    .tile-meld { height: 28px; }
+    .tile-meld-vert { width: 24px; }
+
+    /* 左右プレイヤーの幅を縮小 */
+    .hand-left, .hand-right { min-width: 40px; max-width: 46px; }
+
+    /* 河のオーバーフロー確保 */
+    .river-left, .river-right { min-width: 24px; }
+    .river-left .tile-river-vert, .river-right .tile-river-vert {
+        margin: -6px 0;
+    }
+    .hand-left .tile-vert, .hand-left .tile-river-vert,
+    .hand-right .tile-vert, .hand-right .tile-river-vert {
+        margin: -10px 0;
+    }
+    .hand-left .tile-meld-vert, .hand-right .tile-meld-vert {
+        margin: -8px 0;
+    }
+
+    .hand-area { padding: 2px 4px; }
+    .hand-label { font-size: 11px; }
+    .result-banner { font-size: 12px; padding: 4px; }
+}
+
 </style>
 </head>
 <body>
@@ -343,7 +426,7 @@ const TILE_SVGS = ['Man1', 'Man2', 'Man3', 'Man4', 'Man5', 'Man6', 'Man7', 'Man8
 const ACTIONS = [{"type": "draw", "seat": 0, "tile": 29}, {"type": "discard", "seat": 0, "tile": 29, "riichi": false}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10, "riichi": false}, {"type": "draw", "seat": 2, "tile": 9}, {"type": "discard", "seat": 2, "tile": 1, "riichi": false}, {"type": "draw", "seat": 3, "tile": 31}, {"type": "discard", "seat": 3, "tile": 9, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 21, "riichi": false}, {"type": "draw", "seat": 1, "tile": 24}, {"type": "discard", "seat": 1, "tile": 7, "riichi": false}, {"type": "draw", "seat": 2, "tile": 22}, {"type": "discard", "seat": 2, "tile": 4, "riichi": false}, {"type": "draw", "seat": 3, "tile": 4}, {"type": "discard", "seat": 3, "tile": 12, "riichi": false}, {"type": "draw", "seat": 0, "tile": 10}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 4, "riichi": false}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 8, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 26}, {"type": "discard", "seat": 0, "tile": 26, "riichi": false}, {"type": "draw", "seat": 1, "tile": 19}, {"type": "discard", "seat": 1, "tile": 19, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 22, "riichi": false}, {"type": "draw", "seat": 3, "tile": 24}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 28}, {"type": "discard", "seat": 0, "tile": 28, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 25}, {"type": "discard", "seat": 2, "tile": 18, "riichi": false}, {"type": "draw", "seat": 3, "tile": 20}, {"type": "discard", "seat": 3, "tile": 20, "riichi": false}, {"type": "draw", "seat": 0, "tile": 20}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 21}, {"type": "discard", "seat": 2, "tile": 33, "riichi": false}, {"type": "draw", "seat": 3, "tile": 2}, {"type": "discard", "seat": 3, "tile": 4, "riichi": false}, {"type": "draw", "seat": 0, "tile": 6}, {"type": "discard", "seat": 0, "tile": 20, "riichi": false}, {"type": "draw", "seat": 1, "tile": 18}, {"type": "discard", "seat": 1, "tile": 18, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 32, "riichi": false}, {"type": "draw", "seat": 3, "tile": 19}, {"type": "discard", "seat": 3, "tile": 19, "riichi": false}, {"type": "draw", "seat": 0, "tile": 9}, {"type": "discard", "seat": 0, "tile": 24, "riichi": false}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33, "riichi": false}, {"type": "draw", "seat": 2, "tile": 2}, {"type": "discard", "seat": 2, "tile": 11, "riichi": false}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 31, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 9, "riichi": false}, {"type": "draw", "seat": 1, "tile": 17}, {"type": "discard", "seat": 1, "tile": 17, "riichi": false}, {"type": "draw", "seat": 2, "tile": 14}, {"type": "discard", "seat": 2, "tile": 13, "riichi": false}, {"type": "draw", "seat": 3, "tile": 1}, {"type": "discard", "seat": 3, "tile": 1, "riichi": false}, {"type": "draw", "seat": 0, "tile": 8}, {"type": "discard", "seat": 0, "tile": 6, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 19, "riichi": false}, {"type": "draw", "seat": 3, "tile": 11}, {"type": "discard", "seat": 3, "tile": 11, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "riichi", "seat": 0}, {"type": "discard", "seat": 0, "tile": 8, "riichi": true}, {"type": "draw", "seat": 1, "tile": 12}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 31}, {"type": "discard", "seat": 2, "tile": 3, "riichi": false}, {"type": "draw", "seat": 3, "tile": 3}, {"type": "discard", "seat": 3, "tile": 3, "riichi": false}, {"type": "draw", "seat": 0, "tile": 25}, {"type": "discard", "seat": 0, "tile": 25, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 27, "riichi": false}, {"type": "draw", "seat": 2, "tile": 4}, {"type": "discard", "seat": 2, "tile": 25, "riichi": false}, {"type": "meld", "seat": 3, "meld_type": "chi", "tiles": [23, 24, 25], "from_seat": 2, "taken_tile": 25}, {"type": "discard", "seat": 3, "tile": 33, "riichi": false}, {"type": "draw", "seat": 0, "tile": 31}, {"type": "discard", "seat": 0, "tile": 31, "riichi": false}, {"type": "draw", "seat": 1, "tile": 10}, {"type": "discard", "seat": 1, "tile": 10, "riichi": false}, {"type": "draw", "seat": 2, "tile": 13}, {"type": "discard", "seat": 2, "tile": 2, "riichi": false}, {"type": "draw", "seat": 3, "tile": 28}, {"type": "discard", "seat": 3, "tile": 29, "riichi": false}, {"type": "draw", "seat": 0, "tile": 5}, {"type": "discard", "seat": 0, "tile": 5, "riichi": false}, {"type": "draw", "seat": 1, "tile": 26}, {"type": "discard", "seat": 1, "tile": 30, "riichi": false}, {"type": "draw", "seat": 2, "tile": 24}, {"type": "discard", "seat": 2, "tile": 24, "riichi": false}, {"type": "meld", "seat": 3, "meld_type": "chi", "tiles": [22, 23, 24], "from_seat": 2, "taken_tile": 24}, {"type": "discard", "seat": 3, "tile": 28, "riichi": false}, {"type": "draw", "seat": 0, "tile": 0}, {"type": "discard", "seat": 0, "tile": 0, "riichi": false}, {"type": "draw", "seat": 1, "tile": 25}, {"type": "riichi", "seat": 1}, {"type": "discard", "seat": 1, "tile": 12, "riichi": true}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 32, "riichi": false}, {"type": "draw", "seat": 3, "tile": 18}, {"type": "discard", "seat": 3, "tile": 26, "riichi": false}, {"type": "draw", "seat": 0, "tile": 32}, {"type": "discard", "seat": 0, "tile": 32, "riichi": false}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33, "riichi": false}, {"type": "draw", "seat": 2, "tile": 13}, {"type": "discard", "seat": 2, "tile": 11, "riichi": false}, {"type": "draw", "seat": 3, "tile": 17}, {"type": "discard", "seat": 3, "tile": 18, "riichi": false}];
 const INITIAL_HANDS = [[0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 2, 2, 2, 0, 0, 1, 0], [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0], [2, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1]];
 const RESULT = {"type": "ron", "winner": 0, "from_player": 3, "turn": 15, "winning_tile": 18, "score": {"yaku": [["リーチ", 1], ["七対子", 2]], "han": 3, "fu": 25, "base_points": 800, "payments": {"total": 4800, "from_each_non_dealer": 0, "from_dealer": 0, "from_discarder": 4800}, "is_yakuman": false}};
-const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#2209", "ShantenAgent#2210", "ShantenAgent#2211", "ShantenAgent#2212"]};
+const METADATA = {"wall_seed": 42, "agents": ["ShantenAgent#2233", "ShantenAgent#2234", "ShantenAgent#2235", "ShantenAgent#2236"], "dealer": 0, "round_wind": 0, "dora_indicators": [14]};
 const SEAT_NAMES = ["東家", "南家", "西家", "北家"];
 const AGENTS = METADATA.agents || ["?","?","?","?"];
 
@@ -563,10 +646,19 @@ function render() {
         if (isEnd && p.seat === winner) el.classList.add("winner");
         else if (p.seat === active) el.classList.add("active");
 
+        let dealer = METADATA.dealer || 0;
+        let seatWind = (p.seat - dealer + 4) % 4;
+        let windName = ["\u6771","\u5357","\u897F","\u5317"][seatWind];
+        let isDealer = (p.seat === dealer);
+        let dealerMark = isDealer ? '<span class="dealer-mark">\u89AA</span>' : '';
         let rMark = riichiState[p.seat]
             ? '<span class="riichi-mark">\u30EA\u30FC\u30C1</span>' : '';
-        let label = '<div class="hand-label"><span>' + SEAT_NAMES[p.seat] + rMark +
-                    '</span><span class="agent">' + AGENTS[p.seat] + '</span></div>';
+        let pts = (METADATA.points) ? METADATA.points[p.seat] : '';
+        let ptsHtml = pts !== '' ? '<span class="pts">' + pts + '</span>' : '';
+        let label = '<div class="hand-label">' +
+            '<span>' + windName + dealerMark + rMark + '</span>' +
+            '<span class="agent">' + AGENTS[p.seat] + '</span>' +
+            ptsHtml + '</div>';
         let meldsHtml = renderMelds(p.seat, p.vertical);
         let meldsDiv = meldsHtml
             ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
@@ -587,10 +679,40 @@ function render() {
     }
 
     let turn = getCurrentTurn();
-    document.getElementById("center-info").innerHTML =
-        "<div style='font-size:18px;'>\u5DE1\u76EE: " + turn + "</div>" +
-        "<div style='font-size:12px;color:#8a8;margin-top:4px;'>\u6B8B\u308A: " +
-        (122 - countDraws()) + "\u679A</div>";
+    let windNames = ["\u6771","\u5357","\u897F","\u5317"];
+    let rw = METADATA.round_wind || 0;
+    let rn = (METADATA.round_number || 0) + 1;
+    let honba = METADATA.honba || 0;
+    let pool = METADATA.riichi_pool || 0;
+    let roundLabel = windNames[rw] + rn + "\u5C40";
+    if (honba > 0) roundLabel += " " + honba + "\u672C\u5834";
+
+    let doraHtml = '';
+    let doraList = METADATA.dora_indicators || [];
+    let kanCount = 0;
+    for (let i = 0; i <= step && i < ACTIONS.length; i++) {
+        if (ACTIONS[i].type === 'meld' &&
+            (ACTIONS[i].meld_type === 'ankan' || ACTIONS[i].meld_type === 'daiminkan'
+             || ACTIONS[i].meld_type === 'kakan')) kanCount++;
+    }
+    for (let d = 0; d < Math.min(doraList.length, 1 + kanCount); d++) {
+        doraHtml += '<img class="tile-dora" src="' + tileSvgUrl(doraList[d]) +
+            '" title="\u30C9\u30E9\u8868\u793A\u724C">';
+    }
+    for (let d = Math.min(doraList.length, 1 + kanCount); d < 5; d++) {
+        doraHtml += '<span class="tile-dora tile-dora-hidden"></span>';
+    }
+
+    let centerHtml =
+        '<div class="center-round">' + roundLabel + '</div>' +
+        '<div class="center-dora"><span class="dora-label">\u30C9\u30E9</span>' +
+        doraHtml + '</div>' +
+        '<div class="center-stats">' +
+        '<span>\u5DE1\u76EE:' + turn + '</span>' +
+        '<span>\u6B8B:' + (122 - countDraws()) + '</span>' +
+        (pool > 0 ? '<span>\u4F9B\u8A17:' + pool + '</span>' : '') +
+        '</div>';
+    document.getElementById("center-info").innerHTML = centerHtml;
 
     let info = "\u914D\u724C";
     if (step >= 0) {

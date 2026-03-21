@@ -122,10 +122,39 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 }
 .river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
 
-/* 中央情報（ドラ・嶺上牌: 7牌×2列分のスペース確保） */
+/* 中央情報 */
 .center-info {
     flex: 0 0 220px; text-align: center; padding: 6px 8px;
     background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+}
+.center-round { font-size: 16px; font-weight: bold; color: #fd6; }
+.center-dora {
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+}
+.dora-label {
+    font-size: 10px; color: #aaa; margin-right: 4px; writing-mode: vertical-rl;
+}
+.tile-dora {
+    height: 28px; width: auto; border-radius: 2px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.tile-dora-hidden {
+    display: inline-block; height: 28px; width: 20px;
+    background: #2a4a3a; border: 1px solid #3a6a4a; border-radius: 2px;
+}
+.center-stats {
+    display: flex; justify-content: center; gap: 8px;
+    font-size: 11px; color: #8a8;
+}
+
+/* プレイヤー情報 */
+.dealer-mark {
+    background: #d44; color: #fff; font-size: 9px;
+    padding: 1px 4px; border-radius: 3px; margin-left: 4px;
+}
+.pts {
+    color: #ff8; font-size: 12px; font-weight: bold;
 }
 
 /* 牌画像 */
@@ -311,8 +340,13 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     .river-middle { gap: 2px; }
 
     /* 中央情報を縮小（ドラ表示は維持） */
-    .center-info { flex: 0 0 150px; padding: 3px 4px; font-size: 10px; }
-    .center-info div { font-size: 10px !important; }
+    .center-info { flex: 0 0 140px; padding: 3px 4px; }
+    .center-round { font-size: 12px; }
+    .tile-dora { height: 22px; }
+    .tile-dora-hidden { height: 22px; width: 16px; }
+    .center-stats { font-size: 9px; gap: 4px; }
+    .dealer-mark { font-size: 8px; }
+    .pts { font-size: 10px; }
 
     /* 牌を縮小 */
     .tile-img { height: 30px; }
