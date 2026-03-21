@@ -129,3 +129,24 @@ def hand_to_str(hand):
 def hand_total(hand):
     """手牌の合計枚数"""
     return sum(hand)
+
+
+def dora_from_indicator(indicator_id):
+    """
+    ドラ表示牌からドラ牌を返す。
+
+    数牌: 表示牌の次の数字（9→1に戻る）
+    風牌: 東→南→西→北→東
+    三元牌: 白→發→中→白
+    """
+    if is_suit(indicator_id):
+        base = (indicator_id // 9) * 9
+        num = indicator_id % 9
+        return base + (num + 1) % 9
+    elif indicator_id in KAZEHAI:
+        idx = KAZEHAI.index(indicator_id)
+        return KAZEHAI[(idx + 1) % 4]
+    elif indicator_id in SANGENPAI:
+        idx = SANGENPAI.index(indicator_id)
+        return SANGENPAI[(idx + 1) % 3]
+    return indicator_id

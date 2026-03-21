@@ -184,6 +184,69 @@ def shanten_number(hand, melds_count=0):
     return min_shanten
 
 
+def decompose_regular(hand, melds_count=0):
+    """
+    手牌を4面子1雀頭に分解する全パターンを列挙する。
+
+    Args:
+        hand: カウント配列 (34要素)
+        melds_count: 副露数
+
+    Returns:
+        分解パターンのリスト。各パターンは辞書:
+        {"head": tile_id, "mentsu": [(type, tile_id), ...]}
+        type: "shuntsu" (順子) or "koutsu" (刻子)
+        tile_id: 順子は先頭牌、刻子はその牌
+    """
+    results = []
+    needed = 4 - melds_count
+
+    for head in range(NUM_TILE_TYPES):
+        if hand[head] < 2:
+            continue
+        work = list(hand)
+        work[head] -= 2
+        mentsu_list = []
+        _find_mentsu(work, needed, mentsu_list, results, head)
+
+    return results
+
+
+def _find_mentsu(hand, needed, current, results, head):
+    """面子を再帰的に抽出し、全パターンを収集する"""
+    if needed == 0:
+        if all(c == 0 for c in hand):
+            results.append({"head": head, "mentsu": list(current)})
+        return
+
+    # 最初に牌がある位置を探す
+    for i in range(NUM_TILE_TYPES):
+        if hand[i] > 0:
+            break
+    else:
+        return
+
+    # 刻子
+    if hand[i] >= 3:
+        hand[i] -= 3
+        current.append(("koutsu", i))
+        _find_mentsu(hand, needed - 1, current, results, head)
+        current.pop()
+        hand[i] += 3
+
+    # 順子
+    if is_suit(i) and (i % 9) <= 6 and hand[i + 1] > 0 and hand[i + 2] > 0:
+        hand[i] -= 1
+        hand[i + 1] -= 1
+        hand[i + 2] -= 1
+        current.append(("shuntsu", i))
+        _find_mentsu(hand, needed - 1, current, results, head)
+        current.pop()
+        hand[i] += 1
+        hand[i + 1] += 1
+        hand[i + 2] += 1
+
+
 def _shanten_regular(hand, needed_mentsu):
     """基本形のシャンテン数（再帰探索）"""
     min_shanten = [8]
