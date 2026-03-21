@@ -34,6 +34,11 @@ class GameRound(NakiMixin):
         self.current_player = dealer
         self.result = None
 
+        # 同巡フリテン: ロン可能牌を見逃したプレイヤー（ツモで解除）
+        self.temporary_furiten = [False, False, False, False]
+        # リーチ後フリテン: リーチ後にロン可能牌を見逃し（解除不可）
+        self.permanent_furiten = [False, False, False, False]
+
         self.record = GameRecord()
         self.record.set_metadata(
             wall_seed=wall_seed,
@@ -62,6 +67,9 @@ class GameRound(NakiMixin):
 
                 player.draw_tile(tile)
                 self.record.record_draw(self.current_player, tile)
+
+                # ツモ時に同巡フリテンを解除
+                self.temporary_furiten[self.current_player] = False
 
                 if self.verbose:
                     self._log_draw(tile, player)
@@ -265,12 +273,20 @@ class GameRound(NakiMixin):
             if not can_agari:
                 continue
 
-            # フリテン判定: 自分の河に待ち牌があればロン不可
+            # フリテン判定（3種類）
+            furiten_reason = None
             if player.is_furiten():
+                furiten_reason = "捨て牌フリテン"
+            elif self.temporary_furiten[seat]:
+                furiten_reason = "同巡フリテン"
+            elif self.permanent_furiten[seat]:
+                furiten_reason = "リーチ後フリテン"
+
+            if furiten_reason:
                 if self.verbose:
                     print(
                         f"         ({self.SEAT_NAMES[seat]}家: "
-                        f"フリテンのためロン不可)"
+                        f"{furiten_reason}のためロン不可)"
                     )
                 continue
 
@@ -279,6 +295,12 @@ class GameRound(NakiMixin):
             )
             if wants_ron:
                 return seat
+
+            # ロン可能だが見逃した → フリテン設定
+            self.temporary_furiten[seat] = True
+            if player.is_riichi:
+                self.permanent_furiten[seat] = True
+
         return None
 
     # === ユーティリティ ===

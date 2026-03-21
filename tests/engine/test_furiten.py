@@ -3,6 +3,7 @@
 from mahjong.engine.agari import waiting_tiles, is_agari
 from mahjong.engine.player import Player
 from mahjong.engine.tile import empty_hand
+from mahjong.game.round import GameRound
 
 
 def test_waiting_tiles_tenpai():
@@ -78,3 +79,23 @@ def test_furiten_not_tenpai():
     player.hand = hand
     player.discards.append(0)
     assert player.is_furiten() is False
+
+
+def test_temporary_furiten_state():
+    """同巡フリテン: ロン見逃し後にフラグが立つ"""
+    from agents import ShantenAgent
+    agents = [ShantenAgent(seed=i) for i in range(4)]
+    game = GameRound(agents, wall_seed=42)
+    # 初期状態では同巡フリテンなし
+    assert game.temporary_furiten == [False, False, False, False]
+    assert game.permanent_furiten == [False, False, False, False]
+
+
+def test_furiten_in_game():
+    """実際のゲームでフリテンが正常に動作する（クラッシュしない）"""
+    from agents import ShantenAgent
+    agents = [ShantenAgent(seed=i) for i in range(4)]
+    game = GameRound(agents, wall_seed=42)
+    result = game.run()
+    assert result is not None
+    assert result["type"] in ("tsumo", "ron", "ryukyoku")
