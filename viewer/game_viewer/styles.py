@@ -181,9 +181,9 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     margin-left: 4px;
 }
 
-/* 副露エリア */
+/* === 副露エリア（4人が90度ずつ回転した点対称） === */
 .melds-area {
-    display: flex; gap: 6px; margin-left: 12px; align-items: flex-end;
+    display: flex; gap: 4px;
 }
 .meld-group {
     display: flex; gap: 1px; padding: 2px 3px;
@@ -193,20 +193,92 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     height: 36px; width: auto; border-radius: 2px;
     background: #e8e0d0; padding: 1px; border: 1px solid #a99;
 }
-.tile-meld.meld-taken {
-    background: #d0e8d0; border: 1px solid #5a5;
-}
 .tile-meld-vert {
     height: auto; width: 32px; border-radius: 2px;
     background: #e8e0d0; padding: 1px; border: 1px solid #a99;
 }
-.tile-meld-vert.meld-taken {
-    background: #d0e8d0; border: 1px solid #5a5;
+
+/* 東家(下): 右端から左へ配置 */
+.hand-bottom .melds-area {
+    flex-direction: row-reverse; margin-left: auto;
+    align-items: flex-end;
+}
+
+/* 西家(上): 180度回転内なのでrow-reverseで左端から右へ見える */
+.hand-top .melds-area {
+    flex-direction: row-reverse; margin-left: auto;
+    align-items: flex-end;
+}
+.hand-top .meld-group { flex-direction: row-reverse; }
+
+/* 北家(左): 下端から上へ配置、グループ内は縦並び */
+.hand-left .melds-area {
+    flex-direction: column-reverse; margin-left: 0; margin-top: auto;
+    border-top: 2px solid #4a9; padding-top: 6px;
+}
+.hand-left .meld-group {
+    flex-direction: column; gap: 0;
 }
 .hand-left .tile-meld-vert { transform: rotate(90deg); margin: -6px 0; }
+
+/* 南家(右): 上端から下へ配置、グループ内は縦並び */
+.hand-right .melds-area {
+    flex-direction: column; margin-left: 0; order: -1;
+    border-bottom: 2px solid #4a9; padding-bottom: 6px;
+}
+.hand-right .meld-group {
+    flex-direction: column-reverse; gap: 0;
+}
 .hand-right .tile-meld-vert { transform: rotate(-90deg); margin: -6px 0; }
-.hand-left .melds-area, .hand-right .melds-area {
-    flex-direction: column; margin-left: 0; margin-top: 8px;
+
+/* 横向き牌（鳴いた牌を示す） */
+.tile-meld.tile-sideways {
+    transform: rotate(90deg);
+    margin: 6px -4px;
+}
+.hand-left .tile-meld-vert.tile-sideways {
+    transform: rotate(180deg);
+    margin: 0 0;
+}
+.hand-right .tile-meld-vert.tile-sideways {
+    transform: rotate(0deg);
+    margin: 0 0;
+}
+
+/* 暗槓の裏向き牌 */
+.meld-facedown {
+    background: #4a6a8a;
+    border: 1px solid #6a8aaa;
+    filter: saturate(0.3) brightness(0.7);
+}
+
+/* 加槓・大明槓の重ね表示 */
+.kakan-stack {
+    position: relative;
+    display: inline-flex;
+}
+.tile-meld.tile-stacked {
+    position: absolute;
+    bottom: 100%; left: 50%;
+    transform: translateX(-50%) rotate(90deg);
+    margin: 0; height: 32px;
+}
+.hand-left .kakan-stack, .hand-right .kakan-stack {
+    display: flex; flex-direction: row;
+}
+.hand-left .tile-meld-vert.tile-stacked {
+    position: absolute;
+    transform: rotate(180deg);
+    margin: 0; width: 28px;
+    top: 50%; left: auto; right: 100%;
+    transform: rotate(180deg) translateY(-50%);
+}
+.hand-right .tile-meld-vert.tile-stacked {
+    position: absolute;
+    transform: rotate(0deg);
+    margin: 0; width: 28px;
+    top: 50%; left: 100%;
+    transform: rotate(0deg) translateY(-50%);
 }
 
 .result-banner {

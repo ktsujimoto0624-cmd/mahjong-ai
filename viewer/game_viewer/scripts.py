@@ -143,6 +143,14 @@ function renderMelds(seat, isVertical) {
     let seatMelds = melds[seat];
     if (seatMelds.length === 0) return '';
     let html = '';
+    let tCls = isVertical ? 'tile-meld-vert' : 'tile-meld';
+
+    function meldTile(tid, extra, lbl) {
+        return '<img class="' + tCls + ' ' + extra +
+            '" src="' + tileSvgUrl(tid) +
+            '" title="' + lbl + ' ' + TILE_NAMES[tid] + '">';
+    }
+
     for (let m of seatMelds) {
         html += '<span class="meld-group">';
         let label = {
@@ -150,13 +158,41 @@ function renderMelds(seat, isVertical) {
             daiminkan:"\\u660E\\u69FB", ankan:"\\u6697\\u69FB",
             kakan:"\\u52A0\\u69FB"
         }[m.meld_type] || "";
-        for (let t of m.tiles) {
-            let cls = (t === m.taken_tile && m.meld_type !== "ankan") ? "meld-taken" : "";
-            html += isVertical ?
-                '<img class="tile-meld-vert ' + cls + '" src="' + tileSvgUrl(t) +
-                '" title="' + label + " " + TILE_NAMES[t] + '">' :
-                '<img class="tile-meld ' + cls + '" src="' + tileSvgUrl(t) +
-                '" title="' + label + " " + TILE_NAMES[t] + '">';
+
+        if (m.meld_type === 'ankan') {
+            for (let i = 0; i < 4; i++) {
+                let cls = (i === 0 || i === 3) ? 'meld-facedown' : '';
+                html += meldTile(m.tiles[i], cls, label);
+            }
+        } else {
+            let relPos = (m.from_seat - seat + 4) % 4;
+            let swPos = relPos === 3 ? 0 : relPos === 2 ? 1 : 2;
+
+            if (m.meld_type === 'chi') {
+                html += meldTile(m.taken_tile, 'tile-sideways', label);
+                let rest = m.tiles.filter(function(t) {
+                    return t !== m.taken_tile;
+                }).sort(function(a, b) { return a - b; });
+                for (let j = 0; j < rest.length; j++) {
+                    html += meldTile(rest[j], '', label);
+                }
+            } else if (m.meld_type === 'pon') {
+                for (let i = 0; i < 3; i++) {
+                    let cls = (i === swPos) ? 'tile-sideways' : '';
+                    html += meldTile(m.tiles[i], cls, label);
+                }
+            } else if (m.meld_type === 'daiminkan' || m.meld_type === 'kakan') {
+                for (let i = 0; i < 3; i++) {
+                    if (i === swPos) {
+                        html += '<span class="kakan-stack">' +
+                            meldTile(m.tiles[i], 'tile-sideways', label) +
+                            meldTile(m.tiles[3], 'tile-stacked', label) +
+                            '</span>';
+                    } else {
+                        html += meldTile(m.tiles[i], '', label);
+                    }
+                }
+            }
         }
         html += '</span>';
     }

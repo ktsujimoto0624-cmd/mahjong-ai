@@ -40,32 +40,38 @@ class GameRound(NakiMixin):
     def run(self):
         """1局を実行し、結果と棋譜を返す。"""
         self._deal()
+        naki_player = None  # 鳴いた直後のプレイヤー（ツモ不要）
 
         while True:
-            # ツモ
-            tile = self.wall.draw()
-            if tile is None:
-                self._finish_ryukyoku()
-                break
-
             player = self.players[self.current_player]
-            player.draw_tile(tile)
-            self.record.record_draw(self.current_player, tile)
 
-            if self.verbose:
-                self._log_draw(tile, player)
+            if naki_player is not None:
+                # チー/ポン/大明槓後 → ツモなしで打牌のみ
+                naki_player = None
+            else:
+                # 通常ツモ
+                tile = self.wall.draw()
+                if tile is None:
+                    self._finish_ryukyoku()
+                    break
 
-            # ツモ和了判定
-            if self._check_tsumo(player, tile):
-                break
+                player.draw_tile(tile)
+                self.record.record_draw(self.current_player, tile)
 
-            # 暗槓・加槓判定（ツモ後、打牌前）
-            kan_result = self._handle_self_kan(player)
-            if kan_result == "tsumo":
-                break
-            if kan_result == "rinshan":
-                # 嶺上ツモ後、再度打牌フェーズへ
-                continue
+                if self.verbose:
+                    self._log_draw(tile, player)
+
+                # ツモ和了判定
+                if self._check_tsumo(player, tile):
+                    break
+
+                # 暗槓・加槓判定（ツモ後、打牌前）
+                kan_result = self._handle_self_kan(player)
+                if kan_result == "tsumo":
+                    break
+                if kan_result == "rinshan":
+                    # 嶺上ツモ後、再度打牌フェーズへ
+                    continue
 
             # リーチ判定 & 打牌
             discard = self._handle_discard(player)
@@ -78,13 +84,14 @@ class GameRound(NakiMixin):
             naki_seat = self._handle_pon_kan(discard)
             if naki_seat is not None:
                 self.current_player = naki_seat
-                # 鳴いた人は打牌のみ（ツモなし）
+                naki_player = naki_seat
                 continue
 
             # チー判定（下家のみ）
             chi_seat = self._handle_chi(discard)
             if chi_seat is not None:
                 self.current_player = chi_seat
+                naki_player = chi_seat
                 continue
 
             # 次のプレイヤーへ

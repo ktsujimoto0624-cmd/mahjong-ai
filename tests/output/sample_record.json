@@ -689,11 +689,6 @@
       "taken_tile": 25
     },
     {
-      "type": "draw",
-      "seat": 3,
-      "tile": 31
-    },
-    {
       "type": "discard",
       "seat": 3,
       "tile": 33,
@@ -702,33 +697,29 @@
     {
       "type": "draw",
       "seat": 0,
-      "tile": 10
+      "tile": 31
     },
     {
       "type": "discard",
       "seat": 0,
-      "tile": 10,
+      "tile": 31,
       "riichi": false
     },
     {
       "type": "draw",
       "seat": 1,
-      "tile": 13
-    },
-    {
-      "type": "riichi",
-      "seat": 1
+      "tile": 10
     },
     {
       "type": "discard",
       "seat": 1,
-      "tile": 30,
-      "riichi": true
+      "tile": 10,
+      "riichi": false
     },
     {
       "type": "draw",
       "seat": 2,
-      "tile": 28
+      "tile": 13
     },
     {
       "type": "discard",
@@ -739,51 +730,106 @@
     {
       "type": "draw",
       "seat": 3,
-      "tile": 5
+      "tile": 28
     },
     {
       "type": "discard",
       "seat": 3,
-      "tile": 8,
+      "tile": 29,
       "riichi": false
     },
     {
       "type": "draw",
       "seat": 0,
+      "tile": 5
+    },
+    {
+      "type": "discard",
+      "seat": 0,
+      "tile": 5,
+      "riichi": false
+    },
+    {
+      "type": "draw",
+      "seat": 1,
       "tile": 26
     },
     {
       "type": "discard",
-      "seat": 0,
-      "tile": 26,
+      "seat": 1,
+      "tile": 30,
       "riichi": false
     },
     {
       "type": "draw",
-      "seat": 1,
+      "seat": 2,
       "tile": 24
     },
     {
       "type": "discard",
-      "seat": 1,
+      "seat": 2,
       "tile": 24,
       "riichi": false
     },
     {
+      "type": "meld",
+      "seat": 3,
+      "meld_type": "chi",
+      "tiles": [
+        22,
+        23,
+        24
+      ],
+      "from_seat": 2,
+      "taken_tile": 24
+    },
+    {
+      "type": "discard",
+      "seat": 3,
+      "tile": 28,
+      "riichi": false
+    },
+    {
       "type": "draw",
-      "seat": 2,
+      "seat": 0,
       "tile": 0
     },
     {
       "type": "discard",
-      "seat": 2,
+      "seat": 0,
       "tile": 0,
       "riichi": false
     },
     {
       "type": "draw",
-      "seat": 3,
+      "seat": 1,
       "tile": 25
+    },
+    {
+      "type": "riichi",
+      "seat": 1
+    },
+    {
+      "type": "discard",
+      "seat": 1,
+      "tile": 12,
+      "riichi": true
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 32
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 32,
+      "riichi": false
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 18
     },
     {
       "type": "discard",
@@ -805,11 +851,33 @@
     {
       "type": "draw",
       "seat": 1,
-      "tile": 18
+      "tile": 33
     },
     {
       "type": "discard",
       "seat": 1,
+      "tile": 33,
+      "riichi": false
+    },
+    {
+      "type": "draw",
+      "seat": 2,
+      "tile": 13
+    },
+    {
+      "type": "discard",
+      "seat": 2,
+      "tile": 11,
+      "riichi": false
+    },
+    {
+      "type": "draw",
+      "seat": 3,
+      "tile": 17
+    },
+    {
+      "type": "discard",
+      "seat": 3,
       "tile": 18,
       "riichi": false
     }
@@ -817,8 +885,8 @@
   "result": {
     "type": "ron",
     "winner": 0,
-    "from_player": 1,
-    "turn": 14,
+    "from_player": 3,
+    "turn": 15,
     "winning_tile": 18,
     "score": {
       "yaku": [
