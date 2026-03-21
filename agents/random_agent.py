@@ -8,8 +8,11 @@ from agents.base import AgentBase
 class RandomAgent(AgentBase):
     """ランダムに捨てるエージェント"""
 
-    def __init__(self, seed=None):
-        super().__init__()
+    model = "random-v1"
+    description = "手牌からランダムに1枚選んで捨てる。動作確認・ベースライン用。"
+
+    def __init__(self, seed=None, name=None):
+        super().__init__(name=name)
         self.rng = random.Random(seed)
 
     def choose_discard(self, player, game_state):

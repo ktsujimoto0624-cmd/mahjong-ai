@@ -17,14 +17,29 @@ def _next_agent_id():
 class AgentBase:
     """AIエージェントの基底クラス"""
 
-    def __init__(self):
+    # サブクラスで上書きするメタ情報
+    model = "base"          # モデル名（バージョン管理用）
+    description = ""        # 戦略の概要説明
+
+    def __init__(self, name=None):
         self.agent_id = _next_agent_id()
         self.agent_type = self.__class__.__name__
+        self.name = name or f"{self.agent_type}#{self.agent_id}"
 
     @property
     def label(self):
-        """表示用ラベル（例: 'ShantenAgent#3'）"""
-        return f"{self.agent_type}#{self.agent_id}"
+        """表示用ラベル"""
+        return self.name
+
+    @property
+    def info(self):
+        """エージェント情報の辞書"""
+        return {
+            "name": self.name,
+            "type": self.agent_type,
+            "model": self.model,
+            "description": self.description,
+        }
 
     def choose_discard(self, player, game_state):
         """何を捨てるか決める。"""

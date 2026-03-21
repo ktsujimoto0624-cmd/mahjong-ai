@@ -16,8 +16,15 @@ from agents.base import AgentBase
 class ShantenAgent(AgentBase):
     """シャンテン数ベースのエージェント"""
 
-    def __init__(self, seed=None):
-        super().__init__()
+    model = "shanten-v1"
+    description = (
+        "シャンテン数最小化で打牌選択。"
+        "同シャンテンなら受入枚数が多い牌を残す。"
+        "テンパイ即リーチ。鳴きは基本しない（門前重視）。"
+    )
+
+    def __init__(self, seed=None, name=None):
+        super().__init__(name=name)
         self.rng = random.Random(seed)
 
     def choose_discard(self, player, game_state):
