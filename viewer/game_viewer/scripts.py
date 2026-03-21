@@ -280,10 +280,15 @@ function render() {
         '<div class="center-round">' + roundLabel + '</div>' +
         '<div class="center-dora"><span class="dora-label">\\u30C9\\u30E9</span>' +
         doraHtml + '</div>' +
+        '<div class="center-sticks">' +
+        (honba > 0 ? '<span class="stick-honba">' + honba +
+            '\\u672C\\u5834</span>' : '') +
+        (pool > 0 ? '<span class="stick-riichi">\\u4F9B\\u8A17' + pool +
+            '\\u70B9</span>' : '') +
+        '</div>' +
         '<div class="center-stats">' +
         '<span>\\u5DE1\\u76EE:' + turn + '</span>' +
         '<span>\\u6B8B:' + (122 - countDraws()) + '</span>' +
-        (pool > 0 ? '<span>\\u4F9B\\u8A17:' + pool + '</span>' : '') +
         '</div>';
     document.getElementById("center-info").innerHTML = centerHtml;
 
@@ -311,24 +316,46 @@ function render() {
     let banner = document.getElementById("result-banner");
     if (isEnd) {
         banner.style.display = "block";
-        if (RESULT.type === "tsumo") {
-            banner.innerHTML = "\\u30C4\\u30E2\\u548C\\u4E86! " +
-                SEAT_NAMES[RESULT.winner] +
-                " (" + AGENTS[RESULT.winner] + ") " + RESULT.turn +
-                "\\u5DE1\\u76EE \\u548C\\u4E86\\u724C: " +
-                '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
-                '" style="vertical-align:middle;">';
-        } else if (RESULT.type === "ron") {
-            banner.innerHTML = "\\u30ED\\u30F3\\u548C\\u4E86! " +
-                SEAT_NAMES[RESULT.winner] +
-                " (" + AGENTS[RESULT.winner] + ") \\u2190 " +
-                SEAT_NAMES[RESULT.from_player] +
-                " " + RESULT.turn + "\\u5DE1\\u76EE \\u548C\\u4E86\\u724C: " +
-                '<img class="tile-img" src="' + tileSvgUrl(RESULT.winning_tile) +
-                '" style="vertical-align:middle;">';
+        let bHtml = '';
+        if (RESULT.type === "tsumo" || RESULT.type === "ron") {
+            let wSeat = RESULT.winner;
+            let wDealer = METADATA.dealer || 0;
+            let wWind = ["\\u6771","\\u5357","\\u897F","\\u5317"][(wSeat - wDealer + 4) % 4];
+            let typeLabel = RESULT.type === "tsumo"
+                ? "\\u30C4\\u30E2\\u548C\\u4E86" : "\\u30ED\\u30F3\\u548C\\u4E86";
+            bHtml += '<div class="result-title">' + typeLabel + '!</div>';
+            bHtml += '<div class="result-winner">' + wWind +
+                '\\u5BB6 ' + AGENTS[wSeat];
+            if (RESULT.type === "ron") {
+                let fWind = ["\\u6771","\\u5357","\\u897F","\\u5317"][
+                    (RESULT.from_player - wDealer + 4) % 4];
+                bHtml += ' \\u2190 ' + fWind + '\\u5BB6\\u653E\\u9283';
+            }
+            bHtml += '</div>';
+            bHtml += '<div class="result-tile">' +
+                '<span>\\u548C\\u4E86\\u724C</span>' +
+                '<img class="tile-img result-win-tile" src="' +
+                tileSvgUrl(RESULT.winning_tile) + '">' + '</div>';
+            let sc = RESULT.score;
+            if (sc) {
+                bHtml += '<div class="result-yaku">';
+                for (let y of sc.yaku) {
+                    bHtml += '<span class="yaku-item">' + y[0] +
+                        '<em>' + y[1] + '\\u7FFB</em></span>';
+                }
+                bHtml += '</div>';
+                bHtml += '<div class="result-score">' +
+                    sc.han + '\\u7FFB ' + sc.fu + '\\u7B26 ' +
+                    sc.payments.total + '\\u70B9</div>';
+            } else {
+                bHtml += '<div class="result-score">\\u5F79\\u306A\\u3057</div>';
+            }
         } else {
-            banner.innerHTML = "\\u6D41\\u5C40 (" + RESULT.turn + "\\u5DE1\\u76EE)";
+            bHtml += '<div class="result-title">\\u6D41\\u5C40</div>' +
+                '<div class="result-score">' + RESULT.turn +
+                '\\u5DE1\\u76EE</div>';
         }
+        banner.innerHTML = bHtml;
     } else { banner.style.display = "none"; }
     updateButtons();
 }

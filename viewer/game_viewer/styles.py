@@ -216,11 +216,7 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     margin: 2px 4px;
 }
 
-/* リーチマーク */
-.riichi-mark {
-    color: #f44; font-weight: bold; font-size: 11px;
-    margin-left: 4px;
-}
+/* リーチマーク（新しい定義は下に） */
 
 /* === 副露エリア（4人が90度ずつ回転した点対称） === */
 .melds-area {
@@ -319,10 +315,66 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     transform: rotate(0deg) translateY(-50%);
 }
 
+/* 供託・本場表示 */
+.center-sticks {
+    display: flex; justify-content: center; gap: 8px; font-size: 11px;
+}
+.stick-honba {
+    color: #ffa; background: #553300; padding: 1px 6px;
+    border-radius: 3px; border: 1px solid #aa8;
+}
+.stick-riichi {
+    color: #aef; background: #003355; padding: 1px 6px;
+    border-radius: 3px; border: 1px solid #68c;
+}
+
+/* リーチ状態強調 */
+.riichi-mark {
+    color: #fff; background: #d44; font-size: 9px;
+    padding: 1px 4px; border-radius: 3px; margin-left: 4px;
+    animation: riichi-glow 1.5s infinite alternate;
+}
+@keyframes riichi-glow {
+    from { box-shadow: 0 0 2px #f44; }
+    to { box-shadow: 0 0 8px #f88; }
+}
+
+/* 結果バナー */
 .result-banner {
-    text-align: center; margin: 4px auto; padding: 8px;
-    background: #0d2818; border: 2px solid #f84; border-radius: 8px;
-    font-size: 14px; display: none; max-width: 1000px;
+    text-align: center; margin: 4px auto; padding: 12px;
+    background: #0d2818; border: 3px solid #f84; border-radius: 8px;
+    display: none; max-width: 1000px;
+}
+.result-title {
+    font-size: 22px; font-weight: bold; color: #fd6;
+    margin-bottom: 6px;
+}
+.result-winner {
+    font-size: 14px; color: #cfc; margin-bottom: 8px;
+}
+.result-tile {
+    margin: 8px 0; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+}
+.result-tile span { font-size: 12px; color: #aaa; }
+.result-win-tile {
+    height: 52px !important; border: 2px solid #fd6 !important;
+    box-shadow: 0 0 12px rgba(255,220,100,0.6);
+}
+.result-yaku {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 4px; margin: 8px 0;
+}
+.yaku-item {
+    background: #1a3a2a; padding: 2px 8px; border-radius: 4px;
+    font-size: 13px; color: #efe; border: 1px solid #3a6;
+}
+.yaku-item em {
+    font-style: normal; color: #fd6; margin-left: 4px;
+}
+.result-score {
+    font-size: 18px; font-weight: bold; color: #ff8;
+    margin-top: 4px;
 }
 
 /* === スマホ縦画面対応 === */
