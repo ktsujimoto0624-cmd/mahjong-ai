@@ -107,24 +107,25 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 .river-top { transform: rotate(180deg); }
 /* 南家河: 下→上に6牌、次の列は右へ */
 .river-right {
+    flex: 1; min-width: 0;
     display: flex; flex-direction: column-reverse; flex-wrap: wrap;
     align-content: flex-start;
-    max-height: 166px; min-width: 36px; overflow: hidden;
+    max-height: 166px; overflow: hidden;
 }
 .river-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
 /* 北家河: 上→下に6牌、次の列は左へ */
 .river-left {
+    flex: 1; min-width: 0;
     display: flex; flex-direction: column; flex-wrap: wrap-reverse;
     align-content: flex-end;
-    max-height: 166px; min-width: 36px; overflow: hidden;
+    max-height: 166px; overflow: hidden;
 }
 .river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
 
-/* 中央情報 */
+/* 中央情報（ドラ・嶺上牌: 7牌×2列分のスペース確保） */
 .center-info {
-    flex: 0 0 auto; text-align: center; padding: 6px 8px;
+    flex: 0 0 220px; text-align: center; padding: 6px 8px;
     background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
-    min-width: 60px;
 }
 
 /* 牌画像 */
@@ -309,8 +310,8 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     .river-table { padding: 3px; gap: 1px; }
     .river-middle { gap: 2px; }
 
-    /* 中央情報を最小化 */
-    .center-info { padding: 3px 4px; min-width: 44px; font-size: 10px; }
+    /* 中央情報を縮小（ドラ表示は維持） */
+    .center-info { flex: 0 0 150px; padding: 3px 4px; font-size: 10px; }
     .center-info div { font-size: 10px !important; }
 
     /* 牌を縮小 */
