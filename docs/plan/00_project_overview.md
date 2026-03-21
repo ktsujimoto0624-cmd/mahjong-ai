@@ -80,25 +80,25 @@
 
 ```
 260320ＭＪ/
-├── mahjong/              # 本体コード
-│   ├── tile.py           # 牌の定義・ユーティリティ
-│   ├── wall.py           # 山（壁牌）の管理
-│   ├── player.py         # プレイヤー状態
-│   ├── agari.py          # 和了判定・シャンテン数計算
-│   ├── agent.py          # AIエージェント（基底・ランダム・シャンテン）
-│   ├── game.py           # 1局のゲームループ
-│   ├── record.py         # 棋譜記録（JSON/テキスト）
-│   ├── yaku.py           # 役判定
-│   ├── score.py          # 符計算・点数計算
-│   ├── game_naki.py      # 鳴き処理（Mixin）
-│   ├── viewer.py         # HTMLビューア生成
-│   ├── viewer_css.py     # ビューアCSS定義
-│   └── viewer_js.py      # ビューアJavaScript定義
+├── mahjong/              # 麻雀エンジン
+│   ├── engine/           # コア（tile, wall, player, agari）
+│   ├── game/             # ゲーム進行（round, naki）
+│   ├── scoring/          # 点数計算（yaku, score）
+│   └── record/           # 棋譜記録
+├── agents/               # AIエージェント（独立パッケージ）
+│   ├── base.py           # 基底クラス
+│   ├── random_agent.py   # ランダム
+│   ├── shanten_agent.py  # シャンテン数ベース
+│   └── external/         # 将来: 外部AIラッパー
+├── viewer/               # ビューア・管理サイト
+│   ├── game_viewer/      # 棋譜再生（generator, styles, scripts）
+│   └── dashboard/        # 将来: エージェント管理UI
+├── data/                 # 外部データ・研究
+├── learning/             # 将来: 機械学習
+├── tests/                # テスト（ソース構造ミラー）
 ├── assets/tiles/         # 牌SVG画像（FluffyStuff CC-BY）
 ├── output/               # 生成物（HTML・JSON）→ GitHub Pagesで公開
-├── tests/                # テスト（まとめて削除可能）
-├── tmp/                  # スクリーンショット等（まとめて削除可能）
-└── docs/plan/            # 計画ドキュメント
+└── docs/                 # 計画・実装ドキュメント
 ```
 
 ## ルール: ファイルは500行以下に保つ

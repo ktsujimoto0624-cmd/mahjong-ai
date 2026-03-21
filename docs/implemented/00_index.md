@@ -10,24 +10,41 @@ Phase 1（基盤構築）で実装された機能のドキュメント。
 | 02 | [02_agents.md](02_agents.md) | AIエージェント（RandomAgent / ShantenAgent） |
 | 03 | [03_scoring.md](03_scoring.md) | 点数計算（役判定20種以上・符計算・ドラ） |
 | 04 | [04_record_viewer.md](04_record_viewer.md) | 棋譜記録（JSON/テキスト）・HTMLビューア |
+| 05 | [05_project_structure.md](05_project_structure.md) | プロジェクト構造・依存関係・設計方針 |
 
 ## モジュール構成
 
 ```
-mahjong/
-├── tile.py           # 牌の定義・ユーティリティ
-├── wall.py           # 山（壁牌）の管理
-├── player.py         # プレイヤー状態
-├── agari.py          # 和了判定・シャンテン数・手牌分解
-├── agent.py          # AIエージェント（基底・ランダム・シャンテン）
-├── game.py           # 1局のゲームループ
-├── game_naki.py      # 鳴き処理（Mixin）
-├── yaku.py           # 役判定
-├── score.py          # 符計算・点数計算
-├── record.py         # 棋譜記録（JSON/テキスト）
-├── viewer.py         # HTMLビューア生成
-├── viewer_css.py     # ビューアCSS定義
-└── viewer_js.py      # ビューアJavaScript定義
+mahjong/                          # 麻雀エンジン
+├── engine/                       # コアデータ構造
+│   ├── tile.py                   # 牌の定義・ユーティリティ
+│   ├── wall.py                   # 山（壁牌）の管理
+│   ├── player.py                 # プレイヤー状態
+│   └── agari.py                  # 和了判定・シャンテン数・手牌分解
+├── game/                         # ゲーム進行
+│   ├── round.py                  # 1局のゲームループ
+│   └── naki.py                   # 鳴き処理（Mixin）
+├── scoring/                      # 点数計算
+│   ├── yaku.py                   # 役判定
+│   └── score.py                  # 符計算・点数計算
+└── record/                       # 棋譜記録
+    └── record.py                 # JSON/テキスト出力
+
+agents/                           # AIエージェント（独立パッケージ）
+├── base.py                       # 基底クラス
+├── random_agent.py               # ランダム
+├── shanten_agent.py              # シャンテン数ベース
+└── external/                     # 将来: 外部AIラッパー
+
+viewer/                           # ビューア・管理サイト
+├── game_viewer/                  # 棋譜再生ビューア
+│   ├── generator.py              # HTML生成
+│   ├── styles.py                 # CSS
+│   └── scripts.py                # JavaScript
+└── dashboard/                    # 将来: エージェント管理UI
+
+data/                             # 外部データ・研究
+learning/                         # 将来: 機械学習
 ```
 
 ## Phase 1 完了状況
