@@ -1,0 +1,259 @@
+{
+  "mode": "tonnansen",
+  "points": [
+    23300,
+    34700,
+    14300,
+    27700
+  ],
+  "rankings": [
+    1,
+    3,
+    0,
+    2
+  ],
+  "rounds_played": 13,
+  "round_results": [
+    {
+      "type": "ron",
+      "winner": 0,
+      "from_player": 3,
+      "turn": 6,
+      "winning_tile": 0,
+      "score": null,
+      "round_label": "東1局0本場",
+      "round_wind": 0,
+      "round_number": 0,
+      "honba": 0,
+      "dealer": 0
+    },
+    {
+      "type": "ron",
+      "winner": 2,
+      "from_player": 0,
+      "turn": 7,
+      "winning_tile": 24,
+      "score": null,
+      "round_label": "東1局1本場",
+      "round_wind": 0,
+      "round_number": 0,
+      "honba": 1,
+      "dealer": 0
+    },
+    {
+      "type": "ron",
+      "winner": 1,
+      "from_player": 3,
+      "turn": 9,
+      "winning_tile": 6,
+      "score": null,
+      "round_label": "東2局0本場",
+      "round_wind": 0,
+      "round_number": 1,
+      "honba": 0,
+      "dealer": 1
+    },
+    {
+      "type": "ron",
+      "winner": 2,
+      "from_player": 1,
+      "turn": 11,
+      "winning_tile": 26,
+      "score": null,
+      "round_label": "東2局1本場",
+      "round_wind": 0,
+      "round_number": 1,
+      "honba": 1,
+      "dealer": 1
+    },
+    {
+      "type": "ron",
+      "winner": 1,
+      "from_player": 3,
+      "turn": 8,
+      "winning_tile": 22,
+      "score": {
+        "yaku": [
+          [
+            "断么九",
+            1
+          ]
+        ],
+        "han": 1,
+        "fu": 30,
+        "base_points": 240,
+        "payments": {
+          "total": 1000,
+          "from_each_non_dealer": 0,
+          "from_dealer": 0,
+          "from_discarder": 1000
+        },
+        "is_yakuman": false
+      },
+      "round_label": "東3局0本場",
+      "round_wind": 0,
+      "round_number": 2,
+      "honba": 0,
+      "dealer": 2
+    },
+    {
+      "type": "ron",
+      "winner": 3,
+      "from_player": 2,
+      "turn": 4,
+      "winning_tile": 3,
+      "score": {
+        "yaku": [
+          [
+            "リーチ",
+            1
+          ],
+          [
+            "七対子",
+            2
+          ],
+          [
+            "ドラ",
+            2
+          ]
+        ],
+        "han": 5,
+        "fu": 25,
+        "base_points": 2000,
+        "payments": {
+          "total": 8000,
+          "from_each_non_dealer": 0,
+          "from_dealer": 0,
+          "from_discarder": 8000
+        },
+        "is_yakuman": false
+      },
+      "round_label": "東4局0本場",
+      "round_wind": 0,
+      "round_number": 3,
+      "honba": 0,
+      "dealer": 3
+    },
+    {
+      "type": "ron",
+      "winner": 2,
+      "from_player": 0,
+      "turn": 7,
+      "winning_tile": 30,
+      "score": null,
+      "round_label": "東4局1本場",
+      "round_wind": 0,
+      "round_number": 3,
+      "honba": 1,
+      "dealer": 3
+    },
+    {
+      "type": "ron",
+      "winner": 0,
+      "from_player": 2,
+      "turn": 8,
+      "winning_tile": 15,
+      "score": null,
+      "round_label": "南1局0本場",
+      "round_wind": 1,
+      "round_number": 0,
+      "honba": 0,
+      "dealer": 0
+    },
+    {
+      "type": "ron",
+      "winner": 3,
+      "from_player": 0,
+      "turn": 13,
+      "winning_tile": 10,
+      "score": null,
+      "round_label": "南1局1本場",
+      "round_wind": 1,
+      "round_number": 0,
+      "honba": 1,
+      "dealer": 0
+    },
+    {
+      "type": "ron",
+      "winner": 0,
+      "from_player": 3,
+      "turn": 9,
+      "winning_tile": 18,
+      "score": null,
+      "round_label": "南2局0本場",
+      "round_wind": 1,
+      "round_number": 1,
+      "honba": 0,
+      "dealer": 1
+    },
+    {
+      "type": "ron",
+      "winner": 1,
+      "from_player": 2,
+      "turn": 9,
+      "winning_tile": 21,
+      "score": null,
+      "round_label": "南3局0本場",
+      "round_wind": 1,
+      "round_number": 2,
+      "honba": 0,
+      "dealer": 2
+    },
+    {
+      "type": "ron",
+      "winner": 3,
+      "from_player": 0,
+      "turn": 10,
+      "winning_tile": 1,
+      "score": null,
+      "round_label": "南4局0本場",
+      "round_wind": 1,
+      "round_number": 3,
+      "honba": 0,
+      "dealer": 3
+    },
+    {
+      "type": "tsumo",
+      "winner": 1,
+      "turn": 15,
+      "winning_tile": 24,
+      "score": {
+        "yaku": [
+          [
+            "リーチ",
+            1
+          ],
+          [
+            "門前清自摸和",
+            1
+          ],
+          [
+            "七対子",
+            2
+          ]
+        ],
+        "han": 4,
+        "fu": 25,
+        "base_points": 1600,
+        "payments": {
+          "total": 6400,
+          "from_each_non_dealer": 1600,
+          "from_dealer": 3200,
+          "from_discarder": 0
+        },
+        "is_yakuman": false
+      },
+      "round_label": "南4局1本場",
+      "round_wind": 1,
+      "round_number": 3,
+      "honba": 1,
+      "dealer": 3
+    }
+  ],
+  "agents": [
+    "ShantenAgent#1",
+    "ShantenAgent#2",
+    "ShantenAgent#3",
+    "ShantenAgent#4"
+  ]
+}

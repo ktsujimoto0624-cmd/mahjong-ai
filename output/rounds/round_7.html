@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>麻雀棋譜ビューア</title>
+<title>SimMahjong 牌譜ビューア</title>
 <style>
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -378,6 +378,28 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     font-size: 18px; font-weight: bold; color: #ff8;
     margin-top: 4px;
 }
+.result-payment {
+    font-size: 13px; color: #adc; margin-top: 2px;
+}
+.result-hand {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 2px; margin-top: 10px; padding: 6px;
+    background: rgba(0,0,0,0.2); border-radius: 4px;
+}
+.tile-result {
+    height: 36px; width: auto; border-radius: 2px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.result-nav { margin-top: 12px; }
+.btn-next-round {
+    display: inline-block; padding: 8px 24px;
+    background: #2d6a3f; border: 2px solid #4a9; border-radius: 6px;
+    color: #fff; text-decoration: none; font-size: 14px;
+    transition: all 0.2s;
+}
+.btn-next-round:hover {
+    background: #3a8a5f; transform: translateY(-1px);
+}
 
 /* === スマホ縦画面対応 === */
 @media (max-width: 600px) {
@@ -434,7 +456,7 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 </style>
 </head>
 <body>
-<h1>麻雀棋譜ビューア</h1>
+<h1>SimMahjong 牌譜ビューア</h1>
 <div class="meta" id="meta"></div>
 <div class="controls">
     <button id="btn-start" onclick="goStart()">|&lt;</button>
@@ -475,10 +497,10 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 const TILES_DIR = "../tiles";
 const TILE_NAMES = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '東', '南', '西', '北', '白', '發', '中'];
 const TILE_SVGS = ['Man1', 'Man2', 'Man3', 'Man4', 'Man5', 'Man6', 'Man7', 'Man8', 'Man9', 'Pin1', 'Pin2', 'Pin3', 'Pin4', 'Pin5', 'Pin6', 'Pin7', 'Pin8', 'Pin9', 'Sou1', 'Sou2', 'Sou3', 'Sou4', 'Sou5', 'Sou6', 'Sou7', 'Sou8', 'Sou9', 'Ton', 'Nan', 'Shaa', 'Pei', 'Haku', 'Hatsu', 'Chun'];
-const ACTIONS = [{"type": "draw", "seat": 1, "tile": 21}, {"type": "discard", "seat": 1, "tile": 17, "riichi": false}, {"type": "draw", "seat": 2, "tile": 26}, {"type": "discard", "seat": 2, "tile": 10, "riichi": false}, {"type": "draw", "seat": 3, "tile": 3}, {"type": "discard", "seat": 3, "tile": 12, "riichi": false}, {"type": "draw", "seat": 0, "tile": 14}, {"type": "discard", "seat": 0, "tile": 17, "riichi": false}, {"type": "draw", "seat": 1, "tile": 1}, {"type": "discard", "seat": 1, "tile": 6, "riichi": false}, {"type": "draw", "seat": 2, "tile": 15}, {"type": "discard", "seat": 2, "tile": 19, "riichi": false}, {"type": "meld", "seat": 0, "meld_type": "pon", "tiles": [19, 19, 19], "from_seat": 2, "taken_tile": 19}, {"type": "discard", "seat": 0, "tile": 24, "riichi": false}, {"type": "draw", "seat": 1, "tile": 23}, {"type": "discard", "seat": 1, "tile": 25, "riichi": false}, {"type": "meld", "seat": 0, "meld_type": "pon", "tiles": [25, 25, 25], "from_seat": 1, "taken_tile": 25}, {"type": "discard", "seat": 0, "tile": 11, "riichi": false}, {"type": "draw", "seat": 1, "tile": 0}, {"type": "discard", "seat": 1, "tile": 23, "riichi": false}, {"type": "draw", "seat": 2, "tile": 32}, {"type": "discard", "seat": 2, "tile": 31, "riichi": false}, {"type": "draw", "seat": 3, "tile": 29}, {"type": "discard", "seat": 3, "tile": 3, "riichi": false}, {"type": "meld", "seat": 0, "meld_type": "chi", "tiles": [3, 4, 5], "from_seat": 3, "taken_tile": 3}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 14}, {"type": "discard", "seat": 1, "tile": 14, "riichi": false}];
-const INITIAL_HANDS = [[0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 2, 0, 1, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 1, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1], [0, 0, 2, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0]];
-const RESULT = {"type": "ron", "winner": 0, "from_player": 1, "turn": 4, "winning_tile": 14, "score": null, "round_label": "南2局0本場", "round_wind": 1, "round_number": 1, "honba": 0, "dealer": 1};
-const METADATA = {"wall_seed": null, "agents": ["ShantenAgent#1", "ShantenAgent#2", "ShantenAgent#3", "ShantenAgent#4"], "dealer": 1, "round_wind": 1, "honba": 0, "riichi_pool": 0, "points": [33600, 21800, 22800, 21800], "round_number": 1, "dora_indicators": [6]};
+const ACTIONS = [{"type": "draw", "seat": 0, "tile": 8}, {"type": "discard", "seat": 0, "tile": 22, "riichi": false}, {"type": "draw", "seat": 1, "tile": 30}, {"type": "discard", "seat": 1, "tile": 9, "riichi": false}, {"type": "draw", "seat": 2, "tile": 19}, {"type": "discard", "seat": 2, "tile": 26, "riichi": false}, {"type": "draw", "seat": 3, "tile": 27}, {"type": "discard", "seat": 3, "tile": 25, "riichi": false}, {"type": "draw", "seat": 0, "tile": 3}, {"type": "discard", "seat": 0, "tile": 0, "riichi": false}, {"type": "draw", "seat": 1, "tile": 28}, {"type": "discard", "seat": 1, "tile": 21, "riichi": false}, {"type": "draw", "seat": 2, "tile": 11}, {"type": "discard", "seat": 2, "tile": 10, "riichi": false}, {"type": "draw", "seat": 3, "tile": 16}, {"type": "discard", "seat": 3, "tile": 10, "riichi": false}, {"type": "draw", "seat": 0, "tile": 1}, {"type": "discard", "seat": 0, "tile": 17, "riichi": false}, {"type": "draw", "seat": 1, "tile": 33}, {"type": "discard", "seat": 1, "tile": 33, "riichi": false}, {"type": "draw", "seat": 2, "tile": 12}, {"type": "discard", "seat": 2, "tile": 20, "riichi": false}, {"type": "draw", "seat": 3, "tile": 30}, {"type": "discard", "seat": 3, "tile": 1, "riichi": false}, {"type": "draw", "seat": 0, "tile": 18}, {"type": "discard", "seat": 0, "tile": 18, "riichi": false}, {"type": "draw", "seat": 1, "tile": 0}, {"type": "discard", "seat": 1, "tile": 3, "riichi": false}, {"type": "draw", "seat": 2, "tile": 14}, {"type": "discard", "seat": 2, "tile": 11, "riichi": false}, {"type": "draw", "seat": 3, "tile": 0}, {"type": "discard", "seat": 3, "tile": 16, "riichi": false}, {"type": "draw", "seat": 0, "tile": 16}, {"type": "discard", "seat": 0, "tile": 16, "riichi": false}, {"type": "draw", "seat": 1, "tile": 20}, {"type": "discard", "seat": 1, "tile": 31, "riichi": false}, {"type": "draw", "seat": 2, "tile": 17}, {"type": "discard", "seat": 2, "tile": 12, "riichi": false}, {"type": "draw", "seat": 3, "tile": 33}, {"type": "discard", "seat": 3, "tile": 4, "riichi": false}, {"type": "draw", "seat": 0, "tile": 27}, {"type": "discard", "seat": 0, "tile": 7, "riichi": false}, {"type": "draw", "seat": 1, "tile": 5}, {"type": "discard", "seat": 1, "tile": 16, "riichi": false}, {"type": "draw", "seat": 2, "tile": 30}, {"type": "discard", "seat": 2, "tile": 25, "riichi": false}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 24, "riichi": false}, {"type": "meld", "seat": 0, "meld_type": "chi", "tiles": [24, 25, 26], "from_seat": 3, "taken_tile": 24}, {"type": "discard", "seat": 0, "tile": 27, "riichi": false}, {"type": "draw", "seat": 1, "tile": 32}, {"type": "discard", "seat": 1, "tile": 32, "riichi": false}, {"type": "draw", "seat": 2, "tile": 25}, {"type": "discard", "seat": 2, "tile": 14, "riichi": false}, {"type": "draw", "seat": 3, "tile": 26}, {"type": "discard", "seat": 3, "tile": 6, "riichi": false}, {"type": "draw", "seat": 0, "tile": 11}, {"type": "discard", "seat": 0, "tile": 14, "riichi": false}, {"type": "draw", "seat": 1, "tile": 22}, {"type": "discard", "seat": 1, "tile": 0, "riichi": false}, {"type": "draw", "seat": 2, "tile": 20}, {"type": "discard", "seat": 2, "tile": 8, "riichi": false}, {"type": "draw", "seat": 3, "tile": 29}, {"type": "discard", "seat": 3, "tile": 9, "riichi": false}, {"type": "draw", "seat": 0, "tile": 13}, {"type": "discard", "seat": 0, "tile": 13, "riichi": false}, {"type": "draw", "seat": 1, "tile": 9}, {"type": "discard", "seat": 1, "tile": 29, "riichi": false}, {"type": "draw", "seat": 2, "tile": 24}, {"type": "discard", "seat": 2, "tile": 1, "riichi": false}, {"type": "draw", "seat": 3, "tile": 23}, {"type": "discard", "seat": 3, "tile": 23, "riichi": false}, {"type": "draw", "seat": 0, "tile": 18}, {"type": "discard", "seat": 0, "tile": 18, "riichi": false}, {"type": "draw", "seat": 1, "tile": 2}, {"type": "discard", "seat": 1, "tile": 2, "riichi": false}, {"type": "draw", "seat": 2, "tile": 15}, {"type": "discard", "seat": 2, "tile": 15, "riichi": false}];
+const INITIAL_HANDS = [[1, 0, 1, 0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 0, 2], [0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 1, 0, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0]];
+const RESULT = {"type": "ron", "winner": 0, "from_player": 2, "turn": 8, "winning_tile": 15, "score": null, "round_label": "南1局0本場", "round_wind": 1, "round_number": 0, "honba": 0, "dealer": 0};
+const METADATA = {"wall_seed": null, "agents": ["ShantenAgent#1", "ShantenAgent#2", "ShantenAgent#3", "ShantenAgent#4"], "dealer": 0, "round_wind": 1, "honba": 0, "riichi_pool": 0, "points": [25000, 27000, 17000, 31000], "round_number": 0, "dora_indicators": [7], "round_index": 7};
 const SEAT_NAMES = ["東家", "南家", "西家", "北家"];
 const AGENTS = METADATA.agents || ["?","?","?","?"];
 
@@ -826,14 +848,54 @@ function render() {
                 bHtml += '<div class="result-score">' +
                     sc.han + '\u7FFB ' + sc.fu + '\u7B26 ' +
                     sc.payments.total + '\u70B9</div>';
+                let pay = sc.payments;
+                let payDetail = '';
+                if (RESULT.type === 'tsumo') {
+                    if (pay.from_dealer > 0) {
+                        payDetail = '\u5B50' + pay.from_each_non_dealer +
+                            '\u70B9/\u89AA' + pay.from_dealer + '\u70B9';
+                    } else {
+                        payDetail = '\u5404' + pay.from_each_non_dealer + '\u70B9';
+                    }
+                } else {
+                    payDetail = pay.from_discarder + '\u70B9';
+                }
+                if ((METADATA.honba || 0) > 0) {
+                    payDetail += ' +\u672C\u5834' +
+                        (METADATA.honba * (RESULT.type === 'tsumo' ? 100 : 300)) +
+                        '\u70B9';
+                }
+                bHtml += '<div class="result-payment">' + payDetail + '</div>';
             } else {
                 bHtml += '<div class="result-score">\u5F79\u306A\u3057</div>';
             }
+
+            // 和了者の手牌を表示
+            bHtml += '<div class="result-hand">';
+            for (let t = 0; t < 34; t++) {
+                for (let c = 0; c < hands[wSeat][t]; c++) {
+                    bHtml += '<img class="tile-result" src="' +
+                        tileSvgUrl(t) + '">';
+                }
+            }
+            bHtml += '</div>';
+
         } else {
             bHtml += '<div class="result-title">\u6D41\u5C40</div>' +
                 '<div class="result-score">' + RESULT.turn +
                 '\u5DE1\u76EE</div>';
         }
+
+        // 次の局へボタン
+        let roundIdx = METADATA.round_index;
+        if (roundIdx !== undefined && roundIdx !== null) {
+            let nextUrl = 'round_' + (roundIdx + 1) + '.html';
+            bHtml += '<div class="result-nav">' +
+                '<a class="btn-next-round" href="' + nextUrl +
+                '">\u6B21\u306E\u5C40\u3078 \u25B6</a>' +
+                '</div>';
+        }
+
         banner.innerHTML = bHtml;
     } else { banner.style.display = "none"; }
     updateButtons();

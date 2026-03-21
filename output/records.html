@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SimMahjong - 牌譜一覧</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Meiryo', sans-serif; background: #0d2818; color: #fff; padding: 16px; }
+.header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; margin-bottom: 16px;
+    background: #0a1f10; border-radius: 8px; border: 1px solid #2a5;
+}
+.header h1 { font-size: 20px; color: #fd6; }
+.header a { color: #6cf; font-size: 13px; text-decoration: none; }
+.container { max-width: 900px; margin: 0 auto; }
+.panel {
+    background: #0a1f10; border: 1px solid #2a5; border-radius: 8px;
+    padding: 16px; margin-bottom: 16px;
+}
+.panel h2 { font-size: 16px; color: #8c8; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1px solid #3a6; padding: 8px 12px; text-align: center; font-size: 13px; }
+th { background: #1a3a2a; }
+a { color: #6cf; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>牌譜一覧</h1>
+        <a href="index.html">← タイトルへ</a>
+    </div>
+
+    <div class="panel">
+        <h2>最新の半荘</h2>
+        <table>
+            <tr><th>局</th><th>結果</th><th>和了者</th><th>棋譜</th></tr>
+            <tr><td colspan="4" id="loading" style="color:#8a8;">読み込み中...</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+fetch('sim_result.json')
+    .then(r => r.json())
+    .then(data => {
+        let winds = ['東','南','西','北'];
+        let typeMap = {tsumo:'ツモ', ron:'ロン', ryukyoku:'流局'};
+        let table = document.querySelector('table');
+        document.getElementById('loading').remove();
+        for (let i = 0; i < data.round_results.length; i++) {
+            let r = data.round_results[i];
+            let winner = r.winner !== null ? winds[r.winner] + '家' : '-';
+            let tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + r.round_label + '</td><td>' +
+                (typeMap[r.type]||r.type) + '</td><td>' + winner +
+                '</td><td><a href="rounds/round_' + i + '.html">再生</a></td>';
+            table.appendChild(tr);
+        }
+    })
+    .catch(() => {
+        document.getElementById('loading').textContent = 'データがありません';
+    });
+</script>
+</body>
+</html>

@@ -33,13 +33,13 @@ def generate_html(record, filepath, tiles_dir="tiles"):
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>麻雀棋譜ビューア</title>
+<title>SimMahjong 牌譜ビューア</title>
 <style>
 {get_css()}
 </style>
 </head>
 <body>
-<h1>麻雀棋譜ビューア</h1>
+<h1>SimMahjong 牌譜ビューア</h1>
 <div class="meta" id="meta"></div>
 <div class="controls">
     <button id="btn-start" onclick="goStart()">|&lt;</button>

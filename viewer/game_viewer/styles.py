@@ -376,6 +376,28 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     font-size: 18px; font-weight: bold; color: #ff8;
     margin-top: 4px;
 }
+.result-payment {
+    font-size: 13px; color: #adc; margin-top: 2px;
+}
+.result-hand {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 2px; margin-top: 10px; padding: 6px;
+    background: rgba(0,0,0,0.2); border-radius: 4px;
+}
+.tile-result {
+    height: 36px; width: auto; border-radius: 2px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.result-nav { margin-top: 12px; }
+.btn-next-round {
+    display: inline-block; padding: 8px 24px;
+    background: #2d6a3f; border: 2px solid #4a9; border-radius: 6px;
+    color: #fff; text-decoration: none; font-size: 14px;
+    transition: all 0.2s;
+}
+.btn-next-round:hover {
+    background: #3a8a5f; transform: translateY(-1px);
+}
 
 /* === スマホ縦画面対応 === */
 @media (max-width: 600px) {

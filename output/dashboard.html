@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SimMahjong - ダッシュボード</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Meiryo', 'Yu Gothic', sans-serif;
+    background: #0d2818; color: #fff; padding: 16px;
+}
+.header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; margin-bottom: 16px;
+    background: #0a1f10; border-radius: 8px; border: 1px solid #2a5;
+}
+.header h1 { font-size: 20px; color: #fd6; }
+.header a { color: #6cf; font-size: 13px; text-decoration: none; }
+.container { max-width: 900px; margin: 0 auto; }
+
+/* 設定パネル */
+.panel {
+    background: #0a1f10; border: 1px solid #2a5; border-radius: 8px;
+    padding: 16px; margin-bottom: 16px;
+}
+.panel h2 { font-size: 16px; color: #8c8; margin-bottom: 12px; border-bottom: 1px solid #2a5; padding-bottom: 6px; }
+.form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.form-row label { font-size: 13px; min-width: 80px; color: #aaa; }
+.form-row select, .form-row input {
+    background: #1a3a2a; border: 1px solid #4a9; color: #fff;
+    padding: 6px 10px; border-radius: 4px; font-size: 13px;
+}
+.agent-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+.agent-card {
+    background: #1a3a2a; border: 1px solid #3a6; border-radius: 6px;
+    padding: 10px; text-align: center; font-size: 12px;
+}
+.agent-card .wind { font-size: 18px; font-weight: bold; color: #fd6; }
+.agent-card select { width: 100%; margin-top: 6px; }
+
+/* ボタン */
+.btn-run {
+    display: block; width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #2d6a3f, #1a8a4f);
+    border: 2px solid #4a9; border-radius: 8px;
+    color: #fff; font-size: 18px; font-weight: bold;
+    cursor: pointer; transition: all 0.2s; margin: 16px 0;
+}
+.btn-run:hover { background: linear-gradient(135deg, #3a8a5f, #2aaa6f); transform: translateY(-1px); }
+.btn-run:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+/* 結果表示 */
+.result-panel { display: none; }
+.result-panel.show { display: block; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+th, td { border: 1px solid #3a6; padding: 8px 12px; text-align: center; font-size: 13px; }
+th { background: #1a3a2a; }
+a { color: #6cf; }
+
+.status { text-align: center; padding: 20px; color: #8a8; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>SimMahjong</h1>
+        <a href="index.html">← タイトルへ</a>
+    </div>
+
+    <div class="panel">
+        <h2>対局設定</h2>
+        <div class="form-row">
+            <label>対戦モード</label>
+            <select id="mode">
+                <option value="tonnansen">東南戦（半荘）</option>
+                <option value="tonpusen">東風戦</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label>配牌シード</label>
+            <input type="number" id="seed" placeholder="空欄でランダム" style="width:160px;">
+        </div>
+
+        <h2 style="margin-top:16px;">エージェント選択</h2>
+        <div class="agent-grid">
+            <div class="agent-card">
+                <div class="wind">東</div>
+                <select class="agent-select">
+                    <option value="shanten" selected>ShantenAgent</option>
+                    <option value="random">RandomAgent</option>
+                </select>
+            </div>
+            <div class="agent-card">
+                <div class="wind">南</div>
+                <select class="agent-select">
+                    <option value="shanten" selected>ShantenAgent</option>
+                    <option value="random">RandomAgent</option>
+                </select>
+            </div>
+            <div class="agent-card">
+                <div class="wind">西</div>
+                <select class="agent-select">
+                    <option value="shanten" selected>ShantenAgent</option>
+                    <option value="random">RandomAgent</option>
+                </select>
+            </div>
+            <div class="agent-card">
+                <div class="wind">北</div>
+                <select class="agent-select">
+                    <option value="shanten" selected>ShantenAgent</option>
+                    <option value="random">RandomAgent</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-run" id="btn-run" onclick="runSim()">半荘シミュレーション実行</button>
+
+    <div class="status" id="status">
+        ※ 現在はサーバーサイド実行のため、事前生成された結果を表示します。<br>
+        将来的にはブラウザ上でリアルタイム実行できるようにします。
+    </div>
+
+    <div class="result-panel" id="result-panel">
+        <div class="panel">
+            <h2>最終順位</h2>
+            <table id="ranking-table">
+                <tr><th>順位</th><th>席</th><th>エージェント</th><th>点数</th></tr>
+            </table>
+        </div>
+        <div class="panel">
+            <h2>局一覧</h2>
+            <table id="rounds-table">
+                <tr><th>局</th><th>結果</th><th>和了者</th><th>打点</th></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// 事前生成された結果を読み込む
+function runSim() {
+    document.getElementById('btn-run').disabled = true;
+    document.getElementById('status').textContent = '結果を読み込み中...';
+
+    // 事前生成されたラウンドデータを使用
+    fetch('sim_result.json')
+        .then(r => r.json())
+        .then(data => showResult(data))
+        .catch(() => {
+            document.getElementById('status').innerHTML =
+                '事前生成データがありません。<br>' +
+                '<a href="records.html">牌譜一覧</a>で過去の結果を確認できます。';
+            document.getElementById('btn-run').disabled = false;
+        });
+}
+
+function showResult(data) {
+    let winds = ['東','南','西','北'];
+    let panel = document.getElementById('result-panel');
+    panel.classList.add('show');
+    document.getElementById('status').style.display = 'none';
+
+    // 順位テーブル
+    let rt = document.getElementById('ranking-table');
+    for (let rank = 0; rank < data.rankings.length; rank++) {
+        let seat = data.rankings[rank];
+        let tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + (rank+1) + '位</td><td>' + winds[seat] +
+            '家</td><td>' + data.agents[seat] + '</td><td>' +
+            data.points[seat] + '点</td>';
+        rt.appendChild(tr);
+    }
+
+    // 局一覧テーブル
+    let rdt = document.getElementById('rounds-table');
+    let typeMap = {tsumo:'ツモ', ron:'ロン', ryukyoku:'流局'};
+    for (let i = 0; i < data.round_results.length; i++) {
+        let r = data.round_results[i];
+        let winner = r.winner !== null ? winds[r.winner] + '家' : '-';
+        let pts = r.score ? r.score.payments.total + '点' : '-';
+        let tr = document.createElement('tr');
+        tr.innerHTML = '<td><a href="rounds/round_' + i + '.html">' +
+            r.round_label + '</a></td><td>' + (typeMap[r.type]||r.type) +
+            '</td><td>' + winner + '</td><td>' + pts + '</td>';
+        rdt.appendChild(tr);
+    }
+
+    document.getElementById('btn-run').disabled = false;
+    document.getElementById('btn-run').textContent = '再実行';
+}
+</script>
+</body>
+</html>

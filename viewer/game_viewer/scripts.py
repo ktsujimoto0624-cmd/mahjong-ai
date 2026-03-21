@@ -347,14 +347,54 @@ function render() {
                 bHtml += '<div class="result-score">' +
                     sc.han + '\\u7FFB ' + sc.fu + '\\u7B26 ' +
                     sc.payments.total + '\\u70B9</div>';
+                let pay = sc.payments;
+                let payDetail = '';
+                if (RESULT.type === 'tsumo') {
+                    if (pay.from_dealer > 0) {
+                        payDetail = '\\u5B50' + pay.from_each_non_dealer +
+                            '\\u70B9/\\u89AA' + pay.from_dealer + '\\u70B9';
+                    } else {
+                        payDetail = '\\u5404' + pay.from_each_non_dealer + '\\u70B9';
+                    }
+                } else {
+                    payDetail = pay.from_discarder + '\\u70B9';
+                }
+                if ((METADATA.honba || 0) > 0) {
+                    payDetail += ' +\\u672C\\u5834' +
+                        (METADATA.honba * (RESULT.type === 'tsumo' ? 100 : 300)) +
+                        '\\u70B9';
+                }
+                bHtml += '<div class="result-payment">' + payDetail + '</div>';
             } else {
                 bHtml += '<div class="result-score">\\u5F79\\u306A\\u3057</div>';
             }
+
+            // 和了者の手牌を表示
+            bHtml += '<div class="result-hand">';
+            for (let t = 0; t < 34; t++) {
+                for (let c = 0; c < hands[wSeat][t]; c++) {
+                    bHtml += '<img class="tile-result" src="' +
+                        tileSvgUrl(t) + '">';
+                }
+            }
+            bHtml += '</div>';
+
         } else {
             bHtml += '<div class="result-title">\\u6D41\\u5C40</div>' +
                 '<div class="result-score">' + RESULT.turn +
                 '\\u5DE1\\u76EE</div>';
         }
+
+        // 次の局へボタン
+        let roundIdx = METADATA.round_index;
+        if (roundIdx !== undefined && roundIdx !== null) {
+            let nextUrl = 'round_' + (roundIdx + 1) + '.html';
+            bHtml += '<div class="result-nav">' +
+                '<a class="btn-next-round" href="' + nextUrl +
+                '">\\u6B21\\u306E\\u5C40\\u3078 \\u25B6</a>' +
+                '</div>';
+        }
+
         banner.innerHTML = bHtml;
     } else { banner.style.display = "none"; }
     updateButtons();
