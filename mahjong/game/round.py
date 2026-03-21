@@ -145,6 +145,10 @@ class GameRound(NakiMixin):
             return False
 
         score = self._calc_score(player, tile, is_tsumo=True)
+        # 役なし → 和了不成立
+        if score is None:
+            return False
+
         self.result = {
             "type": "tsumo",
             "winner": self.current_player,
@@ -237,6 +241,15 @@ class GameRound(NakiMixin):
             winner_player, discard, is_tsumo=False, seat=ron_winner,
         )
         winner_player.hand[discard] -= 1
+
+        # 役なし → 和了不成立
+        if score is None:
+            if self.verbose:
+                print(
+                    f"         ({self.SEAT_NAMES[ron_winner]}家: "
+                    f"役なしのためロン不可)"
+                )
+            return False
 
         self.result = {
             "type": "ron",
