@@ -352,6 +352,10 @@ function loadStats() {
             html += statItem('副露率', a.meld_rate);
             html += statItem('平均和了点', a.avg_win_score + '点');
             html += statItem('平均和了翻', a.avg_win_han + '翻');
+            var ptColor = a.sum_pt > 0 ? '#4f4' : a.sum_pt < 0 ? '#f66' : '#fff';
+            html += statItem('合計pt', '<span style="color:' + ptColor + '">' + (a.sum_pt > 0 ? '+' : '') + a.sum_pt + '</span>');
+            var avgPtColor = parseFloat(a.avg_pt) > 0 ? '#4f4' : parseFloat(a.avg_pt) < 0 ? '#f66' : '#fff';
+            html += statItem('平均pt', '<span style="color:' + avgPtColor + '">' + (parseFloat(a.avg_pt) > 0 ? '+' : '') + a.avg_pt + '</span>');
             html += '</div>';
 
             // 順位分布バーグラフ

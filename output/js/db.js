@@ -228,10 +228,26 @@ async function getAgentStats(filterFn) {
 
     for (const sim of filtered) {
         if (!sim.stats || !sim.stats.per_agent) continue;
+
+        // この半荘のポイント計算（ワンツー 10-20, 25000持ち/30000返し）
+        const returnPt = 30000;
+        const uma = [20, 10, -10, -20];
+        let simPts = [0, 0, 0, 0];
+        if (sim.rankings && sim.final_points) {
+            // 2位以下の素点を四捨五入
+            for (let r = 1; r < 4; r++) {
+                const seat = sim.rankings[r];
+                simPts[seat] = Math.round((sim.final_points[seat] - returnPt) / 1000) + uma[r];
+            }
+            // 1位はプラマイゼロ調整
+            const seat0 = sim.rankings[0];
+            simPts[seat0] = -(simPts[sim.rankings[1]] + simPts[sim.rankings[2]] + simPts[sim.rankings[3]]);
+        }
+
         for (const pa of sim.stats.per_agent) {
             const agentType = pa.type || pa.name || 'unknown';
             const key = agentType;
-            const typeNames = {hiyoko:'ひよこ',shanta:'しゃんた',random:'乱子'};
+            const typeNames = {hiyoko:'ひよこ',shanta:'しゃんた',random:'乱子',dev:'作成中'};
             if (!agentMap[key]) {
                 agentMap[key] = {
                     name: typeNames[agentType] || agentType,
@@ -240,6 +256,7 @@ async function getAgentStats(filterFn) {
                     total_rank: 0,
                     rank_counts: [0, 0, 0, 0],
                     total_points: 0,
+                    total_pt: 0,
                     win_count: 0,
                     tsumo_count: 0,
                     ron_count: 0,
@@ -257,6 +274,7 @@ async function getAgentStats(filterFn) {
             a.total_rank += pa.final_rank;
             a.rank_counts[pa.final_rank - 1]++;
             a.total_points += pa.final_points;
+            a.total_pt += simPts[pa.seat] || 0;
             a.win_count += pa.win_count;
             a.tsumo_count += pa.tsumo_count;
             a.ron_count += pa.ron_count;
@@ -277,6 +295,8 @@ async function getAgentStats(filterFn) {
         ...a,
         avg_rank: a.games > 0 ? (a.total_rank / a.games).toFixed(2) : '-',
         avg_points: a.games > 0 ? Math.round(a.total_points / a.games) : 0,
+        sum_pt: a.total_pt,
+        avg_pt: a.games > 0 ? (a.total_pt / a.games).toFixed(1) : '-',
         win_rate: a.total_rounds > 0
             ? (a.win_count / a.total_rounds * 100).toFixed(1) + '%' : '-',
         deal_in_rate: a.total_rounds > 0
