@@ -7,65 +7,71 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    font-family: 'Meiryo', 'Yu Gothic', sans-serif;
-    background: #0d2818; color: #fff; padding: 16px;
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #121212; color: #fff; padding: 16px;
 }
 .header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 16px; margin-bottom: 16px;
-    background: #0a1f10; border-radius: 8px; border: 1px solid #2a5;
+    background: #181818; border-radius: 8px; border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-.header h1 { font-size: 20px; color: #fd6; }
-.header a { color: #6cf; font-size: 13px; text-decoration: none; }
+.header h1 { font-size: 20px; color: #fff; }
+.header a { color: #1DB954; font-size: 13px; text-decoration: none; }
+.header a:hover { color: #1ED760; }
 .container { max-width: 900px; margin: 0 auto; }
 .panel {
-    background: #0a1f10; border: 1px solid #2a5; border-radius: 8px;
+    background: #181818; border: none; border-radius: 8px;
     padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-.panel h2 { font-size: 16px; color: #8c8; margin-bottom: 12px; border-bottom: 1px solid #2a5; padding-bottom: 6px; }
+.panel h2 { font-size: 16px; color: #fff; margin-bottom: 12px; border-bottom: 1px solid #282828; padding-bottom: 6px; }
 .form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-.form-row label { font-size: 13px; min-width: 80px; color: #aaa; }
+.form-row label { font-size: 13px; min-width: 80px; color: #B3B3B3; }
 .form-row select, .form-row input {
-    background: #1a3a2a; border: 1px solid #4a9; color: #fff;
+    background: #282828; border: 1px solid #404040; color: #fff;
     padding: 6px 10px; border-radius: 4px; font-size: 13px;
 }
 .agent-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
 .agent-card {
-    background: #1a3a2a; border: 1px solid #3a6; border-radius: 6px;
+    background: #282828; border: none; border-radius: 8px;
     padding: 10px; text-align: center; font-size: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
-.agent-card .wind { font-size: 18px; font-weight: bold; color: #fd6; }
+.agent-card .wind { font-size: 18px; font-weight: bold; color: #fff; }
 .agent-card select { width: 100%; margin-top: 6px; }
-.agent-desc { font-size: 10px; color: #8a8; margin-top: 4px; min-height: 28px; }
+.agent-desc { font-size: 10px; color: #B3B3B3; margin-top: 4px; min-height: 28px; }
 .btn-run {
     display: block; width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #2d6a3f, #1a8a4f);
-    border: 2px solid #4a9; border-radius: 8px;
-    color: #fff; font-size: 18px; font-weight: bold;
+    background: #1DB954;
+    border: none; border-radius: 500px;
+    color: #000; font-size: 18px; font-weight: bold;
     cursor: pointer; transition: all 0.2s; margin: 16px 0;
 }
-.btn-run:hover { background: linear-gradient(135deg, #3a8a5f, #2aaa6f); transform: translateY(-1px); }
+.btn-run:hover { background: #1ED760; transform: scale(1.04); }
 .btn-run:disabled { opacity: 0.5; cursor: default; transform: none; }
 .result-panel { display: none; }
 .result-panel.show { display: block; }
 table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-th, td { border: 1px solid #3a6; padding: 8px 12px; text-align: center; font-size: 13px; }
-th { background: #1a3a2a; }
-a { color: #6cf; }
-.status { text-align: center; padding: 20px; color: #8a8; font-size: 14px; }
+th, td { border: none; border-bottom: 1px solid #282828; padding: 8px 12px; text-align: center; font-size: 13px; }
+th { background: transparent; color: #B3B3B3; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; }
+a { color: #1DB954; }
+a:hover { color: #1ED760; }
+.status { text-align: center; padding: 20px; color: #B3B3B3; font-size: 14px; }
 .progress-bar {
-    width: 100%; height: 6px; background: #1a3a2a; border-radius: 3px;
+    width: 100%; height: 6px; background: #282828; border-radius: 3px;
     margin-top: 8px; overflow: hidden; display: none;
 }
 .progress-bar .fill {
-    height: 100%; background: #4a9; border-radius: 3px;
+    height: 100%; background: #1DB954; border-radius: 3px;
     transition: width 0.3s;
 }
 .btn-haipu {
-    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
-    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+    background: #1DB954; border: none; color: #000;
+    padding: 4px 12px; border-radius: 500px; cursor: pointer; font-size: 12px;
+    font-weight: bold; transition: all 0.2s;
 }
-.btn-haipu:hover { background: #3a8a5f; }
+.btn-haipu:hover { background: #1ED760; transform: scale(1.04); }
 
 /* 牌譜モーダル */
 .modal-overlay {
@@ -74,28 +80,30 @@ a { color: #6cf; }
 }
 .modal-overlay.show { display: flex; align-items: center; justify-content: center; }
 .modal-content {
-    width: 95vw; height: 95vh; background: #1a472a; border-radius: 8px;
-    border: 2px solid #4a9; position: relative; display: flex; flex-direction: column;
+    width: 95vw; height: 95vh; background: #181818; border-radius: 8px;
+    border: none; box-shadow: 0 8px 32px rgba(0,0,0,0.6); position: relative; display: flex; flex-direction: column;
     overflow: hidden;
 }
 .modal-close {
-    position: absolute; top: 8px; right: 12px; background: #a33; border: none;
-    color: #fff; font-size: 20px; cursor: pointer; border-radius: 4px;
+    position: absolute; top: 8px; right: 12px; background: #282828; border: none;
+    color: #fff; font-size: 20px; cursor: pointer; border-radius: 500px;
+    transition: all 0.2s;
     padding: 2px 10px; z-index: 10;
 }
-.modal-close:hover { background: #c44; }
+.modal-close:hover { background: #404040; }
 .modal-body { flex: 1; overflow: hidden; padding: 8px; }
 
 /* ビューア用スタイル（モーダル内） */
 .modal-body .controls { text-align: center; margin: 4px 0; }
 .modal-body .controls button {
-    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
-    padding: 4px 12px; margin: 0 2px; cursor: pointer; border-radius: 4px; font-size: 12px;
+    background: #282828; border: none; color: #fff;
+    padding: 4px 12px; margin: 0 2px; cursor: pointer; border-radius: 500px; font-size: 12px;
+    transition: all 0.2s;
 }
-.modal-body .controls button:hover { background: #3a8a5f; }
+.modal-body .controls button:hover { background: #404040; }
 .modal-body .controls button:disabled { opacity: 0.4; cursor: default; }
 .modal-body .step-info { display: inline-block; min-width: 130px; font-size: 13px; }
-.modal-body .meta { text-align: center; color: #aaa; margin-bottom: 4px; font-size: 12px; }
+.modal-body .meta { text-align: center; color: #B3B3B3; margin-bottom: 4px; font-size: 12px; }
 
 .modal-body {
     overflow: hidden;
@@ -118,7 +126,7 @@ a { color: #6cf; }
     font-size: 13px; font-weight: bold; margin-bottom: 4px;
     display: flex; justify-content: space-between;
 }
-.modal-body .hand-label .agent { color: #8c8; font-size: 11px; font-weight: normal; }
+.modal-body .hand-label .agent { color: #B3B3B3; font-size: 11px; font-weight: normal; }
 .modal-body .hand-top { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; margin-bottom: 4px; }
 .modal-body .hand-bottom { grid-column: 2; grid-row: 3; display: flex; flex-direction: column; margin-top: 4px; }
 .modal-body .hand-tiles { display: flex; flex-wrap: nowrap; align-items: flex-end; }
@@ -189,7 +197,7 @@ a { color: #6cf; }
     display: inline-block; height: 22px; width: 16px;
     background: #2a4a3a; border: 1px solid #3a6a4a; border-radius: 2px;
 }
-.modal-body .center-stats { display: flex; justify-content: center; gap: 8px; font-size: 11px; color: #8a8; }
+.modal-body .center-stats { display: flex; justify-content: center; gap: 8px; font-size: 11px; color: #B3B3B3; }
 .modal-body .dealer-mark { background: #d44; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 3px; margin-left: 4px; }
 .modal-body .chicha-mark {
     display: inline-block; width: 20px; height: 20px; line-height: 20px;
@@ -258,26 +266,26 @@ a { color: #6cf; }
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
     z-index: 1100; width: 80vw; max-width: 600px; max-height: 85vh; overflow-y: auto;
     text-align: center; padding: 24px;
-    background: rgba(10, 30, 20, 0.97); border: 3px solid #f84; border-radius: 12px;
+    background: rgba(18, 18, 18, 0.97); border: 2px solid #1DB954; border-radius: 12px;
     box-shadow: 0 0 40px rgba(0,0,0,0.8);
     display: none;
 }
 /* ツモ/ロン速報モーダル（半透明・コンパクト） */
 .modal-body .result-banner.quick-banner {
-    background: rgba(5, 20, 12, 0.75); border: 2px solid #fd6;
+    background: rgba(18, 18, 18, 0.85); border: 2px solid #1DB954;
     padding: 16px; max-width: 500px;
     backdrop-filter: blur(2px);
 }
-.modal-body .result-title { font-size: 22px; font-weight: bold; color: #fd6; margin-bottom: 6px; }
-.modal-body .result-winner { font-size: 14px; color: #cfc; margin-bottom: 8px; }
+.modal-body .result-title { font-size: 22px; font-weight: bold; color: #1DB954; margin-bottom: 6px; }
+.modal-body .result-winner { font-size: 14px; color: #B3B3B3; margin-bottom: 8px; }
 .modal-body .result-tile { margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.modal-body .result-tile span { font-size: 12px; color: #aaa; }
-.modal-body .result-win-tile { height: 52px !important; border: 2px solid #fd6 !important; box-shadow: 0 0 12px rgba(255,220,100,0.6); }
+.modal-body .result-tile span { font-size: 12px; color: #B3B3B3; }
+.modal-body .result-win-tile { height: 52px !important; border: 2px solid #1DB954 !important; box-shadow: 0 0 12px rgba(29,185,84,0.6); }
 .modal-body .result-yaku { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: 8px 0; }
-.modal-body .yaku-item { background: #1a3a2a; padding: 2px 8px; border-radius: 4px; font-size: 13px; color: #efe; border: 1px solid #3a6; }
-.modal-body .yaku-item em { font-style: normal; color: #fd6; margin-left: 4px; }
-.modal-body .result-score { font-size: 18px; font-weight: bold; color: #ff8; margin-top: 4px; }
-.modal-body .result-payment { font-size: 13px; color: #adc; margin-top: 2px; }
+.modal-body .yaku-item { background: #282828; padding: 2px 8px; border-radius: 500px; font-size: 13px; color: #fff; border: none; }
+.modal-body .yaku-item em { font-style: normal; color: #1DB954; margin-left: 4px; }
+.modal-body .result-score { font-size: 18px; font-weight: bold; color: #fff; margin-top: 4px; }
+.modal-body .result-payment { font-size: 13px; color: #B3B3B3; margin-top: 2px; }
 .modal-body .result-hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: 10px; padding: 6px; background: rgba(0,0,0,0.2); border-radius: 4px; }
 .modal-body .tile-result { height: 36px; width: auto; border-radius: 2px; background: #f5f0e0; padding: 1px; border: 1px solid #bba; }
 
@@ -285,48 +293,52 @@ a { color: #6cf; }
 .mode-select { display: none; text-align: center; margin: 16px 0; }
 .mode-select.show { display: flex; justify-content: center; gap: 16px; }
 .btn-mode {
-    padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: bold;
-    cursor: pointer; transition: all 0.2s; border: 2px solid;
+    padding: 14px 28px; border-radius: 500px; font-size: 16px; font-weight: bold;
+    cursor: pointer; transition: all 0.2s; border: none;
 }
-.btn-mode:hover { transform: translateY(-1px); }
-.btn-mode-result { background: linear-gradient(135deg, #2d6a3f, #1a8a4f); border-color: #4a9; color: #fff; }
-.btn-mode-watch { background: linear-gradient(135deg, #6a4a2d, #8a6a1a); border-color: #d96; color: #fff; }
+.btn-mode:hover { transform: scale(1.04); }
+.btn-mode-result { background: #1DB954; color: #000; }
+.btn-mode-result:hover { background: #1ED760; }
+.btn-mode-watch { background: #282828; color: #fff; }
+.btn-mode-watch:hover { background: #404040; }
 .watch-round-result {
     display: none; position: absolute; bottom: 8px; left: 8px; z-index: 10;
-    background: rgba(10, 20, 15, 0.88); border: 1px solid #4a9; border-radius: 6px;
+    background: rgba(18, 18, 18, 0.92); border: 1px solid #282828; border-radius: 8px;
     padding: 6px 10px; font-size: 11px; max-width: 200px; line-height: 1.4;
 }
-.watch-result-label { color: #fd6; font-weight: bold; font-size: 12px; }
+.watch-result-label { color: #1DB954; font-weight: bold; font-size: 12px; }
 .watch-result-type { color: #f84; font-weight: bold; font-size: 13px; }
-.watch-result-winner { color: #cfc; font-size: 11px; }
-.watch-result-yaku { color: #efe; font-size: 10px; margin-top: 2px; }
-.watch-result-rank { color: #fd6; font-weight: bold; font-size: 11px; }
-.watch-result-hanfu { color: #aaa; font-size: 10px; }
-.watch-result-score { color: #ff8; font-weight: bold; font-size: 12px; margin-top: 2px; }
-.batch-positive { color: #4f4; }
-.batch-negative { color: #f44; }
-.batch-zero { color: #888; }
-.batch-rank-1 { color: #fd6; font-weight: bold; }
+.watch-result-winner { color: #B3B3B3; font-size: 11px; }
+.watch-result-yaku { color: #ddd; font-size: 10px; margin-top: 2px; }
+.watch-result-rank { color: #1DB954; font-weight: bold; font-size: 11px; }
+.watch-result-hanfu { color: #B3B3B3; font-size: 10px; }
+.watch-result-score { color: #fff; font-weight: bold; font-size: 12px; margin-top: 2px; }
+.batch-positive { color: #1DB954; }
+.batch-negative { color: #f87171; }
+.batch-zero { color: #535353; }
+.batch-rank-1 { color: #1DB954; font-weight: bold; }
 .btn-batch-action {
-    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
-    padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;
-    margin: 0 2px;
+    background: #1DB954; border: none; color: #000;
+    padding: 3px 8px; border-radius: 500px; cursor: pointer; font-size: 11px;
+    margin: 0 2px; font-weight: bold; transition: all 0.2s;
 }
-.btn-batch-action:hover { background: #3a8a5f; }
+.btn-batch-action:hover { background: #1ED760; transform: scale(1.04); }
 .batch-nav {
     display: flex; justify-content: center; align-items: center; gap: 12px; margin: 12px 0;
 }
 .btn-batch-nav {
-    background: #26a; border: 1px solid #49d; color: #fff;
-    padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;
+    background: #282828; border: none; color: #fff;
+    padding: 6px 16px; border-radius: 500px; cursor: pointer; font-size: 13px; font-weight: bold;
+    transition: all 0.2s;
 }
-.btn-batch-nav:hover { background: #38c; }
+.btn-batch-nav:hover { background: #404040; }
 .btn-batch-nav:disabled { opacity: 0.4; cursor: default; }
 .btn-batch-back {
-    background: #555; border: 1px solid #888; color: #fff;
-    padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    background: #282828; border: none; color: #fff;
+    padding: 6px 16px; border-radius: 500px; cursor: pointer; font-size: 13px;
+    transition: all 0.2s;
 }
-.btn-batch-back:hover { background: #777; }
+.btn-batch-back:hover { background: #404040; }
 </style>
 </head>
 <body>
@@ -386,7 +398,7 @@ a { color: #6cf; }
         </select>
         <button class="btn-run" id="btn-batch" onclick="runBatch()" style="width:auto;padding:8px 24px;font-size:14px;margin:0;">連続実行</button>
     </div>
-    <div class="status" id="batch-progress" style="display:none;color:#fd6;"></div>
+    <div class="status" id="batch-progress" style="display:none;color:#1DB954;"></div>
     <div class="progress-bar" id="progress"><div class="fill" id="progress-fill"></div></div>
 
 
@@ -452,13 +464,26 @@ window._pyodideReady = new Promise(function(resolve) {
 <script>
 const AGENT_INFO = {
     hiyoko: { name: 'ひよこ', model: 'hiyoko-v1',
-        desc: '攻守バランス型。危険牌回避・ベタオリ・鳴き判断・打点考慮。' },
+        desc: '攻守バランス型。危険牌回避・ベタオリ・鸣き判断・打点考慮。',
+        style: '🐣 バランス', color: '#1DB954' },
     shanta: { name: 'しゃんた', model: 'shanten-v1',
-        desc: 'シャンテン数最小化で打牌。テンパイ即リーチ。門前重視。' },
+        desc: 'シャンテン数最小化で打牌。テンパイ即リーチ。門前重視。',
+        style: '📐 基本', color: '#4a9' },
     random: { name: '乱子', model: 'random-v1',
-        desc: 'ランダム打牌。ベースライン比較用。' },
+        desc: 'ランダム打牌。ベースライン比較用。',
+        style: '🎲 ランダム', color: '#888' },
+    defense: { name: '守備型', model: 'defense-v1',
+        desc: 'ベタオリ重視・安全牌優先・慎重なリーチ判断。',
+        style: '🛡️ 守備', color: '#4af' },
+    offense: { name: '攻撃型', model: 'offense-v1',
+        desc: '打点重視・ドラ温存・積極的リーチ。',
+        style: '⚔️ 攻撃', color: '#f64' },
+    naki: { name: '鸣き重視', model: 'naki-v1',
+        desc: '副露で素早くテンパイ。速攻型。',
+        style: '🀄 速攻', color: '#fa0' },
     dev: { name: '作成中', model: 'dev-v0',
-        desc: '開発中。ひよこベースで戦略調整中。' }
+        desc: '開発中。ひよこベースで戦略調整中。',
+        style: '🚧 開発', color: '#aaa' }
 };
 const WINDS = ['東','南','西','北'];
 
@@ -468,23 +493,31 @@ try { savedAgents = JSON.parse(localStorage.getItem('simmahjong_agents') || '[]'
 if (savedAgents.length !== 4) savedAgents = ['hiyoko','hiyoko','hiyoko','hiyoko'];
 
 let gridEl = document.getElementById('agent-grid');
+const AGENT_KEYS = Object.keys(AGENT_INFO);
 for (let i = 0; i < 4; i++) {
     let card = document.createElement('div');
     card.className = 'agent-card';
     let sel = savedAgents[i] || 'hiyoko';
+    if (!AGENT_INFO[sel]) sel = 'hiyoko';
+    let optionsHtml = AGENT_KEYS.map(function(k) {
+        return '<option value="' + k + '"' + (sel===k?' selected':'') + '>' + AGENT_INFO[k].name + '</option>';
+    }).join('');
+    card.style.borderLeftColor = AGENT_INFO[sel].color || '#1DB954';
     card.innerHTML = '<div class="wind">' + WINDS[i] + '</div>' +
         '<select class="agent-select" onchange="updateDesc(this);saveAgentSelection()">' +
-        '<option value="hiyoko"' + (sel==='hiyoko'?' selected':'') + '>ひよこ</option>' +
-        '<option value="shanta"' + (sel==='shanta'?' selected':'') + '>しゃんた</option>' +
-        '<option value="random"' + (sel==='random'?' selected':'') + '>乱子</option>' +
-        '<option value="dev"' + (sel==='dev'?' selected':'') + '>作成中</option></select>' +
+        optionsHtml + '</select>' +
+        '<div class="agent-style">' + (AGENT_INFO[sel].style || '') + '</div>' +
         '<div class="agent-desc">' + AGENT_INFO[sel].desc + '</div>';
     gridEl.appendChild(card);
 }
 
 function updateDesc(sel) {
     let key = sel.value;
-    sel.parentElement.querySelector('.agent-desc').textContent = AGENT_INFO[key].desc;
+    let card = sel.parentElement;
+    card.querySelector('.agent-desc').textContent = AGENT_INFO[key].desc;
+    let styleEl = card.querySelector('.agent-style');
+    if (styleEl) styleEl.textContent = AGENT_INFO[key].style || '';
+    card.style.borderLeftColor = AGENT_INFO[key].color || '#1DB954';
 }
 function saveAgentSelection() {
     let sels = document.querySelectorAll('.agent-select');
@@ -543,6 +576,9 @@ async function initPyodide() {
             'agents/random_agent.py', 'agents/shanten_agent.py',
             'agents/shanten_agent_v1.py',
             'agents/dev_agent.py',
+            'agents/dev_defense.py',
+            'agents/dev_offense.py',
+            'agents/dev_naki.py',
             'agents/external/__init__.py'
         ];
 
@@ -605,9 +641,12 @@ from agents.shanten_agent import HiyokoAgent
 from agents.shanten_agent_v1 import ShantenAgentV1
 from agents.random_agent import RandomAgent
 from agents.dev_agent import DevAgent
+from agents.dev_defense import DefenseAgent
+from agents.dev_offense import OffenseAgent
+from agents.dev_naki import NakiAgent
 
 agent_types = ${JSON.stringify(agentTypes)}
-agent_names_map = ${JSON.stringify(Object.fromEntries(Object.entries(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子'],['dev','作成中']]))))}
+agent_names_map = ${JSON.stringify(Object.fromEntries(Object.entries(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子'],['dev','作成中'],['defense','守備型'],['offense','攻撃型'],['naki','鸣き重視']]))))}
 # 同じエージェントが複数いる場合にA,B,C...で区別
 from collections import Counter
 type_counts = Counter(agent_types)
@@ -630,8 +669,17 @@ for i, at in enumerate(agent_types):
         agents.append(RandomAgent(name=name))
     elif at == 'dev':
         agents.append(DevAgent(name=name))
+    elif at == 'defense':
+        agents.append(DefenseAgent(name=name))
+    elif at == 'offense':
+        agents.append(OffenseAgent(name=name))
+    elif at == 'naki':
+        agents.append(NakiAgent(name=name))
     else:
         agents.append(HiyokoAgent(name=name))
+
+import random as _rng
+_rng.shuffle(agents)
 
 hanchan = Hanchan(agents, mode='${mode}')
 result = hanchan.run()
@@ -744,7 +792,7 @@ function renderBatchResults(results) {
     let totalRow = document.createElement('tr');
     totalRow.style.fontWeight = 'bold';
     totalRow.style.fontSize = '15px';
-    totalRow.innerHTML = '<td style="background:#1a3a2a;">合計</td>';
+    totalRow.innerHTML = '<td style="background:#282828;">合計</td>';
 
     let sortedSeats = [];
     for (let s = 0; s < seatCount; s++) sortedSeats.push({ seat: s, total: totalPts[s] });
@@ -756,12 +804,29 @@ function renderBatchResults(results) {
         let cls = totalPts[s] > 0 ? 'batch-positive' : (totalPts[s] < 0 ? 'batch-negative' : 'batch-zero');
         let rankCls = overallRank[s] === 1 ? ' batch-rank-1' : '';
         let ptStr = totalPts[s] > 0 ? '+' + totalPts[s].toFixed(1) : totalPts[s].toFixed(1);
-        totalRow.innerHTML += '<td style="background:#1a3a2a;"><span class="' + cls + rankCls + '">' + ptStr + '</span><br><span style="font-size:11px;color:#fd6;">' + overallRank[s] + '位</span></td>';
+        totalRow.innerHTML += '<td style="background:#282828;"><span class="' + cls + rankCls + '">' + ptStr + '</span><br><span style="font-size:11px;color:#1DB954;">' + overallRank[s] + '位</span></td>';
     }
-    totalRow.innerHTML += '<td style="background:#1a3a2a;"></td>';
+    totalRow.innerHTML += '<td style="background:#282828;"></td>';
     table.appendChild(totalRow);
 
+    // ボタン追加: もう一度シミュレーション / タイトルに戻る
+    let btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;justify-content:center;gap:16px;margin-top:16px;';
+    btnRow.innerHTML =
+        '<button class="btn-run" style="width:auto;padding:10px 24px;font-size:14px;margin:0;" onclick="batchBackToSetup()">もう一度シミュレーション</button>' +
+        '<button class="btn-run" style="width:auto;padding:10px 24px;font-size:14px;margin:0;background:linear-gradient(135deg,#555,#777);border-color:#999;" onclick="location.href='index.html'">タイトルに戻る</button>';
+    panel.querySelector('.panel').appendChild(btnRow);
+
     panel.style.display = 'block';
+}
+
+function batchBackToSetup() {
+    document.getElementById('batch-result-panel').style.display = 'none';
+    document.getElementById('mode-select').classList.remove('show');
+    document.getElementById('result-panel').classList.remove('show');
+    document.getElementById('status').style.display = 'block';
+    document.getElementById('status').textContent = '準備完了！「半荘シミュレーション実行」を押してください。';
+    batchResults = [];
 }
 
 async function runBatch() {
@@ -802,9 +867,12 @@ from agents.shanten_agent import HiyokoAgent
 from agents.shanten_agent_v1 import ShantenAgentV1
 from agents.random_agent import RandomAgent
 from agents.dev_agent import DevAgent
+from agents.dev_defense import DefenseAgent
+from agents.dev_offense import OffenseAgent
+from agents.dev_naki import NakiAgent
 
 agent_types = ${JSON.stringify(agentTypes)}
-agent_names_map = ${JSON.stringify(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子'],['dev','作成中']]))}
+agent_names_map = ${JSON.stringify(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子'],['dev','作成中'],['defense','守備型'],['offense','攻撃型'],['naki','鸣き重視']]))}
 from collections import Counter
 type_counts = Counter(agent_types)
 type_seen = {}
@@ -826,8 +894,17 @@ for i, at in enumerate(agent_types):
         agents.append(RandomAgent(name=name))
     elif at == 'dev':
         agents.append(DevAgent(name=name))
+    elif at == 'defense':
+        agents.append(DefenseAgent(name=name))
+    elif at == 'offense':
+        agents.append(OffenseAgent(name=name))
+    elif at == 'naki':
+        agents.append(NakiAgent(name=name))
     else:
         agents.append(HiyokoAgent(name=name))
+
+import random as _rng
+_rng.shuffle(agents)
 
 hanchan = Hanchan(agents, mode='${mode}')
 result = hanchan.run()
@@ -918,7 +995,7 @@ function showResult(data) {
         let tr = document.createElement('tr');
         tr.innerHTML = '<td>' + r.round_label + '</td><td>' +
             (typeMap[r.type]||r.type) + '</td><td>' + winner +
-            '</td><td>' + pts + (yaku ? '<br><small style="color:#8a8">' +
+            '</td><td>' + pts + (yaku ? '<br><small style="color:#B3B3B3">' +
             yaku + '</small>' : '') + '</td>' +
             '<td><button class="btn-haipu" onclick="openHaipu(' + i + ')">牌譜</button></td>';
         rdt.appendChild(tr);
@@ -936,7 +1013,7 @@ function showResult(data) {
         nav.innerHTML =
             "<button class=\"btn-batch-back\" onclick=\"backToBatchSummary()\">総合結果に戻る</button>" +
             "<button class=\"btn-batch-nav\" onclick=\"batchShowResult(" + (vCurrentBatchIndex - 1) + ")\"" + (prevDis ? " disabled" : "") + ">前の半荘</button>" +
-            "<span style=\"color:#fd6;font-size:14px;line-height:32px;\">" + (vCurrentBatchIndex + 1) + " / " + batchResults.length + " 半荘</span>" +
+            "<span style=\"color:#1DB954;font-size:14px;line-height:32px;\">" + (vCurrentBatchIndex + 1) + " / " + batchResults.length + " 半荘</span>" +
             "<button class=\"btn-batch-nav\" onclick=\"batchShowResult(" + (vCurrentBatchIndex + 1) + ")\"" + (nextDis ? " disabled" : "") + ">次の半荘</button>";
         panel.insertBefore(nav, panel.firstChild);
     }
@@ -1401,15 +1478,15 @@ function vShowResult() {
     // 点数移動・持ち点一覧
     if (vResult.point_changes && vResult.points_after) {
         bHtml += '<table style="width:auto;margin:16px auto 0;border-collapse:collapse;">';
-        bHtml += '<tr><th style="padding:6px 14px;border:1px solid #3a6;background:#1a3a2a;">席</th><th style="padding:6px 14px;border:1px solid #3a6;background:#1a3a2a;">増減</th><th style="padding:6px 14px;border:1px solid #3a6;background:#1a3a2a;">持ち点</th></tr>';
+        bHtml += '<tr><th style="padding:6px 14px;border-bottom:1px solid #282828;background:#282828;">席</th><th style="padding:6px 14px;border-bottom:1px solid #282828;background:#282828;">増減</th><th style="padding:6px 14px;border-bottom:1px solid #282828;background:#282828;">持ち点</th></tr>';
         for (let s = 0; s < 4; s++) {
             let change = vResult.point_changes[s];
             let changeStr = change > 0 ? '<span style="color:#4f4">+' + change + '</span>' :
                             change < 0 ? '<span style="color:#f44">' + change + '</span>' :
                             '<span style="color:#888">±0</span>';
-            bHtml += '<tr><td style="padding:6px 14px;border:1px solid #3a6;">' + windNames[s] + '家 ' + agents[s] + '</td>' +
-                '<td style="padding:6px 14px;border:1px solid #3a6;text-align:right;font-size:15px;">' + changeStr + '</td>' +
-                '<td style="padding:6px 14px;border:1px solid #3a6;text-align:right;color:#ff8;font-weight:bold;font-size:15px;">' + vResult.points_after[s] + '点</td></tr>';
+            bHtml += '<tr><td style="padding:6px 14px;border-bottom:1px solid #282828;">' + windNames[s] + '家 ' + agents[s] + '</td>' +
+                '<td style="padding:6px 14px;border-bottom:1px solid #282828;text-align:right;font-size:15px;">' + changeStr + '</td>' +
+                '<td style="padding:6px 14px;border-bottom:1px solid #282828;text-align:right;color:#ff8;font-weight:bold;font-size:15px;">' + vResult.points_after[s] + '点</td></tr>';
         }
         bHtml += '</table>';
     }

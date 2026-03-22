@@ -7,8 +7,8 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    font-family: 'Meiryo', 'Yu Gothic', sans-serif;
-    background: linear-gradient(135deg, #0a1f10 0%, #1a472a 50%, #0d2818 100%);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #121212;
     color: #fff; min-height: 100vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
@@ -19,20 +19,21 @@ body {
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     margin-bottom: 8px;
 }
-.subtitle { font-size: 16px; color: #8c8; margin-bottom: 40px; letter-spacing: 2px; }
+.subtitle { font-size: 16px; color: #B3B3B3; margin-bottom: 40px; letter-spacing: 2px; }
 .menu { display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .menu a {
     display: block; width: 280px; padding: 14px 24px;
-    background: rgba(0,80,40,0.6); border: 2px solid #4a9;
+    background: #181818; border: none;
     border-radius: 8px; color: #fff; text-decoration: none;
     font-size: 16px; text-align: center; transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .menu a:hover {
-    background: rgba(0,120,60,0.8); border-color: #6cb;
-    transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,200,100,0.3);
+    background: #282828;
+    transform: scale(1.04); box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
-.menu a .desc { font-size: 11px; color: #8a8; margin-top: 4px; }
-.version { position: fixed; bottom: 12px; right: 16px; font-size: 11px; color: #4a6; }
+.menu a .desc { font-size: 11px; color: #B3B3B3; margin-top: 4px; }
+.version { position: fixed; bottom: 12px; right: 16px; font-size: 11px; color: #535353; }
 .tiles-deco {
     margin-top: 30px; opacity: 0.4; display: flex; gap: 4px; justify-content: center;
 }

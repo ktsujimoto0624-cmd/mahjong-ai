@@ -247,7 +247,7 @@ async function getAgentStats(filterFn) {
         for (const pa of sim.stats.per_agent) {
             const agentType = pa.type || pa.name || 'unknown';
             const key = agentType;
-            const typeNames = {hiyoko:'ひよこ',shanta:'しゃんた',random:'乱子',dev:'作成中'};
+            const typeNames = {hiyoko:'ひよこ',shanta:'しゃんた',random:'乱子',dev:'作成中',defense:'守備型',offense:'攻撃型',naki:'鳴き重視'};
             if (!agentMap[key]) {
                 agentMap[key] = {
                     name: typeNames[agentType] || agentType,
