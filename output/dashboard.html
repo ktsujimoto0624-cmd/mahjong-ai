@@ -137,14 +137,31 @@ function updateDesc(sel) {
 let pyodide = null;
 let pyReady = false;
 
+function ensureDir(fs, path) {
+    let parts = path.split('/').filter(p => p);
+    let cur = '';
+    for (let p of parts) {
+        cur += '/' + p;
+        try { fs.mkdir(cur); } catch(e) { /* already exists */ }
+    }
+}
+
 async function initPyodide() {
     try {
-        document.getElementById('status').textContent = 'Python環境を読み込み中... (初回は数秒かかります)';
+        document.getElementById('status').textContent = 'Python環境を読み込み中... (初回は10秒程度かかります)';
         pyodide = await loadPyodide();
 
         document.getElementById('status').textContent = '麻雀エンジンを読み込み中...';
 
-        // Pythonファイルをフェッチしてファイルシステムに書き込む
+        let dirs = [
+            'mahjong', 'mahjong/engine', 'mahjong/game',
+            'mahjong/scoring', 'mahjong/record',
+            'agents', 'agents/external'
+        ];
+        for (let d of dirs) {
+            ensureDir(pyodide.FS, '/home/pyodide/' + d);
+        }
+
         let files = [
             'mahjong/__init__.py', 'mahjong/engine/__init__.py',
             'mahjong/engine/tile.py', 'mahjong/engine/wall.py',
@@ -161,19 +178,20 @@ async function initPyodide() {
 
         for (let f of files) {
             let resp = await fetch('engine/' + f);
+            if (!resp.ok) throw new Error('ファイル取得失敗: ' + f);
             let code = await resp.text();
-            let parts = f.split('/');
-            let dir = parts.slice(0, -1).join('/');
-            if (dir) pyodide.FS.mkdirTree(dir);
-            pyodide.FS.writeFile(f, code);
+            pyodide.FS.writeFile('/home/pyodide/' + f, code);
         }
+
+        // importキャッシュをクリア
+        pyodide.runPython('import importlib; importlib.invalidate_caches()');
 
         pyReady = true;
         document.getElementById('status').textContent = '準備完了！「半荘シミュレーション実行」を押してください。';
         document.getElementById('btn-run').disabled = false;
     } catch (e) {
-        document.getElementById('status').textContent = 'Pyodide読み込みエラー: ' + e.message;
-        console.error(e);
+        document.getElementById('status').textContent = 'エラー: ' + (e.message || e);
+        console.error('Pyodide init error:', e);
     }
 }
 
