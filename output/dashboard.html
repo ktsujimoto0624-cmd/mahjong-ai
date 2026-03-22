@@ -412,19 +412,20 @@ a { color: #6cf; }
 
 <script>
 // Pyodide: ローカルがあればローカル、なければCDNから読み込み
-(function(){
+window._pyodideFromCDN = false;
+window._pyodideReady = new Promise(function(resolve) {
     var s = document.createElement('script');
-    var localUrl = 'pyodide/pyodide.js';
-    var cdnUrl = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
-    s.src = localUrl;
+    s.src = 'pyodide/pyodide.js';
+    s.onload = function() { resolve(); };
     s.onerror = function() {
         var s2 = document.createElement('script');
-        s2.src = cdnUrl;
-        window._pyodideFromCDN = true;
+        s2.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
+        s2.onload = function() { window._pyodideFromCDN = true; resolve(); };
+        s2.onerror = function() { resolve(); };
         document.head.appendChild(s2);
     };
     document.head.appendChild(s);
-})();
+});
 </script>
 <script src="js/db.js"></script>
 <script src="js/mjai.js"></script>
@@ -484,6 +485,11 @@ function ensureDir(fs, path) {
 async function initPyodide() {
     try {
         document.getElementById('status').textContent = 'Python環境を読み込み中... (初回は10秒程度かかります)';
+        // Pyodideスクリプトの読み込み完了を待つ
+        await window._pyodideReady;
+        if (typeof loadPyodide === 'undefined') {
+            throw new Error('Pyodideの読み込みに失敗しました');
+        }
         var pyodideIndexURL = window._pyodideFromCDN
             ? 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/'
             : 'pyodide/';
@@ -610,6 +616,16 @@ json.dumps(result, ensure_ascii=False)
 
         let data = JSON.parse(resultJson);
         simData = data;
+        // agent_types/versionsを追加して保存
+        let agentSels2 = document.querySelectorAll('.agent-select');
+        simData.agent_types = Array.from(agentSels2).map(s => s.value);
+        simData.agent_versions = Array.from(agentSels2).map(s => {
+            let key = s.value;
+            return AGENT_INFO[key] ? AGENT_INFO[key].model : '';
+        });
+        saveSimulation(simData).then(id => {
+            console.log('Saved simulation:', id);
+        }).catch(e => console.error('Save failed:', e));
         document.getElementById("mode-select").classList.add("show");
 
         btn.textContent = '再実行';
@@ -822,16 +838,6 @@ json.dumps(result, ensure_ascii=False)
 function showResult(data) {
     document.getElementById("mode-select").classList.remove("show");
     simData = data;
-    // agent_types と agent_versions を追加
-    let agentSels = document.querySelectorAll('.agent-select');
-    simData.agent_types = Array.from(agentSels).map(s => s.value);
-    simData.agent_versions = Array.from(agentSels).map(s => {
-        let key = s.value;
-        return AGENT_INFO[key] ? AGENT_INFO[key].model : '';
-    });
-    saveSimulation(simData).then(id => {
-        console.log('Saved simulation:', id);
-    }).catch(e => console.error('Save failed:', e));
     let panel = document.getElementById('result-panel');
     panel.classList.add('show');
 
