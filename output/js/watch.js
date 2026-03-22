@@ -430,7 +430,20 @@ function watchShowFinalResult() {
             '<td style="padding:8px 16px;border:1px solid #3a6;color:#ff8;font-weight:bold;">' + points[seat] + '\u70b9</td></tr>';
     }
     html += '</table>';
-    html += '<div style="margin-top:20px;"><button onclick="watchClose()" style="background:#a64;border:2px solid #d96;color:#fff;padding:10px 30px;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;">\u9589\u3058\u308b</button></div>';
+    html += '<div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">';
+    if (typeof batchResults !== "undefined" && batchResults.length > 1 && typeof vCurrentBatchIndex !== "undefined" && vCurrentBatchIndex >= 0) {
+        var hasPrev = vCurrentBatchIndex > 0;
+        var hasNext = vCurrentBatchIndex < batchResults.length - 1;
+        if (hasPrev) {
+            html += '<button onclick="watchClose();batchStartWatch(' + (vCurrentBatchIndex - 1) + ')" style="background:#26a;border:2px solid #49d;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold;">前の半荘</button>';
+        }
+        if (hasNext) {
+            html += '<button onclick="watchClose();batchStartWatch(' + (vCurrentBatchIndex + 1) + ')" style="background:#26a;border:2px solid #49d;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold;">次の半荘</button>';
+        }
+        html += '<button onclick="watchClose();backToBatchSummary()" style="background:#555;border:2px solid #888;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;">総合結果</button>';
+    }
+    html += '<button onclick="watchClose()" style="background:#a64;border:2px solid #d96;color:#fff;padding:10px 30px;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;">閉じる</button>';
+    html += '</div>';
     banner.className = 'result-banner';
     banner.innerHTML = html;
     banner.style.display = 'block';

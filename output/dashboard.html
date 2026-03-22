@@ -307,6 +307,26 @@ a { color: #6cf; }
 .batch-negative { color: #f44; }
 .batch-zero { color: #888; }
 .batch-rank-1 { color: #fd6; font-weight: bold; }
+.btn-batch-action {
+    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
+    padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;
+    margin: 0 2px;
+}
+.btn-batch-action:hover { background: #3a8a5f; }
+.batch-nav {
+    display: flex; justify-content: center; align-items: center; gap: 12px; margin: 12px 0;
+}
+.btn-batch-nav {
+    background: #26a; border: 1px solid #49d; color: #fff;
+    padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;
+}
+.btn-batch-nav:hover { background: #38c; }
+.btn-batch-nav:disabled { opacity: 0.4; cursor: default; }
+.btn-batch-back {
+    background: #555; border: 1px solid #888; color: #fff;
+    padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+.btn-batch-back:hover { background: #777; }
 </style>
 </head>
 <body>
@@ -378,8 +398,8 @@ a { color: #6cf; }
     </div>
 
     <div class="mode-select" id="mode-select">
-        <button class="btn-mode btn-mode-result" onclick="showResult(simData)">結果を全て見る</button>
-        <button class="btn-mode btn-mode-watch" onclick="startWatchMode()">ゲームを眺める</button>
+        <button class="btn-mode btn-mode-result" onclick="modeShowResult()">結果を全て見る</button>
+        <button class="btn-mode btn-mode-watch" onclick="modeStartWatch()">ゲームを眺める</button>
     </div>
     <div class="status" id="status">Pyodide (ブラウザ内Python) を読み込み中...</div>
 
@@ -436,7 +456,9 @@ const AGENT_INFO = {
     shanta: { name: 'しゃんた', model: 'shanten-v1',
         desc: 'シャンテン数最小化で打牌。テンパイ即リーチ。門前重視。' },
     random: { name: '乱子', model: 'random-v1',
-        desc: 'ランダム打牌。ベースライン比較用。' }
+        desc: 'ランダム打牌。ベースライン比較用。' },
+    dev: { name: '作成中', model: 'dev-v0',
+        desc: '開発中。ひよこベースで戦略調整中。' }
 };
 const WINDS = ['東','南','西','北'];
 
@@ -454,7 +476,8 @@ for (let i = 0; i < 4; i++) {
         '<select class="agent-select" onchange="updateDesc(this);saveAgentSelection()">' +
         '<option value="hiyoko"' + (sel==='hiyoko'?' selected':'') + '>ひよこ</option>' +
         '<option value="shanta"' + (sel==='shanta'?' selected':'') + '>しゃんた</option>' +
-        '<option value="random"' + (sel==='random'?' selected':'') + '>乱子</option></select>' +
+        '<option value="random"' + (sel==='random'?' selected':'') + '>乱子</option>' +
+        '<option value="dev"' + (sel==='dev'?' selected':'') + '>作成中</option></select>' +
         '<div class="agent-desc">' + AGENT_INFO[sel].desc + '</div>';
     gridEl.appendChild(card);
 }
@@ -519,6 +542,7 @@ async function initPyodide() {
             'agents/__init__.py', 'agents/base.py',
             'agents/random_agent.py', 'agents/shanten_agent.py',
             'agents/shanten_agent_v1.py',
+            'agents/dev_agent.py',
             'agents/external/__init__.py'
         ];
 
@@ -580,9 +604,10 @@ from mahjong.game.hanchan import Hanchan
 from agents.shanten_agent import HiyokoAgent
 from agents.shanten_agent_v1 import ShantenAgentV1
 from agents.random_agent import RandomAgent
+from agents.dev_agent import DevAgent
 
 agent_types = ${JSON.stringify(agentTypes)}
-agent_names_map = ${JSON.stringify(Object.fromEntries(Object.entries(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子']]))))}
+agent_names_map = ${JSON.stringify(Object.fromEntries(Object.entries(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子'],['dev','作成中']]))))}
 # 同じエージェントが複数いる場合にA,B,C...で区別
 from collections import Counter
 type_counts = Counter(agent_types)
@@ -603,6 +628,8 @@ for i, at in enumerate(agent_types):
         agents.append(ShantenAgentV1(name=name))
     elif at == 'random':
         agents.append(RandomAgent(name=name))
+    elif at == 'dev':
+        agents.append(DevAgent(name=name))
     else:
         agents.append(HiyokoAgent(name=name))
 
@@ -641,6 +668,7 @@ json.dumps(result, ensure_ascii=False)
 
 let simData = null; // シミュレーション結果を保持
 let batchResults = []; // 連続半荘の結果を蓄積
+let vCurrentBatchIndex = -1;
 
 function calcFinalPoints(finalPoints, rankings, startingPoints, returnPoints, umaType) {
     let uma;
@@ -689,6 +717,7 @@ function renderBatchResults(results) {
     for (let s = 0; s < seatCount; s++) {
         hRow.innerHTML += '<th>' + agentNames[s] + '<br><span style="font-size:10px;color:#aaa;">' + WINDS[s] + '家</span></th>';
     }
+    hRow.innerHTML += '<th>操作</th>';
     table.appendChild(hRow);
 
     let totalPts = new Array(seatCount).fill(0);
@@ -708,6 +737,7 @@ function renderBatchResults(results) {
             let ptStr = pt > 0 ? '+' + pt.toFixed(1) : pt.toFixed(1);
             tr.innerHTML += '<td><span class="' + cls + '">' + ptStr + '</span><br><span style="font-size:10px;color:#aaa;">' + r.points[s] + '点 (' + rank + '位)</span></td>';
         }
+        tr.innerHTML += '<td><button class="btn-batch-action" onclick="batchShowResult(' + g + ')">結果</button><button class="btn-batch-action" onclick="batchStartWatch(' + g + ')">眺める</button></td>';
         table.appendChild(tr);
     }
 
@@ -728,6 +758,7 @@ function renderBatchResults(results) {
         let ptStr = totalPts[s] > 0 ? '+' + totalPts[s].toFixed(1) : totalPts[s].toFixed(1);
         totalRow.innerHTML += '<td style="background:#1a3a2a;"><span class="' + cls + rankCls + '">' + ptStr + '</span><br><span style="font-size:11px;color:#fd6;">' + overallRank[s] + '位</span></td>';
     }
+    totalRow.innerHTML += '<td style="background:#1a3a2a;"></td>';
     table.appendChild(totalRow);
 
     panel.style.display = 'block';
@@ -770,9 +801,10 @@ from mahjong.game.hanchan import Hanchan
 from agents.shanten_agent import HiyokoAgent
 from agents.shanten_agent_v1 import ShantenAgentV1
 from agents.random_agent import RandomAgent
+from agents.dev_agent import DevAgent
 
 agent_types = ${JSON.stringify(agentTypes)}
-agent_names_map = ${JSON.stringify(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子']]))}
+agent_names_map = ${JSON.stringify(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子'],['dev','作成中']]))}
 from collections import Counter
 type_counts = Counter(agent_types)
 type_seen = {}
@@ -792,6 +824,8 @@ for i, at in enumerate(agent_types):
         agents.append(ShantenAgentV1(name=name))
     elif at == 'random':
         agents.append(RandomAgent(name=name))
+    elif at == 'dev':
+        agents.append(DevAgent(name=name))
     else:
         agents.append(HiyokoAgent(name=name))
 
@@ -835,6 +869,27 @@ json.dumps(result, ensure_ascii=False)
     setTimeout(function() { prog.style.display = 'none'; }, 500);
 }
 
+
+function modeShowResult() {
+    if (batchResults.length > 1) {
+        vCurrentBatchIndex = 0;
+        simData = batchResults[0];
+    } else {
+        vCurrentBatchIndex = -1;
+    }
+    showResult(simData);
+}
+
+function modeStartWatch() {
+    if (batchResults.length > 1) {
+        vCurrentBatchIndex = 0;
+        simData = batchResults[0];
+    } else {
+        vCurrentBatchIndex = -1;
+    }
+    startWatchMode();
+}
+
 function showResult(data) {
     document.getElementById("mode-select").classList.remove("show");
     simData = data;
@@ -842,6 +897,9 @@ function showResult(data) {
     panel.classList.add('show');
 
     let rt = document.getElementById('ranking-table');
+    while (rt.rows.length > 1) rt.deleteRow(1);
+    let rdt = document.getElementById("rounds-table");
+    while (rdt.rows.length > 1) rdt.deleteRow(1);
     for (let rank = 0; rank < data.rankings.length; rank++) {
         let seat = data.rankings[rank];
         let tr = document.createElement('tr');
@@ -851,7 +909,6 @@ function showResult(data) {
         rt.appendChild(tr);
     }
 
-    let rdt = document.getElementById('rounds-table');
     let typeMap = {tsumo:'ツモ', ron:'ロン', ryukyoku:'流局'};
     for (let i = 0; i < data.round_results.length; i++) {
         let r = data.round_results[i];
@@ -866,7 +923,49 @@ function showResult(data) {
             '<td><button class="btn-haipu" onclick="openHaipu(' + i + ')">牌譜</button></td>';
         rdt.appendChild(tr);
     }
+
+    // batch nav
+    var navEl = document.getElementById("batch-nav");
+    if (navEl) navEl.remove();
+    if (batchResults.length > 1 && vCurrentBatchIndex >= 0) {
+        var nav = document.createElement("div");
+        nav.id = "batch-nav";
+        nav.className = "batch-nav";
+        var prevDis = vCurrentBatchIndex <= 0;
+        var nextDis = vCurrentBatchIndex >= batchResults.length - 1;
+        nav.innerHTML =
+            "<button class=\"btn-batch-back\" onclick=\"backToBatchSummary()\">総合結果に戻る</button>" +
+            "<button class=\"btn-batch-nav\" onclick=\"batchShowResult(" + (vCurrentBatchIndex - 1) + ")\"" + (prevDis ? " disabled" : "") + ">前の半荘</button>" +
+            "<span style=\"color:#fd6;font-size:14px;line-height:32px;\">" + (vCurrentBatchIndex + 1) + " / " + batchResults.length + " 半荘</span>" +
+            "<button class=\"btn-batch-nav\" onclick=\"batchShowResult(" + (vCurrentBatchIndex + 1) + ")\"" + (nextDis ? " disabled" : "") + ">次の半荘</button>";
+        panel.insertBefore(nav, panel.firstChild);
+    }
 }
+
+function batchShowResult(index) {
+    if (index < 0 || index >= batchResults.length) return;
+    vCurrentBatchIndex = index;
+    simData = batchResults[index];
+    document.getElementById("result-panel").classList.remove("show");
+    showResult(batchResults[index]);
+}
+
+function batchStartWatch(index) {
+    if (index < 0 || index >= batchResults.length) return;
+    vCurrentBatchIndex = index;
+    simData = batchResults[index];
+    startWatchMode();
+}
+
+function backToBatchSummary() {
+    document.getElementById("result-panel").classList.remove("show");
+    var navEl = document.getElementById("batch-nav");
+    if (navEl) navEl.remove();
+    vCurrentBatchIndex = -1;
+    document.getElementById("batch-result-panel").style.display = "block";
+    document.getElementById("mode-select").classList.add("show");
+}
+
 
 // === 牌譜ビューア ===
 const TILE_NAMES_V = ['1m','2m','3m','4m','5m','6m','7m','8m','9m','1p','2p','3p','4p','5p','6p','7p','8p','9p','1s','2s','3s','4s','5s','6s','7s','8s','9s','東','南','西','北','白','發','中'];
