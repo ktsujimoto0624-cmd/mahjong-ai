@@ -410,7 +410,22 @@ a { color: #6cf; }
     </div>
 </div>
 
-<script src="pyodide/pyodide.js"></script>
+<script>
+// Pyodide: ローカルがあればローカル、なければCDNから読み込み
+(function(){
+    var s = document.createElement('script');
+    var localUrl = 'pyodide/pyodide.js';
+    var cdnUrl = 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js';
+    s.src = localUrl;
+    s.onerror = function() {
+        var s2 = document.createElement('script');
+        s2.src = cdnUrl;
+        window._pyodideFromCDN = true;
+        document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+})();
+</script>
 <script src="js/db.js"></script>
 <script src="js/mjai.js"></script>
 <script>
@@ -469,7 +484,10 @@ function ensureDir(fs, path) {
 async function initPyodide() {
     try {
         document.getElementById('status').textContent = 'Python環境を読み込み中... (初回は10秒程度かかります)';
-        pyodide = await loadPyodide({ indexURL: 'pyodide/' });
+        var pyodideIndexURL = window._pyodideFromCDN
+            ? 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/'
+            : 'pyodide/';
+        pyodide = await loadPyodide({ indexURL: pyodideIndexURL });
 
         document.getElementById('status').textContent = '麻雀エンジンを読み込み中...';
 
