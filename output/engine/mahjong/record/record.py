@@ -100,6 +100,16 @@ class GameRecord:
         rec.result = data["result"]
         return rec
 
+    def to_mjai(self):
+        """mjai形式のイベントリストとして返す"""
+        from mahjong.record.mjai_converter import to_mjai
+        return to_mjai(self)
+
+    def to_mjai_string(self):
+        """mjai形式のJSON Lines文字列として返す"""
+        from mahjong.record.mjai_converter import to_mjai_string
+        return to_mjai_string(self)
+
     def to_text(self):
         """棋譜をテキスト形式で出力"""
         seat_names = ["東", "南", "西", "北"]

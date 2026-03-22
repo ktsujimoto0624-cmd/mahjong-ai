@@ -45,6 +45,8 @@ def judge_yaku(win_info):
     if len(melds) == 0 and _check_seven_pairs(hand):
         yaku_list = _judge_common_yaku(win_info, None, is_chitoitsu=True)
         yaku_list.append(("七対子", 2))
+        # 七対子と複合する役を判定
+        _judge_chitoitsu_extra(win_info, yaku_list)
         total_han = sum(h for _, h in yaku_list)
         return yaku_list, total_han, None
 
@@ -157,6 +159,15 @@ def _judge_regular_yaku(win_info, decomp):
     if _is_shousangen(head, all_mentsu):
         yaku_list.append(("小三元", 2))
 
+    # 混老頭: 全ての牌が么九牌（刻子+雀頭のみ）
+    if _is_honroutou(head, all_mentsu):
+        yaku_list.append(("混老頭", 2))
+
+    # 三槓子
+    kan_count = sum(1 for m in melds if m["type"] in ("ankan", "daiminkan", "kakan"))
+    if kan_count == 3:
+        yaku_list.append(("三槓子", 2))
+
     return yaku_list
 
 
@@ -166,13 +177,46 @@ def _judge_common_yaku(win_info, decomp, is_chitoitsu=False):
     is_menzen = win_info["is_menzen"]
     is_tsumo = win_info["is_tsumo"]
 
-    # リーチ（門前のみ）
-    if win_info["is_riichi"]:
+    # 天和（親の配牌和了）
+    if win_info.get("is_tenhou"):
+        yaku_list.append(("天和", 13))
+        return yaku_list
+
+    # 地和（子の第一ツモ和了）
+    if win_info.get("is_chiihou"):
+        yaku_list.append(("地和", 13))
+        return yaku_list
+
+    # ダブルリーチ
+    if win_info.get("is_double_riichi"):
+        yaku_list.append(("ダブルリーチ", 2))
+    elif win_info.get("is_riichi"):
+        # リーチ（門前のみ）
         yaku_list.append(("リーチ", 1))
+
+    # 一発
+    if win_info.get("is_ippatsu"):
+        yaku_list.append(("一発", 1))
 
     # 門前清自摸和（門前ツモ）
     if is_menzen and is_tsumo:
         yaku_list.append(("門前清自摸和", 1))
+
+    # 海底撈月（最後のツモで和了）
+    if win_info.get("is_haitei") and is_tsumo:
+        yaku_list.append(("海底撈月", 1))
+
+    # 河底撈魚（最後の捨て牌でロン）
+    if win_info.get("is_houtei") and not is_tsumo:
+        yaku_list.append(("河底撈魚", 1))
+
+    # 嶺上開花
+    if win_info.get("is_rinshan"):
+        yaku_list.append(("嶺上開花", 1))
+
+    # 搶槓
+    if win_info.get("is_chankan"):
+        yaku_list.append(("搶槓", 1))
 
     return yaku_list
 
@@ -398,6 +442,24 @@ def _is_shousangen(head, all_mentsu):
     return san_koutsu == 2 and head in SANGENPAI
 
 
+def _is_honroutou(head, all_mentsu):
+    """混老頭: 全ての牌が么九牌（1,9,字牌）のみ、刻子のみ"""
+    if not is_terminal_or_honor(head):
+        return False
+    has_terminal = is_terminal(head)
+    has_honor = is_honor(head)
+    for mt, tile in all_mentsu:
+        if not is_terminal_or_honor(tile):
+            return False
+        if mt == "shuntsu":
+            return False  # 順子があったら不成立
+        if is_terminal(tile):
+            has_terminal = True
+        if is_honor(tile):
+            has_honor = True
+    return has_terminal and has_honor  # 字牌と老頭牌の両方が必要
+
+
 # === 役満 ===
 
 def _check_yakuman(win_info):
@@ -454,7 +516,92 @@ def _check_yakuman(win_info):
             yakuman.append(("緑一色", 13))
             return yakuman
 
+    # 清老頭: 老頭牌（1,9の数牌）のみ
+    terminal_tiles = {0, 8, 9, 17, 18, 26}  # 1m,9m,1p,9p,1s,9s
+    all_terminal = all(hand[t] == 0 for t in range(NUM_TILE_TYPES) if t not in terminal_tiles)
+    if all_terminal:
+        meld_ok = all(
+            all(t in terminal_tiles for t in m["tiles"]) for m in melds
+        )
+        if meld_ok:
+            yakuman.append(("清老頭", 13))
+            return yakuman
+
+    # 九蓮宝燈: 門前で同種数牌 1-1-1-2-3-4-5-6-7-8-9-9-9 + 任意1枚
+    if is_menzen and len(melds) == 0:
+        for base in (0, 9, 18):
+            # base色の牌だけかチェック
+            other_suit = any(
+                hand[t] > 0
+                for t in range(NUM_TILE_TYPES)
+                if t < base or t >= base + 9
+            )
+            if other_suit:
+                continue
+            # 1,9が3枚以上、2-8が1枚以上
+            ok = (hand[base] >= 3 and hand[base + 8] >= 3)
+            if ok and all(hand[base + i] >= 1 for i in range(9)):
+                yakuman.append(("九蓮宝燈", 13))
+                return yakuman
+
+    # 四槓子
+    kan_count = sum(1 for m in melds if m["type"] in ("ankan", "daiminkan", "kakan"))
+    if kan_count == 4:
+        yakuman.append(("四槓子", 13))
+        return yakuman
+
+    # 小四喜: 風牌3つが刻子+1つが雀頭
+    # 大四喜: 風牌4つが全て刻子
+    if melds_count > 0 or is_menzen:
+        for decomp in decompositions:
+            all_m = _build_all_mentsu(decomp, melds)
+            kaze_koutsu = sum(
+                1 for mt, t in all_m if mt == "koutsu" and t in KAZEHAI
+            )
+            if kaze_koutsu == 4:
+                yakuman.append(("大四喜", 13))
+                return yakuman
+            if kaze_koutsu == 3 and decomp["head"] in KAZEHAI:
+                yakuman.append(("小四喜", 13))
+                return yakuman
+
     return yakuman if yakuman else None
+
+
+def _judge_chitoitsu_extra(win_info, yaku_list):
+    """七対子と複合する役を判定して yaku_list に追加する"""
+    hand = win_info["hand"]
+
+    # 手牌から使用牌を収集（対子の牌種リスト）
+    pair_tiles = [t for t in range(NUM_TILE_TYPES) if hand[t] == 2]
+
+    # 断么九: 全て中張牌
+    if all(not is_terminal_or_honor(t) for t in pair_tiles):
+        yaku_list.append(("断么九", 1))
+
+    # 混一色 / 清一色
+    suits = set()
+    has_honor = False
+    for t in pair_tiles:
+        if is_honor(t):
+            has_honor = True
+        elif t < 9:
+            suits.add("m")
+        elif t < 18:
+            suits.add("p")
+        else:
+            suits.add("s")
+
+    if len(suits) == 1 and has_honor:
+        yaku_list.append(("混一色", 3))  # 七対子は門前のみ
+    elif len(suits) == 1 and not has_honor:
+        yaku_list.append(("清一色", 6))
+
+    # 混老頭: 全て么九牌（七対子との複合あり）
+    if all(is_terminal_or_honor(t) for t in pair_tiles):
+        yaku_list.append(("混老頭", 2))
+
+    # 役牌（七対子では刻子がないため不成立 — スキップ）
 
 
 def _build_all_mentsu(decomp, melds):

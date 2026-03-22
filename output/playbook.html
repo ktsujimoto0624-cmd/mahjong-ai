@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SimMahjong - PLAYBOOK</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Meiryo', 'Yu Gothic', sans-serif;
+    background: #0d2818; color: #ddd; padding: 16px;
+}
+.header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; margin-bottom: 16px;
+    background: #0a1f10; border-radius: 8px; border: 1px solid #2a5;
+    max-width: 960px; margin: 0 auto 16px;
+}
+.header h1 { font-size: 20px; color: #fd6; }
+.header a { color: #6cf; font-size: 13px; text-decoration: none; }
+.container { max-width: 960px; margin: 0 auto; }
+.nav-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.nav-tabs a {
+    padding: 10px 20px; background: #1a3a2a; border: 1px solid #3a6;
+    border-radius: 6px 6px 0 0; color: #8c8; text-decoration: none;
+    font-size: 14px; transition: all 0.2s;
+}
+.nav-tabs a:hover { background: #2a5a3a; color: #fff; }
+.nav-tabs a.active { background: #0a1f10; color: #fd6; border-bottom-color: #0a1f10; font-weight: bold; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.panel {
+    background: #0a1f10; border: 1px solid #2a5; border-radius: 8px;
+    padding: 20px; margin-bottom: 16px;
+}
+.panel h2 { font-size: 18px; color: #fd6; margin-bottom: 12px; border-bottom: 1px solid #2a5; padding-bottom: 6px; }
+.panel h3 { font-size: 15px; color: #8c8; margin: 16px 0 8px; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+th, td { border: 1px solid #3a6; padding: 6px 10px; text-align: left; font-size: 13px; }
+th { background: #1a3a2a; color: #8c8; }
+.status-ok { color: #4f4; font-weight: bold; }
+.status-ng { color: #f66; font-weight: bold; }
+.status-partial { color: #fc6; font-weight: bold; }
+p { font-size: 13px; line-height: 1.7; margin-bottom: 8px; }
+ul { margin: 4px 0 8px 20px; font-size: 13px; line-height: 1.7; }
+code { background: #1a3a2a; padding: 1px 6px; border-radius: 3px; font-size: 12px; color: #8c8; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>PLAYBOOK</h1>
+        <a href="index.html">&larr; タイトルへ</a>
+    </div>
+
+    <div class="nav-tabs">
+        <a href="#" class="active" onclick="showTab('rulebook',this);return false;">ルールブック</a>
+        <a href="#" onclick="showTab('yaku',this);return false;">役一覧</a>
+        <a href="#" onclick="showTab('scoring',this);return false;">点数計算</a>
+        <a href="#" onclick="showTab('spec',this);return false;">実装仕様</a>
+    </div>
+
+    <!-- ルールブック -->
+    <div class="tab-content active" id="tab-rulebook">
+        <div class="panel">
+            <h2>基本ルール</h2>
+            <h3>対局形式</h3>
+            <ul>
+                <li>4人打ち麻雀（東風戦 / 東南戦）</li>
+                <li>初期持ち点: 25,000点</li>
+                <li>和了には必ず1翻以上の役が必要（役なし和了禁止）</li>
+            </ul>
+            <h3>牌</h3>
+            <ul>
+                <li>萬子(1m-9m)、筒子(1p-9p)、索子(1s-9s): 各4枚 = 108枚</li>
+                <li>風牌(東南西北): 各4枚 = 16枚</li>
+                <li>三元牌(白發中): 各4枚 = 12枚</li>
+                <li>合計: 136枚（赤ドラなし）</li>
+            </ul>
+            <h3>王牌</h3>
+            <ul>
+                <li>王牌14枚（嶺上牌4枚 + ドラ表示牌5枚 + 裏ドラ表示牌5枚）</li>
+                <li>ドラ表示牌: 初期1枚、槓ごとに1枚追加（最大5枚）</li>
+                <li>裏ドラ: リーチ和了時のみ開示</li>
+            </ul>
+            <h3>局の進行</h3>
+            <ul>
+                <li>親は東家（席番号0）から開始</li>
+                <li>親が和了 → 連荘（本場+1）</li>
+                <li>子が和了 → 親交代、本場リセット</li>
+                <li>流局時（東場）→ 親がテンパイなら連荘、ノーテンなら親流れ</li>
+                <li>流局時（南場）→ 親は常に続行（本場+1）</li>
+            </ul>
+            <h3>流局時のテンパイ料（ノーテン罰符）</h3>
+            <ul>
+                <li>流局時、場に3,000点をノーテン者からテンパイ者へ移動</li>
+                <li>テンパイ1人 / ノーテン3人: テンパイ者+3,000 / ノーテン者各-1,000</li>
+                <li>テンパイ2人 / ノーテン2人: テンパイ者各+1,500 / ノーテン者各-1,500</li>
+                <li>テンパイ3人 / ノーテン1人: テンパイ者各+1,000 / ノーテン者-3,000</li>
+                <li>全員テンパイ or 全員ノーテン: 点数移動なし</li>
+            </ul>
+
+            <h3>終了条件</h3>
+            <ul>
+                <li>規定の場風が終了（東風戦: 東場まで / 東南戦: 南場まで）</li>
+                <li>誰かの持ち点が0点未満（飛び）</li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h2>鳴き（副露）</h2>
+            <table>
+                <tr><th>種類</th><th>条件</th><th>説明</th></tr>
+                <tr><td>チー</td><td>上家の捨て牌</td><td>順子を完成させる</td></tr>
+                <tr><td>ポン</td><td>他家の捨て牌</td><td>刻子を完成させる</td></tr>
+                <tr><td>大明槓</td><td>他家の捨て牌</td><td>手牌3枚+捨て牌で槓子</td></tr>
+                <tr><td>暗槓</td><td>手牌のみ</td><td>手牌4枚で槓子（門前維持）</td></tr>
+                <tr><td>加槓</td><td>ポン済み</td><td>ポンした刻子に4枚目を加える</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>リーチ</h2>
+            <ul>
+                <li>門前（副露なし）でテンパイ時に宣言可能</li>
+                <li>リーチ宣言時に1,000点の供託</li>
+                <li>リーチ後は手牌変更不可（ツモ切りのみ）</li>
+                <li>和了時に裏ドラを開示</li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h2>ドラ</h2>
+            <table>
+                <tr><th>種類</th><th>説明</th><th>実装</th></tr>
+                <tr><td>表ドラ</td><td>ドラ表示牌の次の牌がドラ</td><td class="status-ok">実装済み</td></tr>
+                <tr><td>裏ドラ</td><td>リーチ和了時に開示。裏ドラ表示牌の次の牌</td><td class="status-ok">実装済み</td></tr>
+                <tr><td>槓ドラ</td><td>槓するたびにドラ表示牌が1枚増加</td><td class="status-ok">実装済み</td></tr>
+                <tr><td>赤ドラ</td><td>赤牌（5m/5p/5sの赤版）</td><td class="status-ng">未実装</td></tr>
+            </table>
+            <h3>ドラの計算方法</h3>
+            <ul>
+                <li>数牌: 表示牌の次の数字（9→1に戻る）</li>
+                <li>風牌: 東→南→西→北→東</li>
+                <li>三元牌: 白→發→中→白</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 役一覧 -->
+    <div class="tab-content" id="tab-yaku">
+        <div class="panel">
+            <h2>1翻役</h2>
+            <table>
+                <tr><th>役名</th><th>条件</th><th>門前</th><th>実装</th></tr>
+                <tr><td>リーチ</td><td>門前テンパイでリーチ宣言</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>門前清自摸和</td><td>門前でツモ和了</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>平和</td><td>順子のみ、役牌以外の雀頭、両面待ち</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>断么九</td><td>中張牌（2-8）のみで構成</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>一盃口</td><td>同じ順子が2組</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>役牌</td><td>三元牌・自風牌・場風牌の刻子</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>一発</td><td>リーチ後一巡以内に和了</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>海底撈月</td><td>最後のツモで和了</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>河底撈魚</td><td>最後の捨て牌でロン</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>嶺上開花</td><td>槓した後の嶺上牌で和了</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>搶槓</td><td>他家の加槓牌でロン</td><td>不要</td><td class="status-ok">OK</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>2翻役</h2>
+            <table>
+                <tr><th>役名</th><th>条件</th><th>門前</th><th>実装</th></tr>
+                <tr><td>七対子</td><td>7組の対子</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>対々和</td><td>全て刻子（4組の刻子+雀頭）</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>三暗刻</td><td>暗刻が3組</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>三色同順</td><td>3色で同じ数の順子（鳴き-1翻）</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>三色同刻</td><td>3色で同じ数の刻子</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>一気通貫</td><td>同色で123+456+789（鳴き-1翻）</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>混全帯么九</td><td>全面子と雀頭に么九牌を含む（鳴き-1翻）</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>小三元</td><td>三元牌2組が刻子、1組が雀頭</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>ダブルリーチ</td><td>第一巡目にリーチ宣言</td><td>必須</td><td class="status-ok">OK</td></tr>
+                <tr><td>三槓子</td><td>槓子が3組</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>混老頭</td><td>么九牌（1,9,字牌）のみ</td><td>不要</td><td class="status-ok">OK</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>3翻役</h2>
+            <table>
+                <tr><th>役名</th><th>条件</th><th>門前</th><th>実装</th></tr>
+                <tr><td>混一色</td><td>1種類の数牌+字牌のみ（鳴き-1翻）</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>純全帯么九</td><td>全面子と雀頭に老頭牌を含む（鳴き-1翻）</td><td>不要</td><td class="status-ok">OK</td></tr>
+                <tr><td>二盃口</td><td>一盃口が2組</td><td>必須</td><td class="status-ok">OK</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>6翻役</h2>
+            <table>
+                <tr><th>役名</th><th>条件</th><th>門前</th><th>実装</th></tr>
+                <tr><td>清一色</td><td>1種類の数牌のみ（鳴き-1翻）</td><td>不要</td><td class="status-ok">OK</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>役満（13翻）</h2>
+            <table>
+                <tr><th>役名</th><th>条件</th><th>実装</th></tr>
+                <tr><td>国士無双</td><td>13種の么九牌を1枚ずつ+1枚</td><td class="status-ok">OK</td></tr>
+                <tr><td>四暗刻</td><td>暗刻4組（門前のみ）</td><td class="status-ok">OK</td></tr>
+                <tr><td>大三元</td><td>三元牌3組が全て刻子</td><td class="status-ok">OK</td></tr>
+                <tr><td>字一色</td><td>字牌のみで構成</td><td class="status-ok">OK</td></tr>
+                <tr><td>緑一色</td><td>2s,3s,4s,6s,8s,發のみ</td><td class="status-ok">OK</td></tr>
+                <tr><td>清老頭</td><td>老頭牌（1,9）のみ</td><td class="status-ok">OK</td></tr>
+                <tr><td>九蓮宝燈</td><td>1-1-1-2-3-4-5-6-7-8-9-9-9+α</td><td class="status-ok">OK</td></tr>
+                <tr><td>四槓子</td><td>槓子4組</td><td class="status-ok">OK</td></tr>
+                <tr><td>天和</td><td>親の配牌で和了</td><td class="status-ok">OK</td></tr>
+                <tr><td>地和</td><td>子の第一ツモで和了</td><td class="status-ok">OK</td></tr>
+                <tr><td>小四喜</td><td>風牌3組が刻子+1組が雀頭</td><td class="status-ok">OK</td></tr>
+                <tr><td>大四喜</td><td>風牌4組が全て刻子</td><td class="status-ok">OK</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 点数計算 -->
+    <div class="tab-content" id="tab-scoring">
+        <div class="panel">
+            <h2>符の計算</h2>
+            <h3>副底（基本符）</h3>
+            <table>
+                <tr><th>条件</th><th>符</th></tr>
+                <tr><td>門前ロン</td><td>30符</td></tr>
+                <tr><td>ツモ和了 / 鳴きロン</td><td>20符</td></tr>
+            </table>
+
+            <h3>面子の符</h3>
+            <table>
+                <tr><th>面子</th><th>中張牌</th><th>么九牌・字牌</th></tr>
+                <tr><td>明刻（ポン）</td><td>2符</td><td>4符</td></tr>
+                <tr><td>暗刻</td><td>4符</td><td>8符</td></tr>
+                <tr><td>明槓</td><td>8符</td><td>16符</td></tr>
+                <tr><td>暗槓</td><td>16符</td><td>32符</td></tr>
+            </table>
+
+            <h3>雀頭の符</h3>
+            <table>
+                <tr><th>雀頭</th><th>符</th></tr>
+                <tr><td>役牌（白發中・自風・場風）</td><td>2符</td></tr>
+                <tr><td>連風牌（自風かつ場風）</td><td>4符</td></tr>
+                <tr><td>その他</td><td>0符</td></tr>
+            </table>
+
+            <h3>待ちの符</h3>
+            <table>
+                <tr><th>待ち</th><th>符</th></tr>
+                <tr><td>両面待ち</td><td>0符</td></tr>
+                <tr><td>嵌張・辺張・単騎待ち</td><td>2符</td></tr>
+            </table>
+
+            <h3>ツモ符</h3>
+            <ul>
+                <li>ツモ和了: +2符（ただし平和ツモは除く）</li>
+            </ul>
+
+            <h3>特例</h3>
+            <ul>
+                <li>七対子: 固定25符</li>
+                <li>平和ツモ: 固定20符</li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h2>点数表</h2>
+            <h3>基本点計算</h3>
+            <p>基本点 = 符 &times; 2<sup>(翻+2)</sup>（2,000点上限で満貫）</p>
+
+            <h3>満貫以上</h3>
+            <table>
+                <tr><th>翻数</th><th>名称</th><th>子ロン</th><th>親ロン</th></tr>
+                <tr><td>5翻</td><td>満貫</td><td>8,000</td><td>12,000</td></tr>
+                <tr><td>6-7翻</td><td>跳満</td><td>12,000</td><td>18,000</td></tr>
+                <tr><td>8-10翻</td><td>倍満</td><td>16,000</td><td>24,000</td></tr>
+                <tr><td>11-12翻</td><td>三倍満</td><td>24,000</td><td>36,000</td></tr>
+                <tr><td>13翻以上</td><td>数え役満</td><td>32,000</td><td>48,000</td></tr>
+            </table>
+
+            <h3>本場ボーナス</h3>
+            <ul>
+                <li>ツモ和了: 各支払者 +100点 &times; 本場数</li>
+                <li>ロン和了: 放銃者 +300点 &times; 本場数</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 実装仕様 -->
+    <div class="tab-content" id="tab-spec">
+        <div class="panel">
+            <h2>エンジン構成</h2>
+            <table>
+                <tr><th>モジュール</th><th>役割</th></tr>
+                <tr><td><code>mahjong/engine/tile.py</code></td><td>牌の定義、ドラ計算</td></tr>
+                <tr><td><code>mahjong/engine/wall.py</code></td><td>山の管理、王牌、ドラ表示牌</td></tr>
+                <tr><td><code>mahjong/engine/player.py</code></td><td>プレイヤーの手牌管理</td></tr>
+                <tr><td><code>mahjong/engine/agari.py</code></td><td>和了判定、手牌分解</td></tr>
+                <tr><td><code>mahjong/game/round.py</code></td><td>1局のゲーム進行</td></tr>
+                <tr><td><code>mahjong/game/naki.py</code></td><td>鳴き（副露）処理</td></tr>
+                <tr><td><code>mahjong/game/hanchan.py</code></td><td>半荘の管理</td></tr>
+                <tr><td><code>mahjong/scoring/yaku.py</code></td><td>役判定</td></tr>
+                <tr><td><code>mahjong/scoring/score.py</code></td><td>点数・符計算</td></tr>
+                <tr><td><code>mahjong/record/record.py</code></td><td>牌譜の記録・再生</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>実行環境</h2>
+            <ul>
+                <li>ブラウザ内Python実行: Pyodide v0.27.5</li>
+                <li>サーバー不要（ローカルHTTPサーバーのみ必要）</li>
+                <li>牌画像: SVG形式（tiles/ディレクトリ）</li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h2>エージェント</h2>
+            <table>
+                <tr><th>名前</th><th>戦略</th></tr>
+                <tr><td>ShantenAgent</td><td>シャンテン数最小化。受入枚数重視。門前リーチ志向。</td></tr>
+                <tr><td>RandomAgent</td><td>ランダム打牌。ベースライン比較用。</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>実装状況サマリー</h2>
+            <table>
+                <tr><th>カテゴリ</th><th>実装済み</th><th>未実装</th><th>割合</th></tr>
+                <tr><td>1翻役</td><td>11</td><td>0</td><td>100%</td></tr>
+                <tr><td>2翻役</td><td>11</td><td>0</td><td>100%</td></tr>
+                <tr><td>3翻役</td><td>3</td><td>0</td><td>100%</td></tr>
+                <tr><td>6翻役</td><td>1</td><td>0</td><td>100%</td></tr>
+                <tr><td>役満</td><td>12</td><td>0</td><td>100%</td></tr>
+                <tr><td>ドラ</td><td>3種</td><td>1種(赤)</td><td>75%</td></tr>
+                <tr><td>副露</td><td>5種</td><td>0</td><td>100%</td></tr>
+                <tr><td>符計算</td><td>全項目</td><td>0</td><td>100%</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(id, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    el.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -3,3 +3,7 @@ __pycache__/
 .claude/
 tmp/
 docs/
+output/pyodide/
+node_modules/
+_agent.b64
+tmp_write_agent.py

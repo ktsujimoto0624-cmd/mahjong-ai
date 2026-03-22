@@ -39,6 +39,11 @@ class GameRound(NakiMixin):
         # リーチ後フリテン: リーチ後にロン可能牌を見逃し（解除不可）
         self.permanent_furiten = [False, False, False, False]
 
+        # 状況役フラグ
+        self.ippatsu = [False, False, False, False]  # 一発可能（リーチ後1巡以内）
+        self.first_turn = True   # 第一巡目（天和・地和・ダブリー判定用）
+        self.is_rinshan = False  # 嶺上ツモ中
+
         self.record = GameRecord()
         self.record.set_metadata(
             wall_seed=wall_seed,
@@ -70,6 +75,10 @@ class GameRound(NakiMixin):
 
                 # ツモ時に同巡フリテンを解除
                 self.temporary_furiten[self.current_player] = False
+                # ツモが来たら一発消滅（自分のリーチ宣言打牌の次の自分のツモまでが一発）
+                # ただしリーチ宣言直後の最初のツモは一発有効なのでここでは消さない
+                # → 一発は打牌後に消す
+                self.first_turn = False  # 第一巡目終了
 
                 if self.verbose:
                     self._log_draw(tile, player)
@@ -79,23 +88,31 @@ class GameRound(NakiMixin):
                     break
 
                 # 暗槓・加槓判定（ツモ後、打牌前）
+                self.is_rinshan = False
                 kan_result = self._handle_self_kan(player)
                 if kan_result == "tsumo":
                     break
                 if kan_result == "rinshan":
+                    self.is_rinshan = True
                     # 嶺上ツモ後、再度打牌フェーズへ
                     continue
 
             # リーチ判定 & 打牌
             discard = self._handle_discard(player)
 
+            # 打牌後に一発を消す（リーチ宣言打牌の直後は消さない）
+            if not player.is_riichi or player.riichi_turn != self.turn:
+                self.ippatsu[self.current_player] = False
+
             # ロン和了判定
             if self._handle_ron(discard):
                 break
 
+            # 鳴きが入ったら全員の一発を消す
             # ポン・大明槓判定
             naki_seat = self._handle_pon_kan(discard)
             if naki_seat is not None:
+                self.ippatsu = [False, False, False, False]  # 鳴きで一発消滅
                 self.current_player = naki_seat
                 naki_player = naki_seat
                 continue
@@ -103,6 +120,7 @@ class GameRound(NakiMixin):
             # チー判定（下家のみ）
             chi_seat = self._handle_chi(discard)
             if chi_seat is not None:
+                self.ippatsu = [False, False, False, False]  # 鳴きで一発消滅
                 self.current_player = chi_seat
                 naki_player = chi_seat
                 continue
@@ -144,7 +162,13 @@ class GameRound(NakiMixin):
         if not is_agari(player.hand, melds_count):
             return False
 
-        score = self._calc_score(player, tile, is_tsumo=True)
+        score = self._calc_score(player, tile, is_tsumo=True,
+            is_ippatsu=self.ippatsu[self.current_player],
+            is_haitei=(self.wall.remaining() == 0),
+            is_rinshan=self.is_rinshan,
+            is_tenhou=(self.first_turn and self.current_player == self.dealer and self.turn == 0),
+            is_chiihou=(self.first_turn and self.current_player != self.dealer and self.turn == 0),
+        )
         # 役なし → 和了不成立
         if score is None:
             return False
@@ -197,6 +221,7 @@ class GameRound(NakiMixin):
         if riichi_declared:
             player.is_riichi = True
             player.riichi_turn = self.turn
+            self.ippatsu[self.current_player] = True
             self.record.record_riichi(self.current_player)
             if self.verbose:
                 print(
@@ -239,6 +264,8 @@ class GameRound(NakiMixin):
         winner_player.hand[discard] += 1
         score = self._calc_score(
             winner_player, discard, is_tsumo=False, seat=ron_winner,
+            is_ippatsu=self.ippatsu[ron_winner],
+            is_houtei=(self.wall.remaining() == 0),
         )
         winner_player.hand[discard] -= 1
 
@@ -319,11 +346,49 @@ class GameRound(NakiMixin):
     # === ユーティリティ ===
 
     def _finish_ryukyoku(self):
-        """流局処理"""
-        self.result = {"type": "ryukyoku", "winner": None, "turn": self.turn}
+        """流局処理（テンパイ料の計算含む）"""
+        from mahjong.engine.agari import waiting_tiles
+
+        # 各プレイヤーのテンパイ判定
+        tenpai = []
+        for seat in range(4):
+            waits = waiting_tiles(
+                list(self.players[seat].hand),
+                len(self.players[seat].melds),
+            )
+            tenpai.append(len(waits) > 0)
+
+        tenpai_count = sum(tenpai)
+        noten_count = 4 - tenpai_count
+
+        # テンパイ料の計算（ノーテン罰符: 場に3000点）
+        tenpai_payments = [0, 0, 0, 0]
+        if 0 < tenpai_count < 4:
+            pay_per_noten = 3000 // tenpai_count   # テンパイ者が受け取る
+            recv_per_tenpai = 3000 // noten_count   # ノーテン者が支払う
+            for seat in range(4):
+                if tenpai[seat]:
+                    tenpai_payments[seat] = recv_per_tenpai
+                else:
+                    tenpai_payments[seat] = -pay_per_noten
+
+        self.result = {
+            "type": "ryukyoku",
+            "winner": None,
+            "turn": self.turn,
+            "tenpai": tenpai,
+            "tenpai_payments": tenpai_payments,
+        }
         self.record.record_result(self.result)
         if self.verbose:
+            tenpai_names = [
+                self.SEAT_NAMES[s] for s in range(4) if tenpai[s]
+            ]
             print(f"\n=== 流局（{self.turn}巡目） ===")
+            if tenpai_names:
+                print(f"    テンパイ: {', '.join(tenpai_names)}家")
+            else:
+                print("    全員ノーテン")
 
     def _advance_turn(self):
         """次のプレイヤーに進める"""
@@ -363,7 +428,10 @@ class GameRound(NakiMixin):
             "melds": [[m.copy() for m in p.melds] for p in self.players],
         }
 
-    def _calc_score(self, player, winning_tile, is_tsumo, seat=None):
+    def _calc_score(self, player, winning_tile, is_tsumo, seat=None,
+                    is_ippatsu=False, is_haitei=False, is_houtei=False,
+                    is_rinshan=False, is_tenhou=False, is_chiihou=False,
+                    is_chankan=False):
         """点数計算用の win_info を構築して計算する"""
         if seat is None:
             seat = self.current_player
@@ -379,6 +447,11 @@ class GameRound(NakiMixin):
             for m in player.melds:
                 dora_count += m["tiles"].count(dt)
 
+        # ダブルリーチ判定
+        is_double_riichi = (player.is_riichi and
+                            hasattr(player, 'riichi_turn') and
+                            player.riichi_turn == 0)
+
         win_info = {
             "hand": list(player.hand),
             "melds": player.melds,
@@ -388,6 +461,14 @@ class GameRound(NakiMixin):
             "seat_wind": (seat - self.dealer + 4) % 4,
             "round_wind": self.round_wind,
             "is_menzen": player.is_menzen(),
+            "is_ippatsu": is_ippatsu,
+            "is_haitei": is_haitei,
+            "is_houtei": is_houtei,
+            "is_rinshan": is_rinshan,
+            "is_tenhou": is_tenhou,
+            "is_chiihou": is_chiihou,
+            "is_chankan": is_chankan,
+            "is_double_riichi": is_double_riichi,
         }
 
         score = calculate_score(win_info)
@@ -396,7 +477,24 @@ class GameRound(NakiMixin):
         if score is not None and dora_count > 0 and not score["is_yakuman"]:
             score["yaku"].append(("ドラ", dora_count))
             score["han"] += dora_count
-            # 翻数が変わったので基本点を再計算
+
+        # 裏ドラ加算（リーチ和了時のみ）
+        ura_dora_count = 0
+        if score is not None and player.is_riichi and not score["is_yakuman"]:
+            ura_dora_tiles = [
+                dora_from_indicator(ind)
+                for ind in self.wall.get_ura_dora_indicators()
+            ]
+            for udt in ura_dora_tiles:
+                ura_dora_count += player.hand[udt]
+                for m in player.melds:
+                    ura_dora_count += m["tiles"].count(udt)
+            if ura_dora_count > 0:
+                score["yaku"].append(("裏ドラ", ura_dora_count))
+                score["han"] += ura_dora_count
+
+        # 翻数が変わった場合は基本点を再計算
+        if score is not None and (dora_count > 0 or ura_dora_count > 0) and not score["is_yakuman"]:
             from mahjong.scoring.score import _han_fu_to_base, _calculate_payments
             score["base_points"] = _han_fu_to_base(
                 score["han"], score["fu"],
@@ -405,6 +503,10 @@ class GameRound(NakiMixin):
                 score["base_points"], is_tsumo,
                 is_dealer=(seat == 0),
             )
+
+        # 裏ドラ表示牌を記録（リーチ和了時）
+        if score is not None and player.is_riichi:
+            score["ura_dora_indicators"] = self.wall.get_ura_dora_indicators()
 
         return score
 

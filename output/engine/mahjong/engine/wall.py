@@ -90,3 +90,15 @@ class Wall:
     def add_dora_indicator(self):
         """カンドラを追加（カン時に呼ぶ）"""
         self.dora_indicator_count += 1
+
+    def get_ura_dora_indicators(self):
+        """
+        裏ドラ表示牌を返す（リーチ和了時に開示）。
+
+        ドラ表示牌の隣（1つずらした位置）が裏ドラ表示牌。
+        """
+        indicators = []
+        base = NUM_TOTAL_TILES - 5
+        for i in range(self.dora_indicator_count):
+            indicators.append(self.tiles[base - i * 2 - 1])
+        return indicators

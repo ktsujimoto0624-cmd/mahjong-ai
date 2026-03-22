@@ -119,43 +119,52 @@ class Hanchan:
 
     def _apply_payments(self, result):
         """和了結果に基づく点数移動"""
+        points_before = list(self.points)
+
         if result["type"] == "ryukyoku":
-            return
-
-        score = result.get("score")
-        if score is None:
-            return
-
-        payments = score["payments"]
-        winner = result["winner"]
-        is_dealer_win = (winner == self.dealer)
-
-        if result["type"] == "tsumo":
+            # テンパイ料（ノーテン罰符）
+            tenpai_payments = result.get("tenpai_payments", [0, 0, 0, 0])
             for seat in range(4):
-                if seat == winner:
-                    continue
-                if is_dealer_win:
-                    pay = payments["from_each_non_dealer"]
-                else:
-                    pay = (payments["from_dealer"]
-                           if seat == self.dealer
-                           else payments["from_each_non_dealer"])
-                # 本場ボーナス: 各自 +100×本場
-                pay += self.honba * 100
-                self.points[seat] -= pay
-                self.points[winner] += pay
+                self.points[seat] += tenpai_payments[seat]
+        else:
+            score = result.get("score")
+            if score is not None:
+                payments = score["payments"]
+                winner = result["winner"]
+                is_dealer_win = (winner == self.dealer)
 
-        elif result["type"] == "ron":
-            discarder = result["from_player"]
-            pay = payments["from_discarder"]
-            # 本場ボーナス: 放銃者から +300×本場
-            pay += self.honba * 300
-            self.points[discarder] -= pay
-            self.points[winner] += pay
+                if result["type"] == "tsumo":
+                    for seat in range(4):
+                        if seat == winner:
+                            continue
+                        if is_dealer_win:
+                            pay = payments["from_each_non_dealer"]
+                        else:
+                            pay = (payments["from_dealer"]
+                                   if seat == self.dealer
+                                   else payments["from_each_non_dealer"])
+                        # 本場ボーナス: 各自 +100×本場
+                        pay += self.honba * 100
+                        self.points[seat] -= pay
+                        self.points[winner] += pay
 
-        # 供託リーチ棒を和了者が獲得
-        self.points[winner] += self.riichi_pool
-        self.riichi_pool = 0
+                elif result["type"] == "ron":
+                    discarder = result["from_player"]
+                    pay = payments["from_discarder"]
+                    # 本場ボーナス: 放銃者から +300×本場
+                    pay += self.honba * 300
+                    self.points[discarder] -= pay
+                    self.points[winner] += pay
+
+                # 供託リーチ棒を和了者が獲得
+                self.points[winner] += self.riichi_pool
+                self.riichi_pool = 0
+
+        # 点数変動と更新後の持ち点を記録
+        result["point_changes"] = [
+            self.points[s] - points_before[s] for s in range(4)
+        ]
+        result["points_after"] = list(self.points)
 
     def _advance_round(self, result):
         """親の交代・局の進行を判定"""
@@ -168,16 +177,29 @@ class Hanchan:
             # 連荘: 親続行、本場+1
             self.honba += 1
         elif result["type"] == "ryukyoku":
-            # 流局: 親続行、本場+1
-            self.honba += 1
+            # 流局時の親交代ルール
+            dealer_tenpai = result.get("tenpai", [False]*4)[self.dealer]
+            if self.round_wind == 0:
+                # 東場: 親がテンパイなら連荘、ノーテンなら親流れ
+                if dealer_tenpai:
+                    self.honba += 1
+                else:
+                    self._rotate_dealer()
+            else:
+                # 南場: 流局時は常に親続行
+                self.honba += 1
         else:
             # 子の和了: 親交代、本場リセット
-            self.honba = 0
-            self.round_number += 1
-            if self.round_number >= 4:
-                self.round_number = 0
-                self.round_wind += 1
-            self.dealer = (self.dealer + 1) % 4
+            self._rotate_dealer()
+
+    def _rotate_dealer(self):
+        """親を次のプレイヤーに交代する"""
+        self.honba = 0
+        self.round_number += 1
+        if self.round_number >= 4:
+            self.round_number = 0
+            self.round_wind += 1
+        self.dealer = (self.dealer + 1) % 4
 
     def _check_end(self):
         """終了条件の判定"""
@@ -211,6 +233,7 @@ class Hanchan:
             "rounds_played": len(self.round_results),
             "round_results": self.round_results,
             "agents": [a.label for a in self.agents],
+            "round_records": [r.to_dict() for r in self.round_records],
         }
 
     def _format_points(self):

@@ -26,7 +26,10 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 /* === 麻雀卓レイアウト === */
 .mahjong-table {
     max-width: 1000px; margin: 0 auto;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto 1fr auto;
+    gap: 4px;
     height: calc(100vh - 100px);
 }
 
@@ -45,9 +48,8 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 .hand-label .agent { color: #8c8; font-size: 11px; font-weight: normal; }
 
 /* 上下の手牌: 横1列 */
-.hand-top, .hand-bottom {
-    display: flex; flex-direction: column; width: 100%;
-}
+.hand-top { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; }
+.hand-bottom { grid-column: 2; grid-row: 3; display: flex; flex-direction: column; }
 .hand-tiles {
     display: flex; flex-wrap: nowrap; align-items: flex-end;
 }
@@ -61,7 +63,13 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 }
 
 /* 左右の手牌: 回転して中心向き */
-.hand-left, .hand-right {
+.hand-left {
+    grid-column: 1; grid-row: 1 / 4;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-width: 56px; max-width: 62px;
+}
+.hand-right {
+    grid-column: 3; grid-row: 1 / 4;
     display: flex; flex-direction: column; align-items: center;
     justify-content: center; min-width: 56px; max-width: 62px;
 }
@@ -87,12 +95,13 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 
 /* 中段 */
 .middle-row {
-    display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1; min-height: 0;
+    display: contents;
 }
 
 /* 河テーブル（中央） */
 .river-table {
-    flex: 1; background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
+    grid-column: 2; grid-row: 2;
+    background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
     padding: 6px; display: flex; flex-direction: column; gap: 2px;
     min-height: 0;
 }
@@ -343,9 +352,12 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
 
 /* 結果バナー */
 .result-banner {
-    text-align: center; margin: 4px auto; padding: 12px;
-    background: #0d2818; border: 3px solid #f84; border-radius: 8px;
-    display: none; max-width: 1000px;
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 1000; width: 80vw; max-width: 600px; max-height: 85vh; overflow-y: auto;
+    text-align: center; padding: 24px;
+    background: rgba(10, 30, 20, 0.97); border: 3px solid #f84; border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    display: none;
 }
 .result-title {
     font-size: 22px; font-weight: bold; color: #fd6;
@@ -465,6 +477,7 @@ h1 { text-align: center; margin-bottom: 4px; font-size: 18px; }
     <button id="btn-next" onclick="goNext()">進む &gt;</button>
     <button id="btn-end" onclick="goEnd()">&gt;|</button>
     <button id="btn-auto" onclick="toggleAuto()">自動再生</button>
+    <button onclick="goEnd()" style="background:#a64;border:1px solid #d96;color:#fff;padding:4px 12px;margin-left:8px;cursor:pointer;border-radius:4px;font-size:12px;">結果表示</button>
 </div>
 
 <!-- 麻雀卓レイアウト -->
@@ -614,16 +627,26 @@ function getActiveSeat() {
 }
 
 function renderHand(seat, isVertical) {
+    let drawTile = lastDraw[seat];
+    let handCopy = hands[seat].slice();
+    if (drawTile !== null && handCopy[drawTile] > 0) {
+        handCopy[drawTile]--;
+    }
     let html = '';
     let reversed = (seat === 1);
     let start = reversed ? 33 : 0;
     let end = reversed ? -1 : 34;
     let step = reversed ? -1 : 1;
     for (let t = start; t !== end; t += step) {
-        for (let c = 0; c < hands[seat][t]; c++) {
-            let cls = (lastDraw[seat] === t && c === hands[seat][t] - 1) ? "draw-highlight" : "";
-            html += isVertical ? tileVert(t, cls) : tileImg(t, cls);
+        for (let c = 0; c < handCopy[t]; c++) {
+            html += isVertical ? tileVert(t, '') : tileImg(t, '');
         }
+    }
+    if (drawTile !== null) {
+        let gap = isVertical ? 'margin-top:6px;' : 'margin-left:8px;';
+        html += '<span style="' + gap + 'display:inline-block;">';
+        html += isVertical ? tileVert(drawTile, 'draw-highlight') : tileImg(drawTile, 'draw-highlight');
+        html += '</span>';
     }
     return html;
 }
@@ -896,6 +919,7 @@ function render() {
                 '</div>';
         }
 
+        bHtml += '<div style="margin-top:16px;"><button onclick="document.getElementById(\'result-banner\').style.display=\'none\'" style="background:#555;border:1px solid #888;color:#fff;padding:8px 24px;border-radius:6px;cursor:pointer;font-size:14px;">閉じる</button></div>';
         banner.innerHTML = bHtml;
     } else { banner.style.display = "none"; }
     updateButtons();

@@ -6,7 +6,7 @@
 <title>SimMahjong - 牌譜一覧</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Meiryo', sans-serif; background: #0d2818; color: #fff; padding: 16px; }
+body { font-family: 'Meiryo', 'Yu Gothic', sans-serif; background: #0d2818; color: #fff; padding: 16px; }
 .header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 16px; margin-bottom: 16px;
@@ -14,55 +14,389 @@ body { font-family: 'Meiryo', sans-serif; background: #0d2818; color: #fff; padd
 }
 .header h1 { font-size: 20px; color: #fd6; }
 .header a { color: #6cf; font-size: 13px; text-decoration: none; }
-.container { max-width: 900px; margin: 0 auto; }
+.container { max-width: 960px; margin: 0 auto; }
+.nav-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.nav-tabs a {
+    padding: 10px 20px; background: #1a3a2a; border: 1px solid #3a6;
+    border-radius: 6px 6px 0 0; color: #aaa; text-decoration: none; font-size: 14px;
+}
+.nav-tabs a:hover { background: #2a5a3a; color: #fff; }
+.nav-tabs a.active { background: #0a1f10; color: #fd6; border-bottom-color: #0a1f10; font-weight: bold; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 .panel {
     background: #0a1f10; border: 1px solid #2a5; border-radius: 8px;
     padding: 16px; margin-bottom: 16px;
 }
-.panel h2 { font-size: 16px; color: #8c8; margin-bottom: 12px; }
-table { width: 100%; border-collapse: collapse; }
+.panel h2 { font-size: 16px; color: #8c8; margin-bottom: 12px; border-bottom: 1px solid #2a5; padding-bottom: 6px; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; }
 th, td { border: 1px solid #3a6; padding: 8px 12px; text-align: center; font-size: 13px; }
 th { background: #1a3a2a; }
 a { color: #6cf; }
+.empty-msg { text-align: center; padding: 40px; color: #8a8; font-size: 14px; }
+.sim-row { cursor: pointer; transition: background 0.15s; }
+.sim-row:hover { background: #1a3a2a; }
+.sim-row.expanded { background: #1a3a2a; }
+.detail-row { display: none; }
+.detail-row.show { display: table-row; }
+.detail-row td { text-align: left; padding: 12px 16px; background: #0f2a18; }
+.detail-inner { max-height: 400px; overflow-y: auto; }
+.detail-inner table { margin-top: 4px; }
+.detail-inner th, .detail-inner td { font-size: 12px; padding: 4px 8px; }
+.btn-delete {
+    background: #6a2a2a; border: 1px solid #a44; color: #faa;
+    padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;
+}
+.btn-delete:hover { background: #8a3a3a; }
+.btn-haipu {
+    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
+    padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;
+}
+.btn-haipu:hover { background: #3a8a5f; }
+.stat-card {
+    background: #0a1f10; border: 1px solid #2a5; border-radius: 8px;
+    padding: 16px; margin-bottom: 16px;
+}
+.stat-card h3 { font-size: 15px; color: #fd6; margin-bottom: 10px; }
+.stat-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px; margin-bottom: 12px;
+}
+.stat-item { background: #1a3a2a; border-radius: 6px; padding: 8px; text-align: center; }
+.stat-item .label { font-size: 11px; color: #8a8; margin-bottom: 2px; }
+.stat-item .value { font-size: 18px; font-weight: bold; color: #fff; }
+.rank-bar { display: flex; gap: 4px; margin-top: 8px; }
+.rank-bar .rank-seg {
+    height: 20px; border-radius: 3px; display: flex; align-items: center;
+    justify-content: center; font-size: 10px; font-weight: bold; min-width: 30px;
+}
+.rank-1 { background: #d4a017; color: #000; }
+.rank-2 { background: #888; color: #000; }
+.rank-3 { background: #a0522d; color: #fff; }
+.rank-4 { background: #444; color: #ccc; }
+.yaku-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.yaku-tag {
+    background: #1a3a2a; border: 1px solid #3a6; border-radius: 4px;
+    padding: 2px 8px; font-size: 11px; color: #aaa;
+}
+.yaku-tag .yaku-count { color: #fd6; margin-left: 4px; }
+.filter-bar {
+    display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;
+}
+.filter-bar label { font-size: 12px; color: #8a8; }
+.filter-bar input, .filter-bar select {
+    background: #1a3a2a; border: 1px solid #4a9; color: #fff;
+    padding: 4px 8px; border-radius: 4px; font-size: 12px;
+}
+.filter-bar button {
+    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
+    padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;
+}
+.yaku-bar-list { margin-top: 8px; }
+.yaku-bar-item { display: flex; align-items: center; margin-bottom: 3px; font-size: 12px; }
+.yaku-bar-name { width: 100px; color: #aaa; text-align: right; margin-right: 8px; flex-shrink: 0; }
+.yaku-bar-bg { flex: 1; background: #1a3a2a; border-radius: 3px; height: 16px; position: relative; }
+.yaku-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #2a8a4f, #4aaa6f); }
+.yaku-bar-count { position: absolute; right: 4px; top: 0; line-height: 16px; font-size: 10px; color: #fff; }
 </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>牌譜一覧</h1>
-        <a href="index.html">← タイトルへ</a>
+        <a href="index.html">&larr; タイトルへ</a>
     </div>
 
-    <div class="panel">
-        <h2>最新の半荘</h2>
-        <table>
-            <tr><th>局</th><th>結果</th><th>和了者</th><th>棋譜</th></tr>
-            <tr><td colspan="4" id="loading" style="color:#8a8;">読み込み中...</td></tr>
-        </table>
+    <div class="nav-tabs">
+        <a href="#" class="active" onclick="showTab('list',this);return false;">対局一覧</a>
+        <a href="#" onclick="showTab('stats',this);return false;">エージェント統計</a>
+    </div>
+
+    <div class="tab-content active" id="tab-list">
+        <div class="panel">
+            <h2>対局履歴</h2>
+            <div class="filter-bar">
+                <label>期間:</label>
+                <input type="date" id="filter-from">
+                <span style="color:#666;">〜</span>
+                <input type="date" id="filter-to">
+                <label>エージェント:</label>
+                <input type="text" id="filter-agent" placeholder="名前で検索">
+                <button onclick="applyFilter()">絞り込み</button>
+                <button onclick="clearFilter()" style="background:#555;">クリア</button>
+            </div>
+            <div id="sim-list-area">
+                <p class="empty-msg" id="list-loading">読み込み中...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-stats">
+        <div class="panel">
+            <h2>エージェント通算成績</h2>
+            <div id="stats-area">
+                <p class="empty-msg" id="stats-loading">読み込み中...</p>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src="js/db.js"></script>
 <script>
-fetch('sim_result.json')
-    .then(r => r.json())
-    .then(data => {
-        let winds = ['東','南','西','北'];
-        let typeMap = {tsumo:'ツモ', ron:'ロン', ryukyoku:'流局'};
-        let table = document.querySelector('table');
-        document.getElementById('loading').remove();
-        for (let i = 0; i < data.round_results.length; i++) {
-            let r = data.round_results[i];
-            let winner = r.winner !== null ? winds[r.winner] + '家' : '-';
-            let tr = document.createElement('tr');
-            tr.innerHTML = '<td>' + r.round_label + '</td><td>' +
-                (typeMap[r.type]||r.type) + '</td><td>' + winner +
-                '</td><td><a href="rounds/round_' + i + '.html">再生</a></td>';
-            table.appendChild(tr);
+var WINDS = ['\u6771','\u5357','\u897f','\u5317'];
+var TYPE_MAP = { tsumo: '\u30c4\u30e2', ron: '\u30ed\u30f3', ryukyoku: '\u6d41\u5c40' };
+var MODE_MAP = { tonnansen: '\u6771\u5357\u6226', tonpusen: '\u6771\u98a8\u6226' };
+
+function showTab(id, el) {
+    document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.nav-tabs a').forEach(function(a) { a.classList.remove('active'); });
+    document.getElementById('tab-' + id).classList.add('active');
+    el.classList.add('active');
+    if (id === 'stats') loadStats();
+}
+
+function formatDate(iso) {
+    var d = new Date(iso);
+    function pad(n) { return String(n).padStart(2, '0'); }
+    return d.getFullYear() + '/' + pad(d.getMonth()+1) + '/' + pad(d.getDate()) +
+        ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function loadSimList() {
+    var area = document.getElementById('sim-list-area');
+    getAllSimulations().then(function(sims) {
+        if (sims.length === 0) {
+            area.innerHTML = '<p class="empty-msg">\u5bfe\u5c40\u30c7\u30fc\u30bf\u304c\u3042\u308a\u307e\u305b\u3093\u3002<br><a href="dashboard.html">\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9</a>\u3067\u30b7\u30df\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3\u3092\u5b9f\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p>';
+            return;
         }
-    })
-    .catch(() => {
-        document.getElementById('loading').textContent = 'データがありません';
+
+        var html = '<table><tr><th>\u65e5\u6642</th><th>\u30e2\u30fc\u30c9</th><th>\u5c40\u6570</th><th>\u7d50\u679c</th><th></th></tr>';
+        for (var i = 0; i < sims.length; i++) {
+            var sim = sims[i];
+            var mode = MODE_MAP[sim.mode] || sim.mode || '-';
+            var date = formatDate(sim.created_at);
+            var rounds = sim.rounds_played || (sim.round_results ? sim.round_results.length : '-');
+            var topSeat = sim.rankings[0];
+            var topName = sim.agents ? sim.agents[topSeat] : (WINDS[topSeat] + '\u5bb6');
+            var topPts = sim.final_points[topSeat];
+            var result = '1\u4f4d: ' + topName + ' (' + topPts + '\u70b9)';
+
+            html += '<tr class="sim-row" data-idx="' + i + '" onclick="toggleDetail(' + i + ')">' +
+                '<td>' + date + '</td>' +
+                '<td>' + mode + '</td>' +
+                '<td>' + rounds + '\u5c40</td>' +
+                '<td style="text-align:left;font-size:12px;">' + result + '</td>' +
+                '<td><button class="btn-delete" onclick="event.stopPropagation();deleteSim(' + sim.id + ')">\u524a\u9664</button></td>' +
+                '</tr>';
+            html += '<tr class="detail-row" id="detail-' + i + '">' +
+                '<td colspan="5"><div class="detail-inner" id="detail-inner-' + i + '"></div></td></tr>';
+        }
+        html += '</table>';
+        area.innerHTML = html;
+        window._simsList = sims;
+    }).catch(function(e) {
+        area.innerHTML = '<p class="empty-msg">\u30c7\u30fc\u30bf\u8aad\u307f\u8fbc\u307f\u30a8\u30e9\u30fc: ' + e.message + '</p>';
+        console.error(e);
     });
+}
+
+function toggleDetail(idx) {
+    var row = document.getElementById('detail-' + idx);
+    var simRow = document.querySelector('.sim-row[data-idx="' + idx + '"]');
+    if (row.classList.contains('show')) {
+        row.classList.remove('show');
+        simRow.classList.remove('expanded');
+        return;
+    }
+    document.querySelectorAll('.detail-row.show').forEach(function(r) { r.classList.remove('show'); });
+    document.querySelectorAll('.sim-row.expanded').forEach(function(r) { r.classList.remove('expanded'); });
+    row.classList.add('show');
+    simRow.classList.add('expanded');
+
+    var inner = document.getElementById('detail-inner-' + idx);
+    var sim = window._simsList[idx];
+
+    var html = '<h3 style="color:#8c8;font-size:13px;margin-bottom:6px;">\u6700\u7d42\u9806\u4f4d</h3>';
+    html += '<table><tr><th>\u9806\u4f4d</th><th>\u30d7\u30ec\u30a4\u30e4\u30fc</th><th>\u30bf\u30a4\u30d7</th><th>\u70b9\u6570</th></tr>';
+    for (var rank = 0; rank < sim.rankings.length; rank++) {
+        var seat = sim.rankings[rank];
+        var name = sim.agents ? sim.agents[seat] : (WINDS[seat] + '\u5bb6');
+        var type = (sim.agent_types && sim.agent_types[seat]) || '-';
+        var pts = sim.final_points[seat];
+        html += '<tr><td>' + (rank+1) + '\u4f4d</td><td>' + name + '</td><td>' + type + '</td><td>' + pts + '\u70b9</td></tr>';
+    }
+    html += '</table>';
+
+    if (sim.round_results && sim.round_results.length > 0) {
+        html += '<h3 style="color:#8c8;font-size:13px;margin:10px 0 6px;">\u5404\u5c40\u7d50\u679c</h3>';
+        html += '<table><tr><th>\u5c40</th><th>\u7d50\u679c</th><th>\u548c\u4e86\u8005</th><th>\u70b9\u6570</th><th></th></tr>';
+        for (var i = 0; i < sim.round_results.length; i++) {
+            var r = sim.round_results[i];
+            var winner = r.winner !== null && r.winner !== undefined ? WINDS[r.winner] + '\u5bb6' : '-';
+            var pts2 = r.score ? r.score.payments.total + '\u70b9' : '-';
+            var yaku = r.score ? r.score.yaku.map(function(y) { return y[0]; }).join(', ') : '';
+            html += '<tr><td>' + r.round_label + '</td>' +
+                '<td>' + (TYPE_MAP[r.type] || r.type) + '</td>' +
+                '<td>' + winner + '</td>' +
+                '<td>' + pts2 + (yaku ? '<br><small style="color:#8a8">' + yaku + '</small>' : '') + '</td>' +
+                '<td><button class="btn-haipu" onclick="event.stopPropagation();openHaipuFromRecord(' + sim.id + ',' + i + ')">\u724c\u8b5c\u3092\u898b\u308b</button></td>' +
+                '</tr>';
+        }
+        html += '</table>';
+    }
+    inner.innerHTML = html;
+}
+
+function deleteSim(id) {
+    if (!confirm('\u3053\u306e\u5bfe\u5c40\u8a18\u9332\u3092\u524a\u9664\u3057\u307e\u3059\u304b\uff1f')) return;
+    deleteSimulation(id).then(function() {
+        loadSimList();
+    }).catch(function(e) {
+        alert('\u524a\u9664\u30a8\u30e9\u30fc: ' + e.message);
+    });
+}
+
+function openHaipuFromRecord(simId, roundIdx) {
+    getSimulation(simId).then(function(sim) {
+        if (!sim) { alert('\u30c7\u30fc\u30bf\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093'); return; }
+        localStorage.setItem('simmahjong_haipu_sim', JSON.stringify(sim));
+        localStorage.setItem('simmahjong_haipu_round', String(roundIdx));
+        window.open('dashboard.html', '_blank');
+    }).catch(function(e) {
+        alert('\u8aad\u307f\u8fbc\u307f\u30a8\u30e9\u30fc: ' + e.message);
+    });
+}
+
+function applyFilter() {
+    var from = document.getElementById('filter-from').value;
+    var to = document.getElementById('filter-to').value;
+    var agent = document.getElementById('filter-agent').value.trim().toLowerCase();
+    loadSimList(from, to, agent);
+}
+function clearFilter() {
+    document.getElementById('filter-from').value = '';
+    document.getElementById('filter-to').value = '';
+    document.getElementById('filter-agent').value = '';
+    loadSimList();
+}
+
+// loadSimListにフィルタ対応を追加（元の関数をオーバーライド）
+var _origLoadSimList = loadSimList;
+loadSimList = function(from, to, agent) {
+    var area = document.getElementById('sim-list-area');
+    getAllSimulations().then(function(sims) {
+        // フィルタ適用
+        var filtered = sims.filter(function(s) {
+            if (from && s.created_at < from) return false;
+            if (to && s.created_at > to + 'T23:59:59') return false;
+            if (agent && s.agents) {
+                var match = s.agents.some(function(a) { return a.toLowerCase().includes(agent); });
+                if (!match) return false;
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            area.innerHTML = '<p class="empty-msg">該当する対局データがありません。</p>';
+            return;
+        }
+
+        var html = '<table><tr><th>日時</th><th>モード</th><th>局数</th><th>結果</th><th></th></tr>';
+        for (var i = 0; i < filtered.length; i++) {
+            var sim = filtered[i];
+            var mode = MODE_MAP[sim.mode] || sim.mode || '-';
+            var date = formatDate(sim.created_at);
+            var rounds = sim.rounds_played || (sim.round_results ? sim.round_results.length : '-');
+            var topSeat = sim.rankings[0];
+            var topName = sim.agents ? sim.agents[topSeat] : (WINDS[topSeat] + '家');
+            var topPts = sim.final_points[topSeat];
+            var result = '1位: ' + topName + ' (' + topPts + '点)';
+            html += '<tr class="sim-row" data-idx="' + i + '" onclick="toggleDetail(' + i + ')">' +
+                '<td>' + date + '</td><td>' + mode + '</td><td>' + rounds + '局</td>' +
+                '<td style="text-align:left;font-size:12px;">' + result + '</td>' +
+                '<td><button class="btn-delete" onclick="event.stopPropagation();deleteSim(' + sim.id + ')">削除</button></td></tr>';
+            html += '<tr class="detail-row" id="detail-' + i + '"><td colspan="5"><div class="detail-inner" id="detail-inner-' + i + '"></div></td></tr>';
+        }
+        html += '</table>';
+        area.innerHTML = html;
+        window._simsList = filtered;
+    }).catch(function(e) {
+        area.innerHTML = '<p class="empty-msg">データ読み込みエラー: ' + e.message + '</p>';
+    });
+};
+
+function loadStats() {
+    var area = document.getElementById('stats-area');
+    area.innerHTML = '<p class="empty-msg">集計中...</p>';
+    getAgentStats().then(function(stats) {
+        if (stats.length === 0) {
+            area.innerHTML = '<p class="empty-msg">統計データがありません。</p>';
+            return;
+        }
+        var html = '';
+        for (var si = 0; si < stats.length; si++) {
+            var a = stats[si];
+            html += '<div class="stat-card">';
+            html += '<h3>' + a.name + ' <small style="color:#8a8;font-size:12px;">(' + (a.type || '不明') + ')</small></h3>';
+            html += '<div class="stat-grid">';
+            html += statItem('対局数', a.games + '回');
+            html += statItem('平均順位', a.avg_rank);
+            html += statItem('平均点数', a.avg_points + '点');
+            html += statItem('和了率', a.win_rate);
+            html += statItem('放銃率', a.deal_in_rate);
+            html += statItem('ツモ率', a.tsumo_rate);
+            html += statItem('ロン率', a.ron_rate);
+            html += statItem('リーチ率', a.riichi_rate);
+            html += statItem('副露率', a.meld_rate);
+            html += statItem('平均和了点', a.avg_win_score + '点');
+            html += statItem('平均和了翻', a.avg_win_han + '翻');
+            html += '</div>';
+
+            // 順位分布バーグラフ
+            html += '<div style="font-size:12px;color:#8a8;margin-bottom:4px;">順位分布</div>';
+            html += '<div class="rank-bar">';
+            var total = a.games || 1;
+            for (var r = 0; r < 4; r++) {
+                var cnt = a.rank_counts[r];
+                var pct = a.rank_rates ? a.rank_rates[r] : (cnt / total * 100).toFixed(1);
+                var w = Math.max(cnt / total * 100, 5);
+                html += '<div class="rank-seg rank-' + (r+1) + '" style="flex:' + w + ';">' +
+                    (r+1) + '位 ' + pct + '%</div>';
+            }
+            html += '</div>';
+
+            // 役の出現回数ランキング（バーグラフ）
+            if (a.yaku_list && a.yaku_list.length > 0) {
+                html += '<div style="font-size:12px;color:#8a8;margin-top:14px;margin-bottom:4px;">役の出現回数 TOP10</div>';
+                html += '<div class="yaku-bar-list">';
+                var maxYaku = a.yaku_list[0].count;
+                var top10 = a.yaku_list.slice(0, 10);
+                for (var yi = 0; yi < top10.length; yi++) {
+                    var y = top10[yi];
+                    var barW = (y.count / maxYaku * 100).toFixed(0);
+                    html += '<div class="yaku-bar-item">' +
+                        '<div class="yaku-bar-name">' + y.name + '</div>' +
+                        '<div class="yaku-bar-bg"><div class="yaku-bar-fill" style="width:' + barW + '%;"></div>' +
+                        '<span class="yaku-bar-count">' + y.count + '</span></div></div>';
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+        }
+        area.innerHTML = html;
+    }).catch(function(e) {
+        area.innerHTML = '<p class="empty-msg">統計読み込みエラー: ' + e.message + '</p>';
+        console.error(e);
+    });
+}
+
+function statItem(label, value) {
+    return '<div class="stat-item"><div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+}
+
+loadSimList();
 </script>
 </body>
 </html>

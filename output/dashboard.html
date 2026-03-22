@@ -61,6 +61,252 @@ a { color: #6cf; }
     height: 100%; background: #4a9; border-radius: 3px;
     transition: width 0.3s;
 }
+.btn-haipu {
+    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
+    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+}
+.btn-haipu:hover { background: #3a8a5f; }
+
+/* 牌譜モーダル */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 1000;
+}
+.modal-overlay.show { display: flex; align-items: center; justify-content: center; }
+.modal-content {
+    width: 95vw; height: 95vh; background: #1a472a; border-radius: 8px;
+    border: 2px solid #4a9; position: relative; display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.modal-close {
+    position: absolute; top: 8px; right: 12px; background: #a33; border: none;
+    color: #fff; font-size: 20px; cursor: pointer; border-radius: 4px;
+    padding: 2px 10px; z-index: 10;
+}
+.modal-close:hover { background: #c44; }
+.modal-body { flex: 1; overflow: hidden; padding: 8px; }
+
+/* ビューア用スタイル（モーダル内） */
+.modal-body .controls { text-align: center; margin: 4px 0; }
+.modal-body .controls button {
+    background: #2d6a3f; border: 1px solid #4a9; color: #fff;
+    padding: 4px 12px; margin: 0 2px; cursor: pointer; border-radius: 4px; font-size: 12px;
+}
+.modal-body .controls button:hover { background: #3a8a5f; }
+.modal-body .controls button:disabled { opacity: 0.4; cursor: default; }
+.modal-body .step-info { display: inline-block; min-width: 130px; font-size: 13px; }
+.modal-body .meta { text-align: center; color: #aaa; margin-bottom: 4px; font-size: 12px; }
+
+.modal-body {
+    overflow: hidden;
+}
+.modal-body .mahjong-table {
+    max-width: 1000px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto 1fr auto;
+    gap: 4px;
+    height: calc(95vh - 130px);
+}
+.modal-body .hand-area {
+    background: #0d2818; border: 1px solid #2a5; border-radius: 6px;
+    padding: 4px 8px; position: relative;
+}
+.modal-body .hand-area.active { border-color: #ff0; box-shadow: 0 0 8px rgba(255,255,0,0.3); }
+.modal-body .hand-area.winner { border-color: #f44; box-shadow: 0 0 12px rgba(255,80,80,0.5); }
+.modal-body .hand-label {
+    font-size: 13px; font-weight: bold; margin-bottom: 4px;
+    display: flex; justify-content: space-between;
+}
+.modal-body .hand-label .agent { color: #8c8; font-size: 11px; font-weight: normal; }
+.modal-body .hand-top { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; margin-bottom: 4px; }
+.modal-body .hand-bottom { grid-column: 2; grid-row: 3; display: flex; flex-direction: column; margin-top: 4px; }
+.modal-body .hand-tiles { display: flex; flex-wrap: nowrap; align-items: flex-end; }
+.modal-body .hand-top .hand-tiles { transform: rotate(180deg); }
+.modal-body .hand-pure {
+    display: flex; flex-wrap: nowrap; gap: 2px; align-items: flex-end;
+    justify-content: center; flex: 1; min-width: 0;
+}
+.modal-body .hand-left {
+    grid-column: 1; grid-row: 1 / 4;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-width: 42px; max-width: 48px;
+}
+.modal-body .hand-right {
+    grid-column: 3; grid-row: 1 / 4;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-width: 42px; max-width: 48px;
+}
+.modal-body .hand-left .hand-tiles, .modal-body .hand-right .hand-tiles {
+    display: flex; flex-direction: column; gap: 0; align-items: center;
+}
+.modal-body .hand-left .hand-pure, .modal-body .hand-right .hand-pure {
+    display: flex; flex-direction: column; gap: 0; align-items: center;
+    flex: 1; min-height: 0; justify-content: center;
+}
+.modal-body .hand-left .tile-vert, .modal-body .hand-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
+.modal-body .hand-right .tile-vert, .modal-body .hand-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
+.modal-body .hand-left .hand-label, .modal-body .hand-right .hand-label { flex-direction: column; align-items: center; gap: 0; }
+.modal-body .hand-left .hand-label .agent, .modal-body .hand-right .hand-label .agent { display: none; }
+.modal-body .middle-row { display: contents; }
+.modal-body .river-table {
+    grid-column: 2; grid-row: 2;
+    background: #0f3320; border: 2px solid #2a5; border-radius: 8px;
+    padding: 6px; display: flex; flex-direction: column; gap: 2px; min-height: 0;
+}
+.modal-body .river-middle { display: flex; align-items: center; gap: 4px; flex: 1; }
+.modal-body .river-top, .modal-body .river-bottom {
+    display: grid; grid-template-columns: repeat(6, auto);
+    justify-content: center; min-height: 36px;
+}
+.modal-body .river-top { transform: rotate(180deg); }
+.modal-body .river-right {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column-reverse; flex-wrap: wrap;
+    align-content: center; max-height: 140px; overflow: hidden;
+}
+.modal-body .river-right .tile-river-vert { transform: rotate(-90deg); margin: -5px 0; }
+.modal-body .river-left {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; flex-wrap: wrap-reverse;
+    align-content: center; max-height: 140px; overflow: hidden;
+}
+.modal-body .river-left .tile-river-vert { transform: rotate(90deg); margin: -5px 0; }
+.modal-body .center-info {
+    flex: 0 0 160px; text-align: center; padding: 4px 6px;
+    background: #0a1f10; border-radius: 6px; border: 1px solid #2a5;
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+    position: relative;
+}
+.modal-body .center-round { font-size: 16px; font-weight: bold; color: #fd6; }
+.modal-body .center-dora { display: flex; align-items: center; justify-content: center; gap: 2px; }
+.modal-body .dora-label { font-size: 10px; color: #aaa; margin-right: 4px; writing-mode: vertical-rl; }
+.modal-body .tile-dora {
+    height: 22px; width: auto; border-radius: 2px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.modal-body .tile-dora-hidden {
+    display: inline-block; height: 22px; width: 16px;
+    background: #2a4a3a; border: 1px solid #3a6a4a; border-radius: 2px;
+}
+.modal-body .center-stats { display: flex; justify-content: center; gap: 8px; font-size: 11px; color: #8a8; }
+.modal-body .dealer-mark { background: #d44; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 3px; margin-left: 4px; }
+.modal-body .chicha-mark {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px;
+    text-align: center; font-size: 11px; font-weight: bold;
+    background: linear-gradient(135deg, #e8d44d 0%, #c4a82a 100%);
+    color: #333; border: 1px solid #a08820; border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4); margin-left: 4px;
+}
+.modal-body .pts { color: #ff8; font-size: 12px; font-weight: bold; }
+.modal-body .tile-img {
+    height: 32px; width: auto; border-radius: 3px;
+    background: #f5f0e0; padding: 1px; border: 1px solid #bba;
+}
+.modal-body .tile-img.draw-highlight { background: #fffbe6; box-shadow: 0 0 8px 2px #ffe066; border: 2px solid #ffcc00; }
+.modal-body .tile-river {
+    height: 26px; width: auto; border-radius: 2px;
+    background: #e8e0d0; padding: 1px; border: 1px solid #a99;
+}
+.modal-body .tile-river.discard-last { background: #ffe0e0; box-shadow: 0 0 5px 1px #ff6666; border: 2px solid #ff4444; }
+.modal-body .tile-vert { height: auto; width: 28px; border-radius: 3px; background: #f5f0e0; padding: 1px; border: 1px solid #bba; }
+.modal-body .tile-vert.draw-highlight { background: #fffbe6; box-shadow: 0 0 8px 2px #ffe066; border: 2px solid #ffcc00; }
+.modal-body .tile-river-vert { height: auto; width: 22px; border-radius: 2px; background: #e8e0d0; padding: 1px; border: 1px solid #a99; }
+.modal-body .tile-river-vert.discard-last { background: #ffe0e0; box-shadow: 0 0 5px 1px #ff6666; border: 2px solid #ff4444; }
+.modal-body .tile-river.riichi-tile { transform: rotate(90deg); margin: 4px 8px; }
+.modal-body .river-right .tile-river-vert.riichi-tile { transform: rotate(0deg); margin: 2px 4px; }
+.modal-body .river-left .tile-river-vert.riichi-tile { transform: rotate(180deg); margin: 2px 4px; }
+.modal-body .riichi-mark {
+    color: #fff; background: #d44; font-size: 9px;
+    padding: 1px 4px; border-radius: 3px; margin-left: 4px;
+}
+.modal-body .melds-area { display: flex; gap: 4px; }
+.modal-body .meld-group { display: flex; gap: 1px; padding: 2px 3px; background: rgba(0,0,0,0.2); border-radius: 3px; }
+.modal-body .tile-meld { height: 28px; width: auto; border-radius: 2px; background: #e8e0d0; padding: 1px; border: 1px solid #a99; }
+.modal-body .tile-meld-vert { height: auto; width: 24px; border-radius: 2px; background: #e8e0d0; padding: 1px; border: 1px solid #a99; }
+.modal-body .hand-bottom .melds-area { flex-direction: row-reverse; align-items: flex-end; flex-shrink: 0; }
+.modal-body .hand-top .melds-area { flex-direction: row; align-items: flex-end; flex-shrink: 0; }
+.modal-body .hand-left .melds-area { flex-direction: column-reverse; flex-shrink: 0; }
+.modal-body .hand-left .meld-group { flex-direction: column; gap: 0; }
+.modal-body .hand-left .tile-meld-vert { transform: rotate(90deg); margin: -6px 0; }
+.modal-body .hand-right .melds-area { flex-direction: column; flex-shrink: 0; order: -1; }
+.modal-body .hand-right .meld-group { flex-direction: column-reverse; gap: 0; }
+.modal-body .hand-right .tile-meld-vert { transform: rotate(-90deg); margin: -6px 0; }
+.modal-body .tile-meld.tile-sideways { transform: rotate(90deg); margin: 4px -2px; }
+.modal-body .hand-left .tile-meld-vert.tile-sideways { transform: rotate(180deg); margin: 0; }
+.modal-body .hand-right .tile-meld-vert.tile-sideways { transform: rotate(0deg); margin: 0; }
+.modal-body .meld-facedown { background: #4a6a8a; border: 1px solid #6a8aaa; filter: saturate(0.3) brightness(0.7); }
+.modal-body .kakan-stack { position: relative; display: inline-flex; }
+.modal-body .tile-meld.tile-stacked {
+    position: absolute; bottom: 100%; left: 50%;
+    transform: translateX(-50%) rotate(90deg); margin: 0; height: 24px;
+}
+.modal-body .center-sticks { display: flex; justify-content: center; gap: 8px; font-size: 12px; font-weight: bold; }
+.modal-body .stick-honba { color: #ffa; background: #553300; padding: 3px 10px; border-radius: 4px; border: 1px solid #aa8; }
+.modal-body .stick-riichi { color: #aef; background: #003355; padding: 3px 10px; border-radius: 4px; border: 1px solid #68c; }
+/* リーチ棒（河の中に表示） */
+.modal-body .riichi-stick {
+    position: absolute; background: linear-gradient(90deg, #fff 0%, #eee 50%, #fff 100%);
+    border: 1px solid #aaa; border-radius: 2px; box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+.modal-body .riichi-stick-bottom { width: 40px; height: 4px; bottom: -14px; left: 50%; transform: translateX(-50%); }
+.modal-body .riichi-stick-top { width: 40px; height: 4px; top: -14px; left: 50%; transform: translateX(-50%); }
+.modal-body .riichi-stick-left { width: 4px; height: 40px; left: -14px; top: 50%; transform: translateY(-50%); }
+.modal-body .riichi-stick-right { width: 4px; height: 40px; right: -14px; top: 50%; transform: translateY(-50%); }
+.modal-body .center-info { position: relative; }
+.modal-body .result-banner {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 1100; width: 80vw; max-width: 600px; max-height: 85vh; overflow-y: auto;
+    text-align: center; padding: 24px;
+    background: rgba(10, 30, 20, 0.97); border: 3px solid #f84; border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    display: none;
+}
+/* ツモ/ロン速報モーダル（半透明・コンパクト） */
+.modal-body .result-banner.quick-banner {
+    background: rgba(5, 20, 12, 0.75); border: 2px solid #fd6;
+    padding: 16px; max-width: 500px;
+    backdrop-filter: blur(2px);
+}
+.modal-body .result-title { font-size: 22px; font-weight: bold; color: #fd6; margin-bottom: 6px; }
+.modal-body .result-winner { font-size: 14px; color: #cfc; margin-bottom: 8px; }
+.modal-body .result-tile { margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.modal-body .result-tile span { font-size: 12px; color: #aaa; }
+.modal-body .result-win-tile { height: 52px !important; border: 2px solid #fd6 !important; box-shadow: 0 0 12px rgba(255,220,100,0.6); }
+.modal-body .result-yaku { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: 8px 0; }
+.modal-body .yaku-item { background: #1a3a2a; padding: 2px 8px; border-radius: 4px; font-size: 13px; color: #efe; border: 1px solid #3a6; }
+.modal-body .yaku-item em { font-style: normal; color: #fd6; margin-left: 4px; }
+.modal-body .result-score { font-size: 18px; font-weight: bold; color: #ff8; margin-top: 4px; }
+.modal-body .result-payment { font-size: 13px; color: #adc; margin-top: 2px; }
+.modal-body .result-hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: 10px; padding: 6px; background: rgba(0,0,0,0.2); border-radius: 4px; }
+.modal-body .tile-result { height: 36px; width: auto; border-radius: 2px; background: #f5f0e0; padding: 1px; border: 1px solid #bba; }
+
+/* ゲームを眺めるモード */
+.mode-select { display: none; text-align: center; margin: 16px 0; }
+.mode-select.show { display: flex; justify-content: center; gap: 16px; }
+.btn-mode {
+    padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: bold;
+    cursor: pointer; transition: all 0.2s; border: 2px solid;
+}
+.btn-mode:hover { transform: translateY(-1px); }
+.btn-mode-result { background: linear-gradient(135deg, #2d6a3f, #1a8a4f); border-color: #4a9; color: #fff; }
+.btn-mode-watch { background: linear-gradient(135deg, #6a4a2d, #8a6a1a); border-color: #d96; color: #fff; }
+.watch-round-result {
+    display: none; position: absolute; bottom: 8px; left: 8px; z-index: 10;
+    background: rgba(10, 20, 15, 0.88); border: 1px solid #4a9; border-radius: 6px;
+    padding: 6px 10px; font-size: 11px; max-width: 200px; line-height: 1.4;
+}
+.watch-result-label { color: #fd6; font-weight: bold; font-size: 12px; }
+.watch-result-type { color: #f84; font-weight: bold; font-size: 13px; }
+.watch-result-winner { color: #cfc; font-size: 11px; }
+.watch-result-yaku { color: #efe; font-size: 10px; margin-top: 2px; }
+.watch-result-rank { color: #fd6; font-weight: bold; font-size: 11px; }
+.watch-result-hanfu { color: #aaa; font-size: 10px; }
+.watch-result-score { color: #ff8; font-weight: bold; font-size: 12px; margin-top: 2px; }
+.batch-positive { color: #4f4; }
+.batch-negative { color: #f44; }
+.batch-zero { color: #888; }
+.batch-rank-1 { color: #fd6; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -80,13 +326,61 @@ a { color: #6cf; }
             </select>
         </div>
 
+        <div class="form-row">
+            <label>持ち点</label>
+            <select id="starting-points">
+                <option value="25000" selected>25000点</option>
+                <option value="26000">26000点</option>
+                <option value="27000">27000点</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label>返し点</label>
+            <select id="return-points">
+                <option value="30000" selected>30000点</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label>ウマ</label>
+            <select id="uma-type">
+                <option value="10-20" selected>ワンツー (10-20)</option>
+                <option value="5-10">ゴットー (5-10)</option>
+                <option value="10-30">ワンスリー (10-30)</option>
+            </select>
+        </div>
+
         <h2 style="margin-top:16px;">エージェント選択</h2>
         <div class="agent-grid" id="agent-grid"></div>
     </div>
 
     <button class="btn-run" id="btn-run" onclick="runSim()">半荘シミュレーション実行</button>
+    <div class="form-row" style="justify-content:center;margin:8px 0;">
+        <label>半荘回数</label>
+        <select id="batch-count">
+            <option value="1" selected>1</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+        <button class="btn-run" id="btn-batch" onclick="runBatch()" style="width:auto;padding:8px 24px;font-size:14px;margin:0;">連続実行</button>
+    </div>
+    <div class="status" id="batch-progress" style="display:none;color:#fd6;"></div>
     <div class="progress-bar" id="progress"><div class="fill" id="progress-fill"></div></div>
 
+
+    <div class="result-panel" id="batch-result-panel" style="display:none;">
+        <div class="panel">
+            <h2>連続半荘 総合結果</h2>
+            <table id="batch-summary-table"></table>
+        </div>
+    </div>
+
+    <div class="mode-select" id="mode-select">
+        <button class="btn-mode btn-mode-result" onclick="showResult(simData)">結果を全て見る</button>
+        <button class="btn-mode btn-mode-watch" onclick="startWatchMode()">ゲームを眺める</button>
+    </div>
     <div class="status" id="status">Pyodide (ブラウザ内Python) を読み込み中...</div>
 
     <div class="result-panel" id="result-panel">
@@ -99,38 +393,64 @@ a { color: #6cf; }
         <div class="panel">
             <h2>局一覧</h2>
             <table id="rounds-table">
-                <tr><th>局</th><th>結果</th><th>和了者</th><th>打点</th></tr>
+                <tr><th>局</th><th>結果</th><th>和了者</th><th>打点</th><th>牌譜</th></tr>
             </table>
+        </div>
+        <div class="panel" style="text-align:center;">
+            <button class="btn-haipu" style="padding:8px 24px;font-size:14px;" onclick="downloadMjai()">mjai形式でダウンロード (.mjson)</button>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+<!-- 牌譜ビューアモーダル -->
+<div class="modal-overlay" id="haipu-modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeHaipu()">&times;</button>
+        <div class="modal-body" id="haipu-body"></div>
+    </div>
+</div>
+
+<script src="pyodide/pyodide.js"></script>
+<script src="js/db.js"></script>
+<script src="js/mjai.js"></script>
 <script>
 const AGENT_INFO = {
-    shanten: { name: 'ShantenAgent', model: 'shanten-v1',
-        desc: 'シャンテン数最小化。受入枚数重視。門前リーチ志向。' },
-    random: { name: 'RandomAgent', model: 'random-v1',
+    hiyoko: { name: 'ひよこ', model: 'hiyoko-v1',
+        desc: '攻守バランス型。危険牌回避・ベタオリ・鳴き判断・打点考慮。' },
+    shanta: { name: 'しゃんた', model: 'shanten-v1',
+        desc: 'シャンテン数最小化で打牌。テンパイ即リーチ。門前重視。' },
+    random: { name: '乱子', model: 'random-v1',
         desc: 'ランダム打牌。ベースライン比較用。' }
 };
 const WINDS = ['東','南','西','北'];
 
-// エージェント選択UI生成
+// エージェント選択の記憶・復元
+let savedAgents = [];
+try { savedAgents = JSON.parse(localStorage.getItem('simmahjong_agents') || '[]'); } catch(e) {}
+if (savedAgents.length !== 4) savedAgents = ['hiyoko','hiyoko','hiyoko','hiyoko'];
+
 let gridEl = document.getElementById('agent-grid');
 for (let i = 0; i < 4; i++) {
     let card = document.createElement('div');
     card.className = 'agent-card';
+    let sel = savedAgents[i] || 'hiyoko';
     card.innerHTML = '<div class="wind">' + WINDS[i] + '</div>' +
-        '<select class="agent-select" onchange="updateDesc(this)">' +
-        '<option value="shanten" selected>ShantenAgent</option>' +
-        '<option value="random">RandomAgent</option></select>' +
-        '<div class="agent-desc">' + AGENT_INFO.shanten.desc + '</div>';
+        '<select class="agent-select" onchange="updateDesc(this);saveAgentSelection()">' +
+        '<option value="hiyoko"' + (sel==='hiyoko'?' selected':'') + '>ひよこ</option>' +
+        '<option value="shanta"' + (sel==='shanta'?' selected':'') + '>しゃんた</option>' +
+        '<option value="random"' + (sel==='random'?' selected':'') + '>乱子</option></select>' +
+        '<div class="agent-desc">' + AGENT_INFO[sel].desc + '</div>';
     gridEl.appendChild(card);
 }
 
 function updateDesc(sel) {
     let key = sel.value;
     sel.parentElement.querySelector('.agent-desc').textContent = AGENT_INFO[key].desc;
+}
+function saveAgentSelection() {
+    let sels = document.querySelectorAll('.agent-select');
+    let vals = Array.from(sels).map(s => s.value);
+    localStorage.setItem('simmahjong_agents', JSON.stringify(vals));
 }
 
 // Pyodide初期化
@@ -149,7 +469,7 @@ function ensureDir(fs, path) {
 async function initPyodide() {
     try {
         document.getElementById('status').textContent = 'Python環境を読み込み中... (初回は10秒程度かかります)';
-        pyodide = await loadPyodide();
+        pyodide = await loadPyodide({ indexURL: 'pyodide/' });
 
         document.getElementById('status').textContent = '麻雀エンジンを読み込み中...';
 
@@ -169,10 +489,12 @@ async function initPyodide() {
             'mahjong/game/__init__.py', 'mahjong/game/round.py',
             'mahjong/game/naki.py', 'mahjong/game/hanchan.py',
             'mahjong/record/__init__.py', 'mahjong/record/record.py',
+            'mahjong/record/mjai_converter.py',
             'mahjong/scoring/__init__.py', 'mahjong/scoring/score.py',
             'mahjong/scoring/yaku.py',
             'agents/__init__.py', 'agents/base.py',
             'agents/random_agent.py', 'agents/shanten_agent.py',
+            'agents/shanten_agent_v1.py',
             'agents/external/__init__.py'
         ];
 
@@ -200,6 +522,7 @@ initPyodide();
 
 async function runSim() {
     if (!pyReady) return;
+    saveAgentSelection();
     let btn = document.getElementById('btn-run');
     btn.disabled = true;
     btn.textContent = '実行中...';
@@ -217,6 +540,7 @@ async function runSim() {
 
     // 結果パネルをリセット
     let rp = document.getElementById('result-panel');
+    document.getElementById("mode-select").classList.remove("show");
     rp.classList.remove('show');
     let rt = document.getElementById('ranking-table');
     let rdt = document.getElementById('rounds-table');
@@ -229,26 +553,46 @@ async function runSim() {
         let resultJson = await pyodide.runPythonAsync(`
 import json
 from mahjong.game.hanchan import Hanchan
-from agents import ShantenAgent, RandomAgent
+from agents.shanten_agent import HiyokoAgent
+from agents.shanten_agent_v1 import ShantenAgentV1
+from agents.random_agent import RandomAgent
 
 agent_types = ${JSON.stringify(agentTypes)}
-winds = ['東','南','西','北']
+agent_names_map = ${JSON.stringify(Object.fromEntries(Object.entries(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子']]))))}
+# 同じエージェントが複数いる場合にA,B,C...で区別
+from collections import Counter
+type_counts = Counter(agent_types)
+type_seen = {}
 agents = []
 for i, at in enumerate(agent_types):
-    name = winds[i] + 'AI'
-    if at == 'random':
+    base = agent_names_map.get(at, at)
+    if type_counts[at] > 1:
+        idx = type_seen.get(at, 0)
+        suffix = chr(65 + idx)
+        type_seen[at] = idx + 1
+        name = base + suffix
+    else:
+        name = base
+    if at == 'hiyoko':
+        agents.append(HiyokoAgent(name=name))
+    elif at == 'shanta':
+        agents.append(ShantenAgentV1(name=name))
+    elif at == 'random':
         agents.append(RandomAgent(name=name))
     else:
-        agents.append(ShantenAgent(name=name))
+        agents.append(HiyokoAgent(name=name))
 
 hanchan = Hanchan(agents, mode='${mode}')
 result = hanchan.run()
+result['agent_types'] = [at for at in agent_types]
+result['agent_versions'] = [a.model if hasattr(a, 'model') else '' for a in agents]
 json.dumps(result, ensure_ascii=False)
 `);
         document.getElementById('progress-fill').style.width = '100%';
 
         let data = JSON.parse(resultJson);
-        showResult(data);
+        simData = data;
+        document.getElementById("mode-select").classList.add("show");
 
         btn.textContent = '再実行';
         document.getElementById('status').style.display = 'none';
@@ -261,7 +605,215 @@ json.dumps(result, ensure_ascii=False)
     setTimeout(() => { prog.style.display = 'none'; }, 500);
 }
 
+let simData = null; // シミュレーション結果を保持
+let batchResults = []; // 連続半荘の結果を蓄積
+
+function calcFinalPoints(finalPoints, rankings, startingPoints, returnPoints, umaType) {
+    let uma;
+    if (umaType === '5-10') uma = [10, 5, -5, -10];
+    else if (umaType === '10-20') uma = [20, 10, -10, -20];
+    else if (umaType === '10-30') uma = [30, 10, -10, -30];
+    else uma = [20, 10, -10, -20];
+
+    let rawPoints = rankings.map(function(seat, rank) {
+        let raw = (finalPoints[seat] - returnPoints) / 1000;
+        return { seat: seat, rank: rank, raw: raw, withUma: 0 };
+    });
+
+    for (let i = 1; i < 4; i++) {
+        rawPoints[i].raw = Math.round(rawPoints[i].raw);
+    }
+
+    for (let i = 0; i < 4; i++) {
+        rawPoints[i].withUma = rawPoints[i].raw + uma[i];
+    }
+
+    let othersSum = rawPoints[1].withUma + rawPoints[2].withUma + rawPoints[3].withUma;
+    rawPoints[0].withUma = -othersSum;
+
+    return rawPoints.map(function(p) {
+        return { seat: p.seat, rank: p.rank, finalPt: p.withUma };
+    });
+}
+
+function renderBatchResults(results) {
+    let panel = document.getElementById('batch-result-panel');
+    let table = document.getElementById('batch-summary-table');
+    table.innerHTML = '';
+
+    if (results.length === 0) { panel.style.display = 'none'; return; }
+
+    let startingPoints = parseInt(document.getElementById('starting-points').value);
+    let returnPoints = parseInt(document.getElementById('return-points').value);
+    let umaType = document.getElementById('uma-type').value;
+
+    let agentNames = results[0].agents;
+    let seatCount = agentNames.length;
+
+    let hRow = document.createElement('tr');
+    hRow.innerHTML = '<th>半荘</th>';
+    for (let s = 0; s < seatCount; s++) {
+        hRow.innerHTML += '<th>' + agentNames[s] + '<br><span style="font-size:10px;color:#aaa;">' + WINDS[s] + '家</span></th>';
+    }
+    table.appendChild(hRow);
+
+    let totalPts = new Array(seatCount).fill(0);
+
+    for (let g = 0; g < results.length; g++) {
+        let r = results[g];
+        let pts = calcFinalPoints(r.points, r.rankings, startingPoints, returnPoints, umaType);
+
+        let tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + (g + 1) + '</td>';
+        for (let s = 0; s < seatCount; s++) {
+            let ptInfo = pts.find(function(p) { return p.seat === s; });
+            let pt = ptInfo ? ptInfo.finalPt : 0;
+            let rank = ptInfo ? (ptInfo.rank + 1) : '-';
+            totalPts[s] += pt;
+            let cls = pt > 0 ? 'batch-positive' : (pt < 0 ? 'batch-negative' : 'batch-zero');
+            let ptStr = pt > 0 ? '+' + pt.toFixed(1) : pt.toFixed(1);
+            tr.innerHTML += '<td><span class="' + cls + '">' + ptStr + '</span><br><span style="font-size:10px;color:#aaa;">' + r.points[s] + '点 (' + rank + '位)</span></td>';
+        }
+        table.appendChild(tr);
+    }
+
+    let totalRow = document.createElement('tr');
+    totalRow.style.fontWeight = 'bold';
+    totalRow.style.fontSize = '15px';
+    totalRow.innerHTML = '<td style="background:#1a3a2a;">合計</td>';
+
+    let sortedSeats = [];
+    for (let s = 0; s < seatCount; s++) sortedSeats.push({ seat: s, total: totalPts[s] });
+    sortedSeats.sort(function(a, b) { return b.total - a.total; });
+    let overallRank = new Array(seatCount).fill(0);
+    for (let i = 0; i < sortedSeats.length; i++) overallRank[sortedSeats[i].seat] = i + 1;
+
+    for (let s = 0; s < seatCount; s++) {
+        let cls = totalPts[s] > 0 ? 'batch-positive' : (totalPts[s] < 0 ? 'batch-negative' : 'batch-zero');
+        let rankCls = overallRank[s] === 1 ? ' batch-rank-1' : '';
+        let ptStr = totalPts[s] > 0 ? '+' + totalPts[s].toFixed(1) : totalPts[s].toFixed(1);
+        totalRow.innerHTML += '<td style="background:#1a3a2a;"><span class="' + cls + rankCls + '">' + ptStr + '</span><br><span style="font-size:11px;color:#fd6;">' + overallRank[s] + '位</span></td>';
+    }
+    table.appendChild(totalRow);
+
+    panel.style.display = 'block';
+}
+
+async function runBatch() {
+    if (!pyReady) return;
+    saveAgentSelection();
+    let count = parseInt(document.getElementById('batch-count').value);
+    let btnBatch = document.getElementById('btn-batch');
+    let btnRun = document.getElementById('btn-run');
+    let batchProg = document.getElementById('batch-progress');
+    btnBatch.disabled = true;
+    btnRun.disabled = true;
+    batchProg.style.display = 'block';
+    batchProg.textContent = '0/' + count + ' 半荘完了...';
+
+    document.getElementById('batch-result-panel').style.display = 'none';
+    document.getElementById('mode-select').classList.remove('show');
+    document.getElementById('result-panel').classList.remove('show');
+
+    let prog = document.getElementById('progress');
+    prog.style.display = 'block';
+
+    let mode = document.getElementById('mode').value;
+    let agentSels = document.querySelectorAll('.agent-select');
+    let agentTypes = [];
+    for (let s of agentSels) agentTypes.push(s.value);
+
+    batchResults = [];
+
+    for (let g = 0; g < count; g++) {
+        document.getElementById('progress-fill').style.width = ((g / count) * 100) + '%';
+        batchProg.textContent = g + '/' + count + ' 半荘完了...';
+
+        try {
+            let resultJson = await pyodide.runPythonAsync(`
+import json
+from mahjong.game.hanchan import Hanchan
+from agents.shanten_agent import HiyokoAgent
+from agents.shanten_agent_v1 import ShantenAgentV1
+from agents.random_agent import RandomAgent
+
+agent_types = ${JSON.stringify(agentTypes)}
+agent_names_map = ${JSON.stringify(Object.fromEntries([['hiyoko','ひよこ'],['shanta','しゃんた'],['random','乱子']]))}
+from collections import Counter
+type_counts = Counter(agent_types)
+type_seen = {}
+agents = []
+for i, at in enumerate(agent_types):
+    base = agent_names_map.get(at, at)
+    if type_counts[at] > 1:
+        idx = type_seen.get(at, 0)
+        suffix = chr(65 + idx)
+        type_seen[at] = idx + 1
+        name = base + suffix
+    else:
+        name = base
+    if at == 'hiyoko':
+        agents.append(HiyokoAgent(name=name))
+    elif at == 'shanta':
+        agents.append(ShantenAgentV1(name=name))
+    elif at == 'random':
+        agents.append(RandomAgent(name=name))
+    else:
+        agents.append(HiyokoAgent(name=name))
+
+hanchan = Hanchan(agents, mode='${mode}')
+result = hanchan.run()
+result['agent_types'] = [at for at in agent_types]
+result['agent_versions'] = [a.model if hasattr(a, 'model') else '' for a in agents]
+json.dumps(result, ensure_ascii=False)
+`);
+            let data = JSON.parse(resultJson);
+            batchResults.push(data);
+
+            if (g === 0) simData = data;
+
+            data.agent_types = agentTypes.slice();
+            data.agent_versions = agentTypes.map(function(k) {
+                return AGENT_INFO[k] ? AGENT_INFO[k].model : '';
+            });
+            await saveSimulation(data).catch(function(e) { console.error('Save failed:', e); });
+
+        } catch (e) {
+            console.error('Batch game ' + (g+1) + ' error:', e);
+            batchProg.textContent = 'エラー (半荘' + (g+1) + '): ' + e.message;
+            break;
+        }
+    }
+
+    document.getElementById('progress-fill').style.width = '100%';
+    batchProg.textContent = count + '/' + count + ' 半荘完了！';
+
+    if (batchResults.length > 1) {
+        renderBatchResults(batchResults);
+    }
+
+    if (batchResults.length > 0) {
+        document.getElementById('mode-select').classList.add('show');
+    }
+
+    btnBatch.disabled = false;
+    btnRun.disabled = false;
+    setTimeout(function() { prog.style.display = 'none'; }, 500);
+}
+
 function showResult(data) {
+    document.getElementById("mode-select").classList.remove("show");
+    simData = data;
+    // agent_types と agent_versions を追加
+    let agentSels = document.querySelectorAll('.agent-select');
+    simData.agent_types = Array.from(agentSels).map(s => s.value);
+    simData.agent_versions = Array.from(agentSels).map(s => {
+        let key = s.value;
+        return AGENT_INFO[key] ? AGENT_INFO[key].model : '';
+    });
+    saveSimulation(simData).then(id => {
+        console.log('Saved simulation:', id);
+    }).catch(e => console.error('Save failed:', e));
     let panel = document.getElementById('result-panel');
     panel.classList.add('show');
 
@@ -286,10 +838,568 @@ function showResult(data) {
         tr.innerHTML = '<td>' + r.round_label + '</td><td>' +
             (typeMap[r.type]||r.type) + '</td><td>' + winner +
             '</td><td>' + pts + (yaku ? '<br><small style="color:#8a8">' +
-            yaku + '</small>' : '') + '</td>';
+            yaku + '</small>' : '') + '</td>' +
+            '<td><button class="btn-haipu" onclick="openHaipu(' + i + ')">牌譜</button></td>';
         rdt.appendChild(tr);
     }
 }
+
+// === 牌譜ビューア ===
+const TILE_NAMES_V = ['1m','2m','3m','4m','5m','6m','7m','8m','9m','1p','2p','3p','4p','5p','6p','7p','8p','9p','1s','2s','3s','4s','5s','6s','7s','8s','9s','東','南','西','北','白','發','中'];
+const TILE_SVGS = ['Man1','Man2','Man3','Man4','Man5','Man6','Man7','Man8','Man9','Pin1','Pin2','Pin3','Pin4','Pin5','Pin6','Pin7','Pin8','Pin9','Sou1','Sou2','Sou3','Sou4','Sou5','Sou6','Sou7','Sou8','Sou9','Ton','Nan','Shaa','Pei','Haku','Hatsu','Chun'];
+const TILES_DIR = 'tiles';
+const SEAT_NAMES_V = ['東家','南家','西家','北家'];
+
+let vStep = -1;
+let vAutoTimer = null;
+let vActions = [];
+let vInitialHands = [];
+let vResult = {};
+let vMetadata = {};
+let vShowingResult = false;
+let vResultPhase = 0; // 0=なし, 1=速報, 2=結果表示, 3=卓表示(結果済み)
+let vCurrentRoundIndex = -1;
+let vHands = [[],[],[],[]];
+let vRivers = [[],[],[],[]];
+let vMelds = [[],[],[],[]];
+let vLastDraw = [null,null,null,null];
+let vRiichiState = [false,false,false,false];
+
+function tileSvgUrl(id) { return TILES_DIR + '/' + TILE_SVGS[id] + '.svg'; }
+function tileImg(id, cls) { return '<img class="tile-img ' + cls + '" src="' + tileSvgUrl(id) + '" title="' + TILE_NAMES_V[id] + '">'; }
+function tileVert(id, cls) { return '<img class="tile-vert ' + cls + '" src="' + tileSvgUrl(id) + '" title="' + TILE_NAMES_V[id] + '">'; }
+function tileRiver(id, cls) { return '<img class="tile-river ' + cls + '" src="' + tileSvgUrl(id) + '" title="' + TILE_NAMES_V[id] + '">'; }
+function tileRiverVert(id, cls) { return '<img class="tile-river-vert ' + cls + '" src="' + tileSvgUrl(id) + '" title="' + TILE_NAMES_V[id] + '">'; }
+
+function vResetState() {
+    for (let s = 0; s < 4; s++) {
+        vHands[s] = vInitialHands[s].slice();
+        vRivers[s] = []; vMelds[s] = [];
+        vLastDraw[s] = null; vRiichiState[s] = false;
+    }
+}
+
+function vApplyActions(upTo) {
+    vResetState();
+    for (let i = 0; i <= upTo; i++) {
+        let a = vActions[i];
+        if (a.type === 'draw') { vHands[a.seat][a.tile]++; vLastDraw[a.seat] = a.tile; }
+        else if (a.type === 'riichi') { vRiichiState[a.seat] = true; }
+        else if (a.type === 'discard') {
+            vHands[a.seat][a.tile]--;
+            vRivers[a.seat].push({tile:a.tile,isLast:false,riichi:!!a.riichi});
+            if (vLastDraw[a.seat] === a.tile) vLastDraw[a.seat] = null;
+        } else if (a.type === 'meld') {
+            let mt = a.meld_type, tiles = a.tiles, taken = a.taken_tile;
+            if (mt === 'chi') { for (let t of tiles) { if (t !== taken) vHands[a.seat][t]--; } }
+            else if (mt === 'pon') { vHands[a.seat][taken] -= 2; }
+            else if (mt === 'daiminkan') { vHands[a.seat][taken] -= 3; }
+            else if (mt === 'ankan') { vHands[a.seat][taken] -= 4; }
+            else if (mt === 'kakan') {
+                vHands[a.seat][taken] -= 1;
+                for (let m of vMelds[a.seat]) { if (m.meld_type === 'pon' && m.tiles[0] === taken) { m.meld_type = 'kakan'; m.tiles.push(taken); } }
+            }
+            if (mt !== 'kakan') { vMelds[a.seat].push({meld_type:mt,tiles:tiles,from_seat:a.from_seat,taken_tile:taken}); }
+            if (a.from_seat !== null && a.from_seat !== undefined && mt !== 'ankan' && mt !== 'kakan') {
+                let fromRiver = vRivers[a.from_seat];
+                if (fromRiver.length > 0) fromRiver.pop();
+            }
+        }
+    }
+    for (let s = 0; s < 4; s++) { if (vRivers[s].length > 0) vRivers[s][vRivers[s].length-1].isLast = true; }
+}
+
+function vGetCurrentTurn() {
+    if (vStep < 0) return 0;
+    let draws = [0,0,0,0];
+    for (let i = 0; i <= vStep; i++) { if (vActions[i].type === 'draw') draws[vActions[i].seat]++; }
+    return Math.max(0, Math.max(...draws) - 1);
+}
+
+function vCountDraws() {
+    let c = 0;
+    for (let i = 0; i <= vStep; i++) { if (vActions[i].type === 'draw') c++; }
+    return c;
+}
+
+function vRenderHand(seat, isVertical) {
+    let drawTile = vLastDraw[seat];
+    let handCopy = vHands[seat].slice();
+    // ツモ牌を手牌から1枚除外
+    if (drawTile !== null && handCopy[drawTile] > 0) {
+        handCopy[drawTile]--;
+    }
+    let html = '';
+    let reversed = (seat === 1);
+    let start = reversed ? 33 : 0, end = reversed ? -1 : 34, st = reversed ? -1 : 1;
+    for (let t = start; t !== end; t += st) {
+        for (let c = 0; c < handCopy[t]; c++) {
+            html += isVertical ? tileVert(t, '') : tileImg(t, '');
+        }
+    }
+    // ツモ牌を隙間を空けて右端（縦なら下端）に表示
+    if (drawTile !== null) {
+        let gap = isVertical ? 'margin-top:6px;' : 'margin-left:8px;';
+        html += '<span style="' + gap + 'display:inline-block;">';
+        html += isVertical ? tileVert(drawTile, 'draw-highlight') : tileImg(drawTile, 'draw-highlight');
+        html += '</span>';
+    }
+    return html;
+}
+
+function vRenderRiver(seat, isVertical) {
+    let tiles = vRivers[seat], html = '';
+    for (let r = 0; r < tiles.length; r++) {
+        let cls = tiles[r].isLast ? 'discard-last' : '';
+        if (tiles[r].riichi) cls += ' riichi-tile';
+        html += isVertical ? tileRiverVert(tiles[r].tile, cls) : tileRiver(tiles[r].tile, cls);
+    }
+    return html;
+}
+
+function vRenderMelds(seat, isVertical) {
+    let seatMelds = vMelds[seat];
+    if (seatMelds.length === 0) return '';
+    let html = '', tCls = isVertical ? 'tile-meld-vert' : 'tile-meld';
+    function meldTile(tid, extra, lbl) {
+        return '<img class="' + tCls + ' ' + extra + '" src="' + tileSvgUrl(tid) + '" title="' + lbl + ' ' + TILE_NAMES_V[tid] + '">';
+    }
+    for (let m of seatMelds) {
+        html += '<span class="meld-group">';
+        let label = {chi:'チー',pon:'ポン',daiminkan:'明槓',ankan:'暗槓',kakan:'加槓'}[m.meld_type] || '';
+        if (m.meld_type === 'ankan') {
+            for (let i = 0; i < 4; i++) { let cls = (i===0||i===3)?'meld-facedown':''; html += meldTile(m.tiles[i],cls,label); }
+        } else {
+            let relPos = (m.from_seat - seat + 4) % 4;
+            let swPos = relPos === 3 ? 0 : relPos === 2 ? 1 : 2;
+            if (m.meld_type === 'chi') {
+                html += meldTile(m.taken_tile, 'tile-sideways', label);
+                let rest = m.tiles.filter(t => t !== m.taken_tile).sort((a,b) => a-b);
+                for (let j = 0; j < rest.length; j++) html += meldTile(rest[j], '', label);
+            } else if (m.meld_type === 'pon') {
+                for (let i = 0; i < 3; i++) { let cls = (i===swPos)?'tile-sideways':''; html += meldTile(m.tiles[i],cls,label); }
+            } else if (m.meld_type === 'daiminkan' || m.meld_type === 'kakan') {
+                for (let i = 0; i < 3; i++) {
+                    if (i === swPos) {
+                        html += '<span class="kakan-stack">' + meldTile(m.tiles[i],'tile-sideways',label) + meldTile(m.tiles[3],'tile-stacked',label) + '</span>';
+                    } else { html += meldTile(m.tiles[i],'',label); }
+                }
+            }
+        }
+        html += '</span>';
+    }
+    return html;
+}
+
+function vRender() {
+    if (vStep < 0) { vResetState(); } else { vApplyActions(vStep); }
+    let active = vStep >= 0 ? vActions[vStep].seat : -1;
+    let isEnd = (vStep >= vActions.length - 1) && vResult;
+    let winner = (vResult && (vResult.type === 'tsumo' || vResult.type === 'ron')) ? vResult.winner : -1;
+    let agents = vMetadata.agents || ['?','?','?','?'];
+
+    let positions = [
+        {seat:2,id:'v-hand-2',pos:'hand-top',vertical:false},
+        {seat:3,id:'v-hand-3',pos:'hand-left',vertical:true},
+        {seat:1,id:'v-hand-1',pos:'hand-right',vertical:true},
+        {seat:0,id:'v-hand-0',pos:'hand-bottom',vertical:false},
+    ];
+    for (let p of positions) {
+        let el = document.getElementById(p.id);
+        el.className = 'hand-area ' + p.pos;
+        if (isEnd && p.seat === winner) el.classList.add('winner');
+        else if (p.seat === active) el.classList.add('active');
+        let dealer = vMetadata.dealer || 0;
+        let seatWind = (p.seat - dealer + 4) % 4;
+        let windName = ['東','南','西','北'][seatWind];
+        let dealerMark = (p.seat === dealer) ? '<span class="dealer-mark">親</span>' : '';
+        // 起家マーク: seat 0（最初の親）の位置に場風を表示
+        let chichaWind = ['東','南','西','北'][vMetadata.round_wind || 0];
+        let chichaMark = (p.seat === 0) ? '<span class="chicha-mark" title="起家マーク">' + chichaWind + '</span>' : '';
+        let rMark = vRiichiState[p.seat] ? '<span class="riichi-mark">リーチ</span>' : '';
+        let pts = vMetadata.points ? vMetadata.points[p.seat] : '';
+        let ptsHtml = pts !== '' ? '<span class="pts">' + pts + '</span>' : '';
+        let label = '<div class="hand-label"><span>' + windName + dealerMark + chichaMark + rMark + '</span><span class="agent">' + agents[p.seat] + '</span>' + ptsHtml + '</div>';
+        let meldsHtml = vRenderMelds(p.seat, p.vertical);
+        let meldsDiv = meldsHtml ? '<div class="melds-area">' + meldsHtml + '</div>' : '';
+        let tiles = '<div class="hand-tiles"><div class="hand-pure">' + vRenderHand(p.seat, p.vertical) + '</div>' + meldsDiv + '</div>';
+        el.innerHTML = label + tiles;
+    }
+
+    let riverConfigs = [{seat:2,id:'v-river-2',vertical:false},{seat:3,id:'v-river-3',vertical:true},{seat:1,id:'v-river-1',vertical:true},{seat:0,id:'v-river-0',vertical:false}];
+    for (let rc of riverConfigs) { document.getElementById(rc.id).innerHTML = vRenderRiver(rc.seat, rc.vertical); }
+
+    let turn = vGetCurrentTurn();
+    let windNames = ['東','南','西','北'];
+    let rw = vMetadata.round_wind || 0, rn = (vMetadata.round_number || 0) + 1;
+    let honba = vMetadata.honba || 0, pool = vMetadata.riichi_pool || 0;
+    let roundLabel = windNames[rw] + rn + '局';
+    if (honba > 0) roundLabel += ' ' + honba + '本場';
+
+    let doraHtml = '', doraList = vMetadata.dora_indicators || [];
+    let kanCount = 0;
+    for (let i = 0; i <= vStep && i < vActions.length; i++) {
+        if (vActions[i].type === 'meld' && (vActions[i].meld_type === 'ankan' || vActions[i].meld_type === 'daiminkan' || vActions[i].meld_type === 'kakan')) kanCount++;
+    }
+    for (let d = 0; d < Math.min(doraList.length, 1+kanCount); d++) {
+        doraHtml += '<img class="tile-dora" src="' + tileSvgUrl(doraList[d]) + '" title="ドラ表示牌">';
+    }
+    for (let d = Math.min(doraList.length, 1+kanCount); d < 5; d++) {
+        doraHtml += '<span class="tile-dora tile-dora-hidden"></span>';
+    }
+
+    let sticksHtml = '';
+    if (honba > 0) sticksHtml += '<span class="stick-honba">🀄 ' + honba + '本場</span>';
+    if (pool > 0) sticksHtml += '<span class="stick-riichi">🔵 供託 ' + pool + '点</span>';
+    if (!sticksHtml) sticksHtml = '<span style="color:#555;">-</span>';
+
+    document.getElementById('v-center-info').innerHTML =
+        '<div class="center-round">' + roundLabel + '</div>' +
+        '<div class="center-dora"><span class="dora-label">ドラ</span>' + doraHtml + '</div>' +
+        '<div class="center-sticks">' + sticksHtml + '</div>' +
+        '<div class="center-stats"><span>巡目:' + turn + '</span><span>残:' + (122-vCountDraws()) + '</span></div>';
+
+    let info = '配牌';
+    if (vStep >= 0) {
+        let a = vActions[vStep];
+        if (a.type === 'riichi') info = SEAT_NAMES_V[a.seat] + ' リーチ!';
+        else if (a.type === 'meld') {
+            let mLabel = {chi:'チー',pon:'ポン',daiminkan:'明槓',ankan:'暗槓',kakan:'加槓'}[a.meld_type] || '';
+            info = SEAT_NAMES_V[a.seat] + ' ' + mLabel + '! ' + TILE_NAMES_V[a.taken_tile];
+        } else {
+            info = SEAT_NAMES_V[a.seat] + ' ' + (a.type === 'draw' ? 'ツモ ' : '打 ') + TILE_NAMES_V[a.tile];
+        }
+    }
+    document.getElementById('v-step-info').textContent = (vStep+1) + '/' + vActions.length + ' ' + info;
+
+    // リーチ棒表示（河の中央付近）
+    let riichiSticksHtml = '';
+    for (let s = 0; s < 4; s++) {
+        if (vRiichiState[s]) {
+            let pos = ['bottom','right','top','left'][s];
+            riichiSticksHtml += '<div class="riichi-stick riichi-stick-' + pos + '"></div>';
+        }
+    }
+    document.getElementById('v-center-info').innerHTML += riichiSticksHtml;
+
+    let banner = document.getElementById('v-result-banner');
+    if (isEnd && vResultPhase === 0 && !watchActive) {
+        vResultPhase = 1;
+    }
+    if (vResultPhase === 1) {
+        // 速報モーダル（半透明・コンパクト）
+        banner.className = 'result-banner quick-banner';
+        banner.style.display = 'block';
+        let agents = vMetadata.agents || ['?','?','?','?'];
+        let windNames2 = ['東','南','西','北'];
+        let wDealer = vMetadata.dealer || 0;
+        let qHtml = '';
+        if (vResult.type === 'tsumo' || vResult.type === 'ron') {
+            let wSeat = vResult.winner;
+            let wWind = windNames2[(wSeat - wDealer + 4) % 4];
+            let typeLabel = vResult.type === 'tsumo' ? 'ツモ!' : 'ロン!';
+            qHtml += '<div class="result-title" style="font-size:26px;">' + typeLabel + '</div>';
+            qHtml += '<div style="font-size:13px;color:#cfc;margin:4px 0;">' + wWind + '家 ' + agents[wSeat];
+            if (vResult.type === 'ron') {
+                let fWind = windNames2[(vResult.from_player - wDealer + 4) % 4];
+                qHtml += ' ← ' + fWind + '家';
+            }
+            qHtml += '</div>';
+            // 和了牌
+            qHtml += '<div style="margin:8px 0;"><img class="tile-img result-win-tile" src="' + tileSvgUrl(vResult.winning_tile) + '" style="height:48px !important;"></div>';
+            // 和了者の手牌（ツモ牌分離）
+            let handCopy = vHands[wSeat].slice();
+            if (vResult.type === 'tsumo' && handCopy[vResult.winning_tile] > 0) {
+                handCopy[vResult.winning_tile]--;
+            }
+            qHtml += '<div class="result-hand" style="padding:4px;">';
+            for (let t = 0; t < 34; t++) { for (let c = 0; c < handCopy[t]; c++) qHtml += '<img class="tile-result" src="' + tileSvgUrl(t) + '" style="height:30px;">'; }
+            // ツモ牌を分離表示
+            if (vResult.type === 'tsumo') {
+                qHtml += '<span style="margin-left:8px;"><img class="tile-result" src="' + tileSvgUrl(vResult.winning_tile) + '" style="height:30px;border:2px solid #fd6;box-shadow:0 0 6px rgba(255,220,100,0.6);"></span>';
+            }
+            // 副露
+            let wMelds = vMelds[wSeat];
+            if (wMelds.length > 0) {
+                qHtml += '<span style="margin-left:6px;border-left:2px solid #4a9;padding-left:6px;">';
+                for (let m of wMelds) { for (let mt of m.tiles) qHtml += '<img class="tile-result" src="' + tileSvgUrl(mt) + '" style="height:30px;">'; }
+                qHtml += '</span>';
+            }
+            qHtml += '</div>';
+        } else {
+            qHtml += '<div class="result-title" style="font-size:26px;">流局</div>';
+        }
+        qHtml += '<div style="margin-top:12px;"><button onclick="vShowResult()" style="background:#a64;border:2px solid #d96;color:#fff;padding:8px 28px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:bold;">結果表示 ▶</button></div>';
+        banner.innerHTML = qHtml;
+    } else if (vResultPhase === 3) {
+        // 卓表示中 → バナー非表示、コントロールにボタン追加
+        banner.style.display = 'none';
+    } else if (vResultPhase === 0) {
+        banner.style.display = 'none';
+    }
+
+    // コントロール追加ボタンの表示
+    let extraBtns = document.getElementById('v-extra-btns');
+    if (extraBtns) {
+        if (vResultPhase === 3) {
+            let nextDisabled = !simData || !simData.round_records || !simData.round_records[vCurrentRoundIndex + 1];
+            extraBtns.innerHTML = '<button onclick="vShowResult()" style="background:#a64;border:1px solid #d96;color:#fff;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;margin-left:8px;">結果表示</button>' +
+                '<button onclick="vNextRound()" style="background:#26a;border:1px solid #49d;color:#fff;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;margin-left:4px;"' + (nextDisabled ? ' disabled style="opacity:0.4;background:#26a;border:1px solid #49d;color:#fff;padding:4px 12px;border-radius:4px;font-size:12px;margin-left:4px;"' : '') + '>次の局 ▶</button>';
+            extraBtns.style.display = 'inline';
+        } else {
+            extraBtns.style.display = 'none';
+        }
+    }
+
+    var _bp = document.getElementById('v-btn-prev');
+    var _bs = document.getElementById('v-btn-start');
+    var _bn = document.getElementById('v-btn-next');
+    var _be = document.getElementById('v-btn-end');
+    if (_bp) _bp.disabled = (vStep < 0);
+    if (_bs) _bs.disabled = (vStep < 0);
+    if (_bn) _bn.disabled = (vStep >= vActions.length - 1);
+    if (_be) _be.disabled = (vStep >= vActions.length - 1);
+}
+
+function vGoNext() { if (vStep < vActions.length - 1) { vResultPhase = 0; vShowingResult = false; vStep++; vRender(); } }
+function vGoPrev() { if (vStep >= 0) { vResultPhase = 0; vShowingResult = false; vStep--; vRender(); } }
+function vGoStart() { vResultPhase = 0; vShowingResult = false; vStep = -1; vRender(); }
+function vGoEnd() { vResultPhase = 0; vShowingResult = false; vStep = vActions.length - 1; vRender(); }
+
+function vShowResult() {
+    vShowingResult = true;
+    let banner = document.getElementById('v-result-banner');
+    let agents = vMetadata.agents || ['?','?','?','?'];
+    let windNames = ['東','南','西','北'];
+    let honba = vMetadata.honba || 0;
+    let bHtml = '';
+
+    if (vResult.type === 'tsumo' || vResult.type === 'ron') {
+        let wSeat = vResult.winner, wDealer = vMetadata.dealer || 0;
+        let wWind = windNames[(wSeat - wDealer + 4) % 4];
+        let typeLabel = vResult.type === 'tsumo' ? 'ツモ和了' : 'ロン和了';
+        bHtml += '<div class="result-title">' + typeLabel + '!</div>';
+        bHtml += '<div class="result-winner">' + wWind + '家 ' + agents[wSeat];
+        if (vResult.type === 'ron') {
+            let fWind = windNames[(vResult.from_player - wDealer + 4) % 4];
+            bHtml += ' ← ' + fWind + '家放銃';
+        }
+        bHtml += '</div>';
+        bHtml += '<div class="result-tile"><span>和了牌</span><img class="tile-img result-win-tile" src="' + tileSvgUrl(vResult.winning_tile) + '"></div>';
+
+        // 和了者の手牌（ツモ牌を分離表示）
+        let rHandCopy = vHands[wSeat].slice();
+        if (vResult.type === 'tsumo' && rHandCopy[vResult.winning_tile] > 0) {
+            rHandCopy[vResult.winning_tile]--;
+        }
+        bHtml += '<div class="result-hand">';
+        for (let t = 0; t < 34; t++) { for (let c = 0; c < rHandCopy[t]; c++) bHtml += '<img class="tile-result" src="' + tileSvgUrl(t) + '">'; }
+        // ツモ牌/ロン牌を分離
+        bHtml += '<span style="margin-left:8px;"><img class="tile-result" src="' + tileSvgUrl(vResult.winning_tile) + '" style="border:2px solid #fd6;box-shadow:0 0 6px rgba(255,220,100,0.6);"></span>';
+        // 副露も表示
+        let wMelds = vMelds[wSeat];
+        if (wMelds.length > 0) {
+            bHtml += '<span style="margin-left:8px;border-left:2px solid #4a9;padding-left:8px;">';
+            for (let m of wMelds) { for (let mt of m.tiles) bHtml += '<img class="tile-result" src="' + tileSvgUrl(mt) + '">'; }
+            bHtml += '</span>';
+        }
+        bHtml += '</div>';
+
+        let sc = vResult.score;
+        if (sc) {
+            bHtml += '<div class="result-yaku">';
+            for (let y of sc.yaku) bHtml += '<span class="yaku-item">' + y[0] + '<em>' + y[1] + '翻</em></span>';
+            bHtml += '</div>';
+            let pay = sc.payments;
+            let actualTotal = pay.total;
+            let payDetail = '';
+            if (vResult.type === 'tsumo') {
+                let hpb = honba * 100;
+                let eNd = pay.from_each_non_dealer + hpb;
+                let fD = pay.from_dealer > 0 ? pay.from_dealer + hpb : 0;
+                if (pay.from_dealer > 0) {
+                    actualTotal = eNd * 2 + fD;
+                    payDetail = '子' + eNd + '点/親' + fD + '点';
+                } else {
+                    actualTotal = eNd * 3;
+                    payDetail = eNd + '点オール';
+                }
+            } else {
+                let hr = honba * 300;
+                actualTotal = pay.from_discarder + hr;
+                payDetail = actualTotal + '点';
+            }
+            let rk = '';
+            if (sc.han >= 13) rk = '役満 ';
+            else if (sc.han >= 11) rk = '三倍満 ';
+            else if (sc.han >= 8) rk = '倍満 ';
+            else if (sc.han >= 6) rk = '跳満 ';
+            else if (sc.han >= 5) rk = '満貫 ';
+            bHtml += '<div class="result-score">' + rk + sc.han + '翻 ' + sc.fu + '符 ' + actualTotal + '点</div>';
+            bHtml += '<div class="result-payment">' + payDetail + (honba > 0 ? ' (本場' + honba + ')' : '') + '</div>';
+        }
+
+        // ドラ表示牌（＋裏ドラ）
+        let doraList = vMetadata.dora_indicators || [];
+        let uraDoraList = (sc && sc.ura_dora_indicators) ? sc.ura_dora_indicators : [];
+        if (doraList.length > 0 || uraDoraList.length > 0) {
+            bHtml += '<div style="margin-top:12px;display:flex;justify-content:center;gap:16px;align-items:center;">';
+            bHtml += '<div><div style="font-size:10px;color:#aaa;margin-bottom:2px;">ドラ表示</div><div style="display:flex;gap:2px;">';
+            for (let d of doraList) bHtml += '<img class="tile-result" src="' + tileSvgUrl(d) + '">';
+            bHtml += '</div></div>';
+            if (uraDoraList.length > 0) {
+                bHtml += '<div><div style="font-size:10px;color:#aaa;margin-bottom:2px;">裏ドラ表示</div><div style="display:flex;gap:2px;">';
+                for (let u of uraDoraList) bHtml += '<img class="tile-result" src="' + tileSvgUrl(u) + '">';
+                bHtml += '</div></div>';
+            }
+            bHtml += '</div>';
+        }
+    } else {
+        bHtml += '<div class="result-title">流局</div><div class="result-score">' + vResult.turn + '巡目</div>';
+        // テンパイ/ノーテン表示
+        if (vResult.tenpai) {
+            let tenpaiNames = [], notenNames = [];
+            for (let s = 0; s < 4; s++) {
+                if (vResult.tenpai[s]) tenpaiNames.push(windNames[s] + '家');
+                else notenNames.push(windNames[s] + '家');
+            }
+            if (tenpaiNames.length > 0 && tenpaiNames.length < 4) {
+                bHtml += '<div style="margin-top:8px;font-size:14px;"><span style="color:#4f4;">テンパイ: ' + tenpaiNames.join(', ') + '</span>';
+                bHtml += ' / <span style="color:#f66;">ノーテン: ' + notenNames.join(', ') + '</span></div>';
+                bHtml += '<div style="font-size:12px;color:#aaa;margin-top:4px;">ノーテン罰符: 場に3,000点</div>';
+            } else if (tenpaiNames.length === 0) {
+                bHtml += '<div style="margin-top:8px;font-size:14px;color:#888;">全員ノーテン</div>';
+            } else {
+                bHtml += '<div style="margin-top:8px;font-size:14px;color:#8c8;">全員テンパイ</div>';
+            }
+        }
+    }
+
+    // 点数移動・持ち点一覧
+    if (vResult.point_changes && vResult.points_after) {
+        bHtml += '<table style="width:auto;margin:16px auto 0;border-collapse:collapse;">';
+        bHtml += '<tr><th style="padding:6px 14px;border:1px solid #3a6;background:#1a3a2a;">席</th><th style="padding:6px 14px;border:1px solid #3a6;background:#1a3a2a;">増減</th><th style="padding:6px 14px;border:1px solid #3a6;background:#1a3a2a;">持ち点</th></tr>';
+        for (let s = 0; s < 4; s++) {
+            let change = vResult.point_changes[s];
+            let changeStr = change > 0 ? '<span style="color:#4f4">+' + change + '</span>' :
+                            change < 0 ? '<span style="color:#f44">' + change + '</span>' :
+                            '<span style="color:#888">±0</span>';
+            bHtml += '<tr><td style="padding:6px 14px;border:1px solid #3a6;">' + windNames[s] + '家 ' + agents[s] + '</td>' +
+                '<td style="padding:6px 14px;border:1px solid #3a6;text-align:right;font-size:15px;">' + changeStr + '</td>' +
+                '<td style="padding:6px 14px;border:1px solid #3a6;text-align:right;color:#ff8;font-weight:bold;font-size:15px;">' + vResult.points_after[s] + '点</td></tr>';
+        }
+        bHtml += '</table>';
+    }
+
+    // ボタン: 卓を表示 + 次の局へ
+    let nextDisabled2 = !simData || !simData.round_records || !simData.round_records[vCurrentRoundIndex + 1];
+    bHtml += '<div style="margin-top:20px;display:flex;gap:12px;justify-content:center;">';
+    bHtml += '<button onclick="vBackToTable()" style="background:#555;border:1px solid #888;color:#fff;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;">卓を表示</button>';
+    bHtml += '<button onclick="vNextRound()" style="background:#26a;border:1px solid #49d;color:#fff;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;"' + (nextDisabled2 ? ' disabled style="opacity:0.4;background:#26a;border:1px solid #49d;color:#fff;padding:8px 20px;border-radius:6px;font-size:14px;"' : '') + '>次の局 ▶</button>';
+    bHtml += '</div>';
+    banner.className = 'result-banner';
+    banner.innerHTML = bHtml;
+    banner.style.display = 'block';
+}
+
+function vBackToTable() {
+    vResultPhase = 3;
+    vShowingResult = false;
+    document.getElementById('v-result-banner').style.display = 'none';
+    vRender();
+}
+
+function vNextRound() {
+    if (simData && simData.round_records && simData.round_records[vCurrentRoundIndex + 1]) {
+        if (watchActive) {
+            watchLoadRound(vCurrentRoundIndex + 1);
+        } else {
+            openHaipu(vCurrentRoundIndex + 1);
+        }
+    }
+}
+function vToggleAuto() {
+    if (vAutoTimer) {
+        clearInterval(vAutoTimer); vAutoTimer = null;
+        document.getElementById('v-btn-auto').textContent = '自動再生';
+    } else {
+        vAutoTimer = setInterval(() => {
+            if (vStep >= vActions.length - 1) { clearInterval(vAutoTimer); vAutoTimer = null; document.getElementById('v-btn-auto').textContent = '自動再生'; return; }
+            vGoNext();
+        }, 100);
+        document.getElementById('v-btn-auto').textContent = '停止';
+    }
+}
+
+function openHaipu(roundIndex) {
+    console.log('openHaipu called:', roundIndex, 'simData:', simData);
+    console.log('round_records:', simData ? simData.round_records : 'no simData');
+    if (!simData || !simData.round_records || !simData.round_records[roundIndex]) {
+        console.error('牌譜データがありません。ページをリロードして再実行してください。');
+        alert('牌譜データがありません。ページをリロードしてシミュレーションを再実行してください。');
+        return;
+    }
+    let rec = simData.round_records[roundIndex];
+    vActions = rec.actions;
+    vInitialHands = rec.initial_hands;
+    vResult = rec.result;
+    vMetadata = rec.metadata;
+    vStep = -1;
+    vShowingResult = false;
+    vResultPhase = 0;
+    vCurrentRoundIndex = roundIndex;
+    if (vAutoTimer) { clearInterval(vAutoTimer); vAutoTimer = null; }
+
+    let agents = vMetadata.agents || ['?','?','?','?'];
+    document.getElementById('haipu-body').innerHTML =
+        '<div class="meta" id="v-meta">' + agents.join(' vs ') + '</div>' +
+        '<div class="controls">' +
+        '<button id="v-btn-start" onclick="vGoStart()">|&lt;</button>' +
+        '<button id="v-btn-prev" onclick="vGoPrev()">&lt; 戻る</button>' +
+        '<span class="step-info" id="v-step-info">配牌</span>' +
+        '<button id="v-btn-next" onclick="vGoNext()">進む &gt;</button>' +
+        '<button id="v-btn-end" onclick="vGoEnd()">&gt;|</button>' +
+        '<button id="v-btn-auto" onclick="vToggleAuto()">自動再生</button>' +
+        '<span id="v-extra-btns" style="display:none;"></span>' +
+        '</div>' +
+        '<div class="mahjong-table">' +
+        '<div class="hand-area hand-top" id="v-hand-2"></div>' +
+        '<div class="middle-row">' +
+        '<div class="hand-area hand-left" id="v-hand-3"></div>' +
+        '<div class="river-table">' +
+        '<div class="river-area river-top" id="v-river-2"></div>' +
+        '<div class="river-middle">' +
+        '<div class="river-area river-left" id="v-river-3"></div>' +
+        '<div class="center-info" id="v-center-info"></div>' +
+        '<div class="river-area river-right" id="v-river-1"></div>' +
+        '</div>' +
+        '<div class="river-area river-bottom" id="v-river-0"></div>' +
+        '</div>' +
+        '<div class="hand-area hand-right" id="v-hand-1"></div>' +
+        '</div>' +
+        '<div class="hand-area hand-bottom" id="v-hand-0"></div>' +
+        '</div>' +
+        '<div class="result-banner" id="v-result-banner"></div>';
+
+    document.getElementById('haipu-modal').classList.add('show');
+    vRender();
+}
+
+function closeHaipu() {
+    if (vAutoTimer) { clearInterval(vAutoTimer); vAutoTimer = null; }
+    document.getElementById('haipu-modal').classList.remove('show');
+}
+
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('haipu-modal').classList.contains('show')) return;
+    if (e.key === 'ArrowRight') vGoNext();
+    else if (e.key === 'ArrowLeft') vGoPrev();
+    else if (e.key === 'Home') vGoStart();
+    else if (e.key === 'End') vGoEnd();
+    else if (e.key === ' ') { e.preventDefault(); vToggleAuto(); }
+    else if (e.key === 'Escape') closeHaipu();
+});
 </script>
+<script src="js/watch.js"></script>
 </body>
 </html>
